@@ -87,7 +87,7 @@ class ApplicationRouting
 	 * Lighttp does not fill up the QUERY_STRING var when using rewrites or the error handler.
 	 * This function fakes the QUERY_STRING.
 	 *
-	 * PHP uses QUERY_STRING to fill up the GET array. Without this fix GET would be empty
+	 * PHP uses QUERY_STRING to fill up the GET array. Without this fix, GET would be empty
 	 */
 	public static function spoofQueryString()
 	{
