@@ -21,7 +21,8 @@ class FrontendCurrencyConverterIndex extends FrontendBaseBlock
 
             $this->loadTemplate();
             $this->getData();
-            //$this->parse();
+            $this->validateForm();
+            $this->parse();
     }
     
     private function getData()
@@ -33,10 +34,9 @@ class FrontendCurrencyConverterIndex extends FrontendBaseBlock
         
         // create & add elements
         $this->frm->addText('amount');
-        $this->frm->addDropdown('currency', $dropdownArray);
+        $this->frm->addDropdown('currencyTarget', $dropdownArray);
         
-        // parse form
-        $this->frm->parse($this->tpl);
+        
         
     }
     
@@ -52,6 +52,42 @@ class FrontendCurrencyConverterIndex extends FrontendBaseBlock
         return $array;
     }
     
+    
+    /**
+     * Validate the form.
+     */
+    private function validateForm()
+    {
+        // submitted
+        if($this->frm->isSubmitted())
+        {
+            // amount is required
+            $this->frm->getField('amount')->isFilled('Please fill in the amount');
+            
+            if($this->frm->isCorrect())
+            {
+                // all the information that was submitted
+                $data = $this->frm->getValues();
+
+                $amount = $data['amount'];
+                $rate = $data['currencyTarget'];
+                
+                $converted = $amount * $rate;
+                
+                $this->tpl->assign('convertIsSuccess', true);
+                $this->tpl->assign('convertSucces', $converted);
+            }
+        }
+        
+        
+    }
+    
+    private function parse()
+    {
+        // parse form
+        $this->frm->parse($this->tpl);
+    }
+
 
 	
 }
