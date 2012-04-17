@@ -5,14 +5,19 @@
 			{option:convertIsSuccess}<div class="message success"><p>{$msgConvertSuccess}</p></div>{/option:convertIsSuccess}
 
 				{form:convert}
-					<p{option:txtEmailError} class="errorArea"{/option:txtEmailError}>
-						<label for="email">{$lblEmail|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
-						{$txtEmail} {$txtEmailError}
+					<p{option:txtAmountError} class="errorArea"{/option:txtAmountError}>
+						<label for="amount">{$lblAmount|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
+						{$txtAmount} {$txtAmountError}
 					</p>
+                                        <p {option:txtCurrencyError} class="errorArea"{/option:txtCurrencyError}>
+                                                <label for="currency">{$lblCurrency|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
+						{$ddlCurrency} {$ddlCurrencyError}
+                                        </p>
 					<p>
-						<input id="send" class="inputSubmit" type="submit" name="send" value="{$lblSend|ucfirst}" />
+						<input id="convertBtn" class="convertSubmit" type="submit" name="convertBtn" value="{$lblConvert|ucfirst}" />
 					</p>
 				{/form:convert}
 		</div>
+                <div class="test">Frederick Roegiers</div>
 	</div>
 </section>

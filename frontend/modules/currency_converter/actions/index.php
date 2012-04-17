@@ -6,6 +6,21 @@
  */
 class FrontendCurrencyConverterIndex extends FrontendBaseBlock
 {
+    public function execute()
+    {
+            parent::execute();
 
+            $this->loadTemplate();
+            
+            $this->getData();
+    }
+    
+    private function getData()
+    {
+        $data = $this->record = FrontendCurrencyConverterModel::getCurrencies();
+
+        //var_dump($data);
+        
+    }
 	
 }

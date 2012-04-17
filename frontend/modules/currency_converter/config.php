@@ -12,7 +12,7 @@ final class FrontendCurrencyConverterConfig extends FrontendBaseConfig
 	 *
 	 * @var	string
 	 */
-	protected $defaultAction = array();
+	protected $defaultAction = 'index';
 
 	/**
 	 * The disabled actions

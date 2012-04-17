@@ -1,9 +1,10 @@
 <?php
 
 /**
- * 
+ * In this file we store all generic functions that we will be using in the form_builder module
  *
- * @author Frederick Roegiers
+ * @author Dieter Vanden Eynde <dieter.vandeneynde@netlash.com>
+ * @author Tijs Verkoyen <tijs@sumocoders.be>
  */
 class FrontendCurrencyConverterModel
 {
@@ -14,16 +15,10 @@ class FrontendCurrencyConverterModel
 	 */
 	public static function getCurrencies()
 	{
-            // get db
-            $db = FrontendModel::getDB();
-            
-            $currencies = (array) $db->getRecords(
-                    'SELECT *
-                     FROM currency_converter_rates');
 
-            return $currencies;
+
+		//return $currencies;
 	}
-        
         
     /**
 	 * Get the rate of the currency
