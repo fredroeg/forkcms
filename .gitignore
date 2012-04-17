@@ -4,3 +4,7 @@
 .settings
 .*.swp
 backend/cache/navigation/
+nbproject
+nbproject/private/private.properties
+nbproject/project.properties
+nbproject/project.xml/
