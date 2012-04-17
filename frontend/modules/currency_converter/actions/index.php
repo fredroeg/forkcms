@@ -6,6 +6,8 @@
  */
 class FrontendCurrencyConverterIndex extends FrontendBaseBlock
 {
+    protected $currencies = array();
+    
     public function execute()
     {
             parent::execute();
@@ -17,9 +19,9 @@ class FrontendCurrencyConverterIndex extends FrontendBaseBlock
     
     private function getData()
     {
-        $data = $this->record = FrontendCurrencyConverterModel::getCurrencies();
+        $this->currencies = $this->record = FrontendCurrencyConverterModel::getCurrencies();
 
-        //var_dump($data);
+        Spoon::dump($this->currencies);
         
     }
 	
