@@ -6,6 +6,13 @@
  */
 class FrontendCurrencyConverterIndex extends FrontendBaseBlock
 {
+    /**
+     * FrontendForm instance
+     *
+     * @var	FrontendForm
+     */
+    private $frm;
+        
     protected $currencies = array();
     
     public function execute()
@@ -13,16 +20,38 @@ class FrontendCurrencyConverterIndex extends FrontendBaseBlock
             parent::execute();
 
             $this->loadTemplate();
-            
             $this->getData();
+            //$this->parse();
     }
     
     private function getData()
     {
-        $this->currencies = $this->record = FrontendCurrencyConverterModel::getCurrencies();
+        $dropdownArray = $this->recordsToArray();
 
-        Spoon::dump($this->currencies);
+        // create form
+        $this->frm = new FrontendForm('index', null, null, 'indexForm');
+        
+        // create & add elements
+        $this->frm->addText('amount');
+        $this->frm->addDropdown('currency', $dropdownArray);
+        
+        // parse form
+        $this->frm->parse($this->tpl);
         
     }
+    
+    private function recordsToArray()
+    {
+        $this->currencies = FrontendCurrencyConverterModel::getCurrencies();
+        $array = array();
+        foreach ($this->currencies as $currency)
+        {
+            
+            $array[$currency['rate']] = $currency['currency'];
+        }
+        return $array;
+    }
+    
+
 	
 }
