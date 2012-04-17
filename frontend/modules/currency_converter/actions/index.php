@@ -62,7 +62,11 @@ class FrontendCurrencyConverterIndex extends FrontendBaseBlock
         if($this->frm->isSubmitted())
         {
             // amount is required
-            $this->frm->getField('amount')->isFilled('Please fill in the amount');
+            if($this->frm->getField('amount')->isFilled('Please fill in the amount'))
+            {
+                $this->frm->getField('amount')->isFloat('Only decimal values please!');
+            }
+            
             
             if($this->frm->isCorrect())
             {
