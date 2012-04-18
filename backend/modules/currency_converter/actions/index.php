@@ -14,16 +14,26 @@ class BackendCurrencyConverterIndex extends BackendBaseActionIndex
 	 */
 	public function execute()
 	{
-		// call parent, this will probably add some general CSS/JS or other required files
 		parent::execute();
-                
-                // parse page
+                $this->loadDataGrid();
 		$this->parse();
-                
-                // display the page
 		$this->display();
 
 	}
 
-	
+	private function loadDataGrid()
+	{
+		$this->dataGrid = new BackendDataGridDB(BackendCurrencyConverterModel::QRY_BROWSE, BL::getWorkingLanguage());
+		//$this->dataGrid->setHeaderLabels(array('currency' => SpoonFilter::ucfirst(BL::getLabel('Currency')), 'rate' => SpoonFilter::ucfirst(BL::getLabel('Rate'))));
+		$this->dataGrid->setSortingColumns(array('currency', 'rate', 'last_changed'), 'currency');
+
+	}
+
+        protected function parse()
+        {
+            // add datagrid
+		$this->tpl->assign('dataGrid', ($this->dataGrid->getNumResults() != 0) ? $this->dataGrid->getContent() : false);
+        }
+
+
 }
