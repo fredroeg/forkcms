@@ -1,7 +1,8 @@
+<h3>{$lblCurrencyConvert|ucfirst}</h3>
 <section id="currencyConvert" class="mod">
 	<div class="inner">
 		<div class="bd">
-                    {form:index}
+                    {form:convert}
                             <p{option:txtAmountError} class="errorArea"{/option:txtAmountError}>
                                     <label for="amount">{$lblAmount|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
                                     {$txtAmount} {$txtAmountError}
@@ -17,8 +18,8 @@
                             <p>
                                     <input id="convertBtn" class="convertSubmit" type="submit" name="convertBtn" value="{$lblConvert|ucfirst}" />
                             </p>
-                    {/form:index}
-                    {option:convertIsSuccess}<div class="message success"><p>{$convertSucces}</p></div>{/option:convertIsSuccess}
+                    {/form:convert}
+                    {option:convertWidgetIsSuccess}<div class="message success"><p>{$convertWidgetSucces}</p></div>{/option:convertWidgetIsSuccess}
 		</div>
 	</div>
 </section>
