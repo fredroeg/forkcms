@@ -88,6 +88,9 @@ class FrontendCurrencyConverterIndex extends FrontendBaseBlock
     {
         // get the submitted values
         $amount = $_POST['amount'];
+        $curSource = $_POST['currencySource'];
+        $curTarget = $_POST['currencyTarget'];
+
         $rateSource = FrontendCurrencyConverterModel::getRateByCurrency($_POST['currencySource']);
         $rateTarget = FrontendCurrencyConverterModel::getRateByCurrency($_POST['currencyTarget']);
 
@@ -97,8 +100,11 @@ class FrontendCurrencyConverterIndex extends FrontendBaseBlock
         // calculate the exchange rate
         $converted = $amount * $exchange;
 
+        // make a succes message
+        $succesmessage = $amount . " " . $curSource . " = " . $converted . " " . $curTarget;
+        
         // assign the message to the template
         $this->tpl->assign('convertIsSuccess', true);
-        $this->tpl->assign('convertSucces', $converted);
+        $this->tpl->assign('convertSucces', $succesmessage);
     }
 }
