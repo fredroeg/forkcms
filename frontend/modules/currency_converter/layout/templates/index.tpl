@@ -3,8 +3,12 @@
 		<div class="bd">
                     {form:index}
                             <p{option:txtAmountError} class="errorArea"{/option:txtAmountError}>
-                                    <label for="amount">{$lblAmount|ucfirst} (&euro;)<abbr title="{$lblRequiredField}">*</abbr></label>
+                                    <label for="amount">{$lblAmount|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
                                     {$txtAmount} {$txtAmountError}
+                            </p>
+                            <p {option:txtCurrencySourceError} class="errorArea"{/option:txtCurrencySourceError}>
+                                    <label for="currencySource">{$lblCurrencySource|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
+                                    {$ddmCurrencySource} {$ddmCurrencySourceError}
                             </p>
                             <p {option:txtCurrencyError} class="errorArea"{/option:txtCurrencyError}>
                                     <label for="currencyTarget">{$lblCurrencyTarget|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>

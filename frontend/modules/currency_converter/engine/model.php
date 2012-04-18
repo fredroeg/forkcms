@@ -34,12 +34,10 @@ class FrontendCurrencyConverterModel
      *
      * @return string
      */
-    public static function getRateByCurrency()
+    public static function getRateByCurrency($currency)
     {
         // get db
         $db = FrontendModel::getDB();
-
-        $currency = $_POST['currencyTarget'];
 
         $rate = $db->getRecord(
                 "SELECT rate

@@ -37,7 +37,7 @@ class FrontendCurrencyConverterIndex extends FrontendBaseBlock
         // parse
         $this->parse();
     }
-    
+
     /**
      * Parse the data into the template
      */
@@ -54,6 +54,7 @@ class FrontendCurrencyConverterIndex extends FrontendBaseBlock
     {
         $this->frm = new FrontendForm('index', null, null, 'indexForm');
         $this->frm->addText('amount');
+        $this->frm->addDropdown('currencySource', FrontendCurrencyConverterModel::getCurrencies());
         $this->frm->addDropdown('currencyTarget', FrontendCurrencyConverterModel::getCurrencies());
     }
 
@@ -85,12 +86,16 @@ class FrontendCurrencyConverterIndex extends FrontendBaseBlock
      */
     private function calculate()
     {
-        // get the submitted information
+        // get the submitted values
         $amount = $_POST['amount'];
-        $rate = FrontendCurrencyConverterModel::getRateByCurrency();
+        $rateSource = FrontendCurrencyConverterModel::getRateByCurrency($_POST['currencySource']);
+        $rateTarget = FrontendCurrencyConverterModel::getRateByCurrency($_POST['currencyTarget']);
+
+        // calculate the exchange
+        $exchange = $rateTarget / $rateSource;
 
         // calculate the exchange rate
-        $converted = $amount * $rate;
+        $converted = $amount * $exchange;
 
         // assign the message to the template
         $this->tpl->assign('convertIsSuccess', true);
