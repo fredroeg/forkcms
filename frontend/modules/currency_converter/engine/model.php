@@ -24,15 +24,12 @@ class FrontendCurrencyConverterModel
 
         $db = FrontendModel::getDB();
 
-        $currencies = (array) $db->getRecords(
-                'SELECT currency
+        $currencies = (array) $db->getPairs(
+                'SELECT currency, currency AS coerency
                  FROM ' . self::DB_EXCHANGERATES_TABLE);
 
-        foreach($currencies as $currency)
-        {
-            $currencyArray[$currency['currency']] = $currency['currency'];
-        }
-        return $currencyArray;
+
+        return $currencies;
     }
 
     /**
