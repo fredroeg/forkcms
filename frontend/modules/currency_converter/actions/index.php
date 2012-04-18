@@ -7,49 +7,122 @@
 class FrontendCurrencyConverterIndex extends FrontendBaseBlock
 {
     /**
-     * FrontendForm instance
+     * Name of the cachefile
+     *
+     * @var	string
+     */
+    private $cacheFile;
+    
+    /**
+     * Name of the sourcefile
+     *
+     * @var	string
+     */
+    private $sourceFile;
+    
+    /**
      *
      * @var	FrontendForm
      */
     private $frm;
-        
+    
+    /**
+     *
+     * @var string
+     */
+    private $term = 'currencyCache';
+    
+    /**
+     *
+     * @var array
+     */    
     protected $currencies = array();
+    
+    
     
     public function execute()
     {
             parent::execute();
 
             $this->loadTemplate();
-            $this->getData();
+            $this->createForm();
             $this->validateForm();
-            $this->parse();
+            $this->display();
     }
     
+    private function display()
+    {
+        $this->cacheFile = FRONTEND_CACHE_PATH . '/' . $this->getModule() . '/' . md5($this->term) . '.php';
+        $this->sourceFile = FRONTEND_MODULES_PATH . '/' . $this->getModule() . '/sourcefile/source.php';
+
+        // load the cached data
+        $this->runCachedData();
+
+        // parse
+        $this->parse();
+    }
+    
+    
+    /**
+     * Check if cached data exists, and run the cached data
+     */
+    private function runCachedData()
+    {
+        // Open the file to get existing content
+        $sourceFile = file_get_contents($this->sourceFile);
+            
+        // check if cachefile exists
+        if(!SpoonFile::exists($this->cacheFile))
+        {
+            // set cache content
+            SpoonFile::setContent($this->cacheFile, $sourceFile);
+        }
+        
+        // get cachefile modification time
+        $cacheInfo = @filemtime($this->cacheFile);
+
+        // check if cache file is recent enough (1 day)
+        if($cacheInfo < strtotime('-1 day'))
+        {
+            // change modification date in current date
+            touch($this->cacheFile);
+            
+            // include cache file
+            require_once $this->cacheFile;
+            
+            // error handling
+            if(isset ($xmlError))
+            {
+                $this->handleXmlLoadError($xmlError);
+            }
+        }
+    }
+    
+    /*
+     *  Create the form and append the input box and dropdownlist
+     */
+    private function createForm()
+    {
+        $this->frm = new FrontendForm('index', null, null, 'indexForm');
+        $this->frm->addText('amount');
+        $this->frm->addDropdown('currencyTarget', $this->getData());
+    }
+    
+    
+    /**
+     * Get the data from the model, and put it in an array
+     * 
+     * @return Array 
+     */
     private function getData()
     {
-        $dropdownArray = $this->recordsToArray();
-
-        // create form
-        $this->frm = new FrontendForm('index', null, null, 'indexForm');
-        
-        // create & add elements
-        $this->frm->addText('amount');
-        $this->frm->addDropdown('currencyTarget', $dropdownArray);
-        
-        
-        
-    }
-    
-    private function recordsToArray()
-    {
         $this->currencies = FrontendCurrencyConverterModel::getCurrencies();
-        $array = array();
+        $currencyArray = array();
         foreach ($this->currencies as $currency)
         {
-            
-            $array[$currency['rate']] = $currency['currency'];
+            $currencyArray[$currency['rate']] = $currency['currency'];
         }
-        return $array;
+        return $currencyArray;
     }
     
     
@@ -82,14 +155,27 @@ class FrontendCurrencyConverterIndex extends FrontendBaseBlock
                 $this->tpl->assign('convertSucces', $converted);
             }
         }
-        
-        
     }
     
+    /**
+     * Parse the data into the template
+     */
     private function parse()
     {
         // parse form
         $this->frm->parse($this->tpl);
+    }
+    
+    
+    /**
+     * function to handle an error message in case of xml-read error
+     * 
+     * @param type $errorMessage 
+     */
+    private function handleXmlLoadError($errorMessage)
+    {
+        $this->tpl->assign('xmlErrorOption', true);
+        $this->tpl->assign('xmlError', $errorMessage);
     }
 
 

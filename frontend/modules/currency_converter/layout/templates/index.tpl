@@ -15,6 +15,7 @@
                             </p>
                     {/form:index}
                     {option:convertIsSuccess}<div class="message success"><p>{$convertSucces}</p></div>{/option:convertIsSuccess}
+                    {option:xmlErrorOption}<div class="message error"><p>{$xmlError}</p></div>{/option:xmlErrorOption}
 		</div>
 	</div>
 </section>
