@@ -7,6 +7,10 @@
  */
 class FrontendCurrencyConverterModel
 {
+    //CONSTANTS
+    const CURRENCY_XML_URL = "http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml";
+    const DB_EXCHANGERATES_TABLE = "currency_converter_exchangerates";
+    const DB_UPDATE_TABLE = "currency_converter_update";
 
     /**
      * Get all currencies for the dropdownlist.
@@ -15,14 +19,16 @@ class FrontendCurrencyConverterModel
      */
     public static function getCurrencies()
     {
-        // get db
+        //Check updates on the fly
+        self::checkLastUpdatedTable();
+
         $db = FrontendModel::getDB();
 
         $currencies = (array) $db->getRecords(
                 'SELECT currency
-                 FROM currency_converter_exchangerates');
+                 FROM ' . self::DB_EXCHANGERATES_TABLE);
 
-        foreach ($currencies as $currency)
+        foreach($currencies as $currency)
         {
             $currencyArray[$currency['currency']] = $currency['currency'];
         }
@@ -36,15 +42,14 @@ class FrontendCurrencyConverterModel
      */
     public static function getRateByCurrency($currency)
     {
-        // get db
         $db = FrontendModel::getDB();
 
-        $rate = $db->getRecord(
+        $rate = $db->getVar(
                 "SELECT rate
-                 FROM currency_converter_exchangerates
-                 WHERE currency = '" . $currency . "'");
+                 FROM " . self::DB_EXCHANGERATES_TABLE .
+                 " WHERE currency = ?", $currency);
 
-        return $rate['rate'];
+        return $rate;
     }
 
 
@@ -55,20 +60,19 @@ class FrontendCurrencyConverterModel
      */
     public static function checkLastUpdatedTable()
     {
-        // get db
         $db = FrontendModel::getDB();
 
-        $lastUpdated = $db->getRecord(
+        $lastUpdated = $db->getVar(
                 "SELECT exchangetable_last_updated
-                 FROM currency_converter_update");
+                 FROM " . self::DB_UPDATE_TABLE);
 
         // if the date is different, it means that the table has to be updated
-        if($lastUpdated['exchangetable_last_updated'] != date('Y-m-d'))
+        if($lastUpdated != date('Y-m-d'))
         {
             // no errors -> update the table
             if(self::updateExchangeTable())
             {
-                $db->update("currency_converter_update", array("exchangetable_last_updated" => date("Y-m-d")));
+                $db->update(self::DB_UPDATE_TABLE, array("exchangetable_last_updated" => date("Y-m-d")));
             }
         }
     }
@@ -80,19 +84,13 @@ class FrontendCurrencyConverterModel
      */
     private static function updateExchangeTable()
     {
-        // get db
         $db = FrontendModel::getDB();
 
-        $xmlUrl = "http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml";
-
         // displays all the file nodes
-        if(!$xml=simplexml_load_file($xmlUrl))
+        if(!$xml=simplexml_load_file(self::CURRENCY_XML_URL))
         {
             return false;
         }
-
-        // truncate the table (only once a day)
-        //$db->truncate("currency_converter_exchangerates");
 
         // every exchange rate will be inserted back into the table
         foreach($xml->Cube->Cube->Cube as $cube)
@@ -101,15 +99,14 @@ class FrontendCurrencyConverterModel
             $rate = (string) $cube->attributes()->rate;
 
             //Get the rate of the record from the database
-            $rateDB =$db->getRecord("SELECT rate FROM currency_converter_exchangerates WHERE currency = '" . $currency . "'");
+            $rateDB =$db->getVar("SELECT rate FROM " . self::DB_EXCHANGERATES_TABLE ." WHERE currency = ?", $currency);
 
             // Check if the rate of the xml is different from the rate in the database
-            if($rate != $rateDB["rate"])
+            if($rate != $rateDB)
             {
                 $record["rate"] = $rate;
                 $record["last_changed"] = date('Y-m-d H:i:s');
-                $sql =$db->update("currency_converter_exchangerates", $record, 'currency = ?', $currency);
-                //var_dump();
+                $db->update(self::DB_EXCHANGERATES_TABLE, $record, 'currency = ?', $currency);
             }
         }
 
