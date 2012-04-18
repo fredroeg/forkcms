@@ -25,7 +25,7 @@ class FrontendCurrencyConverterModel
         $db = FrontendModel::getDB();
 
         $currencies = (array) $db->getPairs(
-                'SELECT currency, currency AS coerency
+                'SELECT currency, currency AS currencyLbl
                  FROM ' . self::DB_EXCHANGERATES_TABLE);
 
 
