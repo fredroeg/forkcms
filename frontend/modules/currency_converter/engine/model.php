@@ -70,9 +70,10 @@ class FrontendCurrencyConverterModel
     {
         $db = FrontendModel::getDB();
         $evol = $db->getRecords(
-                "SELECT time_id, rate
+                "SELECT *
                  FROM " . self::DB_EXCHANGERATES_TABLE .
-                 " WHERE currency = ? ORDER BY time_id ASC", $currency);
+                " AS A INNER JOIN currency_converter_update AS U ON A.time_id  = U.currency_converter_update_id" .
+                " WHERE currency = ? ORDER BY time_id ASC", $currency);
 
         return $evol;
     }

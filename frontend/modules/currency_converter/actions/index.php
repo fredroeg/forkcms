@@ -105,7 +105,8 @@ class FrontendCurrencyConverterIndex extends FrontendBaseBlock
         $tempArray = array();
         foreach ($evolutionArray as $value)
         {
-            $tempArray[$value['time_id']] = $value['rate'];
+            
+            $tempArray[$value['exchangetable_last_updated']] = $value['rate'];
         }
         $tableData = json_encode($tempArray);
         $this->tpl->assign('val', $tableData);
