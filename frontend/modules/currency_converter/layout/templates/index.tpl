@@ -22,3 +22,12 @@
 		</div>
 	</div>
 </section>
+
+<script>
+    data = {
+        value: {$val}
+    }
+</script>
+
+<!-- HighRoller: linechart div container -->
+<div id="linechart" style="height: 800px;"></div>

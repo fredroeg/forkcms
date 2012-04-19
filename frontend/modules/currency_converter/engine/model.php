@@ -32,6 +32,18 @@ class FrontendCurrencyConverterModel
         return $currencies;
     }
 
+    public static function getExchangeRate()
+    {
+        $db = FrontendModel::getDB();
+
+        $exchangeRates = (array) $db->getPairs(
+                'SELECT currency, rate
+                 FROM ' . self::DB_EXCHANGERATES_TABLE);
+
+
+        return $exchangeRates;
+    }
+
     /**
      * Get the rate of the currency
      *

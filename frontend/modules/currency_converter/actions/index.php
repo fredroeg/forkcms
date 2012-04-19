@@ -10,10 +10,22 @@ class FrontendCurrencyConverterIndex extends FrontendBaseBlock
     {
         parent::execute();
 
+        //Add the javascript file
+        $this->addJS('highcharts/highcharts.js');
+
+        //Theming
+        //
+        $this->addJS('highcharts/themes/grid.js');
+
         $this->loadTemplate();
         $this->createForm();
         $this->validateForm();
+
+        $this->createChart();
+
         $this->display();
+
+
     }
 
     private function display()
@@ -55,7 +67,7 @@ class FrontendCurrencyConverterIndex extends FrontendBaseBlock
     /**
      * Calculate the exchange rate
      */
-     private function calculate()
+    private function calculate()
     {
         // get the submitted values
         $amount = $this->frm->getField('amount')->getValue();
@@ -77,5 +89,17 @@ class FrontendCurrencyConverterIndex extends FrontendBaseBlock
         // assign the message to the template
         $this->tpl->assign('convertIsSuccess', true);
         $this->tpl->assign('convertSucces', $succesmessage);
+    }
+
+    private function createChart()
+    {
+        //For now we will use a jsonstring.
+        //TODO: will be replaced by a exported CSV-file
+        //SOURCE to do this:    http://www.highcharts.com/documentation/how-to-use#options ,
+        //                      http://www.highcharts.com/studies/data-from-csv.htm
+        $chartArray = FrontendCurrencyConverterModel::getExchangeRate();
+
+        $tableData = json_encode($chartArray);
+        $this->tpl->assign('val', $tableData);
     }
 }
