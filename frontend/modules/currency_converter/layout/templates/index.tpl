@@ -30,4 +30,4 @@
 </script>
 
 <!-- HighRoller: linechart div container -->
-<div id="linechart" style="height: 800px;"></div>
+<div id="linechart" style="height: 400px; width: 600px;"></div>

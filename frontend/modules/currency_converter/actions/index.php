@@ -22,10 +22,9 @@ class FrontendCurrencyConverterIndex extends FrontendBaseBlock
         $this->validateForm();
 
         $this->createChart();
+        $this->createEvolutionChart();
 
         $this->display();
-
-
     }
 
     private function display()
@@ -42,8 +41,8 @@ class FrontendCurrencyConverterIndex extends FrontendBaseBlock
     {
         $this->frm = new FrontendForm('index', null, null, 'indexForm');
         $this->frm->addText('amount');
-        $this->frm->addDropdown('currencySource', FrontendCurrencyConverterModel::getCurrencies());
-        $this->frm->addDropdown('currencyTarget', FrontendCurrencyConverterModel::getCurrencies());
+        $this->frm->addDropdown('currencySource', FrontendCurrencyConverterModel::getCurrencies(true));
+        $this->frm->addDropdown('currencyTarget', FrontendCurrencyConverterModel::getCurrencies(false));
     }
 
     private function validateForm()
@@ -93,13 +92,22 @@ class FrontendCurrencyConverterIndex extends FrontendBaseBlock
 
     private function createChart()
     {
-        //For now we will use a jsonstring.
-        //TODO: will be replaced by a exported CSV-file
-        //SOURCE to do this:    http://www.highcharts.com/documentation/how-to-use#options ,
-        //                      http://www.highcharts.com/studies/data-from-csv.htm
         $chartArray = FrontendCurrencyConverterModel::getExchangeRate();
 
         $tableData = json_encode($chartArray);
+        //$this->tpl->assign('val', $tableData);
+    }
+
+    //With this function we will be able to view the evolution of a currency
+    private function createEvolutionChart()
+    {
+        $evolutionArray = FrontendCurrencyConverterModel::getEvolutionOfCurrency("USD");
+        $tempArray = array();
+        foreach ($evolutionArray as $value)
+        {
+            $tempArray[$value['time_id']] = $value['rate'];
+        }
+        $tableData = json_encode($tempArray);
         $this->tpl->assign('val', $tableData);
     }
 }
