@@ -16,7 +16,6 @@ class BackendCurrencyConverterGraph extends BackendBaseActionIndex
                 $this->loadDataGrid();
 		$this->parse();
 		$this->display();
-
 	}
 
         private function loadDataGrid()
@@ -31,7 +30,11 @@ class BackendCurrencyConverterGraph extends BackendBaseActionIndex
                                 'xaxis_title' => SpoonFilter::ucfirst(BL::getLabel('XAxisTitle')),
                                 'yaxis_title' => SpoonFilter::ucfirst(BL::getLabel('YAxisTitle'))
                              ));
-                $this->dataGrid->addColumn('edit', null, BL::getLabel('Edit'), BackendModel::createURLForAction('edit') . '&amp;id=[id]', BL::getLabel('Edit'));
+                // check if edit action is allowed
+		if(BackendAuthentication::isAllowedAction('edit'))
+		{
+                    $this->dataGrid->addColumn('edit', null, BL::getLabel('Edit'), BackendModel::createURLForAction('edit') . '&amp;id=[id]', BL::getLabel('Edit'));
+                }
 	}
 
         protected function parse()

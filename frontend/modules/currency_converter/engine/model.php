@@ -127,10 +127,17 @@ class FrontendCurrencyConverterModel
             $record['rate'] = $rate;
             $record['currency'] = $currency;
             $record['time_id'] = $timeId;
-            $record['last_changed'] = date('Y-m-d H:i:s');
 
             $db->insert(self::DB_EXCHANGERATES_TABLE, $record);
         }
+
+        // at last we have to insert euro manually (this will always be the same value)
+        $record['rate'] = "1";
+        $record['currency'] = "EUR";
+        $record['time_id'] = $timeId;
+
+        $db->insert(self::DB_EXCHANGERATES_TABLE, $record);
+
         return true;
     }
 }

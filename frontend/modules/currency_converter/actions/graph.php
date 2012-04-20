@@ -11,7 +11,6 @@ class FrontendCurrencyConverterGraph extends FrontendBaseBlock
         parent::execute();
 
         $this->addJS('highcharts/highcharts.js');
-
         $this->addJS('highcharts/themes/highroller.js');
 
         $this->loadTemplate();
