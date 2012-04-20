@@ -16,7 +16,6 @@
     graphDataObj = new Object();
     graphDataObj.graphValues = {$val};
     graphDataObj.graphCurrency = "{$cur}";
-    graphDataObj.graphTheme = "{$theme}";
     graphDataObj.graphType = "{$type}";
     graphDataObj.graphTitle = "{$title}";
     graphDataObj.graphSubtitle = "{$subtitle}";

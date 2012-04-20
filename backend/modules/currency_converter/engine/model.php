@@ -1,10 +1,9 @@
 <?php
 
 /**
- * In this file we store all generic functions that we will be using in the form_builder module
+ * In this file we store all generic functions that we will be using in the currency converter module
  *
- * @author Dieter Vanden Eynde <dieter.vandeneynde@netlash.com>
- * @author Tijs Verkoyen <tijs@sumocoders.be>
+ * @author Frederick Roegiers <frederick.roegiers@wijs.be>
  */
 class BackendCurrencyConverterModel
 {
@@ -73,7 +72,7 @@ class BackendCurrencyConverterModel
 
         public static function getEnumValues($field)
         {
-            $enums = (array) BackendModel::getDB()->getEnumValues("currency_converter_graphsettings", $field);
+            $enums = (array) BackendModel::getDB()->getEnumValues('currency_converter_graphsettings', $field);
 
             //We make an improved array to populate the dropdownbox in a better way
             $imprEnumsarray = array();

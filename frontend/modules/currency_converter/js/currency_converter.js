@@ -1,3 +1,9 @@
+/**
+ * All the settings to create the highchart
+ *
+ * @author	Lowie Benoot <frederick.roegiers@wijs.be>
+ */
+
 jsFrontend.currency_converter =
 {
     init : function ()

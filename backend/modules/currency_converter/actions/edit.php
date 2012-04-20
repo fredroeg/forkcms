@@ -1,17 +1,9 @@
 <?php
 
-/*
- * This file is part of Fork CMS.
- *
- * For the full copyright and license information, please view the license
- * file that was distributed with this source code.
- */
-
 /**
  * This is the edit-action, it will display a form to edit an existing item
  *
- * @author Dieter Vanden Eynde <dieter.vandeneynde@netlash.com>
- * @author Tijs Verkoyen <tijs@sumocoders.be>
+ * @author Frederick Roegiers <frederick.roegiers@wijs.be>
  */
 class BackendCurrencyConverterEdit extends BackendBaseActionEdit
 {
@@ -80,45 +72,44 @@ class BackendCurrencyConverterEdit extends BackendBaseActionEdit
 	{
 		if($this->frm->isSubmitted())
 		{
-                    $this->frm->cleanupFields();
+                        $this->frm->cleanupFields();
 
-                    // shorten the fields
-                    $txtBlock = $this->frm->getField('block');
-                    $ddmType = $this->frm->getField('type');
-                    $ddmTheme = $this->frm->getField('theme');
-                    $txtTitle = $this->frm->getField('title');
-                    $txtSubtitle = $this->frm->getField('subtitle');
-                    $txtXAxisTitle = $this->frm->getField('xaxistitle');
-                    $txtYAxisTitle = $this->frm->getField('yaxistitle');
+                        // shorten the fields
+                        $txtBlock = $this->frm->getField('block');
+                        $ddmType = $this->frm->getField('type');
+                        $ddmTheme = $this->frm->getField('theme');
+                        $txtTitle = $this->frm->getField('title');
+                        $txtSubtitle = $this->frm->getField('subtitle');
+                        $txtXAxisTitle = $this->frm->getField('xaxistitle');
+                        $txtYAxisTitle = $this->frm->getField('yaxistitle');
 
-                    // validate the fields
+                        // validate the fields
+                        $txtBlock->isFilled(BL::getError('BlockIsRequired'));
+                        $txtTitle->isFilled(BL::getError('TitleIsRequired'));
+                        $txtSubtitle->isFilled(BL::getError('SubtitleIsRequired'));
+                        $txtXAxisTitle->isFilled(BL::getError('XaxistitleIsRequired'));
+                        $txtYAxisTitle->isFilled(BL::getError('YaxistitleIsRequired'));
 
-                    $txtBlock->isFilled(BL::getError('BlockIsRequired'));
-                    $txtTitle->isFilled(BL::getError('TitleIsRequired'));
-                    $txtSubtitle->isFilled(BL::getError('SubtitleIsRequired'));
-                    $txtXAxisTitle->isFilled(BL::getError('XaxistitleIsRequired'));
-                    $txtYAxisTitle->isFilled(BL::getError('YaxistitleIsRequired'));
+                        if($this->frm->isCorrect())
+                        {
+                                // build array
+                                $values['block'] = $txtBlock->getValue();
+                                $values['type'] = $ddmType->getValue();
+                                $values['theme'] = $ddmTheme->getValue();
+                                $values['title'] = $txtTitle->getValue();
+                                $values['subtitle'] = $txtSubtitle->getValue();
+                                $values['xaxis_title'] = $txtXAxisTitle->getValue();
+                                $values['yaxis_title'] = $txtYAxisTitle->getValue();
 
-                    if($this->frm->isCorrect())
-                    {
-                            // build array
-                            $values['block'] = $txtBlock->getValue();
-                            $values['type'] = $ddmType->getValue();
-                            $values['theme'] = $ddmTheme->getValue();
-                            $values['title'] = $txtTitle->getValue();
-                            $values['subtitle'] = $txtSubtitle->getValue();
-                            $values['xaxis_title'] = $txtXAxisTitle->getValue();
-                            $values['yaxis_title'] = $txtYAxisTitle->getValue();
+                                // insert the item
+                                $id = (int) BackendCurrencyConverterModel::update($this->id, $values);
 
-                            // insert the item
-                            $id = (int) BackendCurrencyConverterModel::update($this->id, $values);
+                                // trigger event
+                                BackendModel::triggerEvent($this->getModule(), 'after_edit', array('item' => $values));
 
-                            // trigger event
-                            BackendModel::triggerEvent($this->getModule(), 'after_edit', array('item' => $values));
-
-                            // everything is saved, so redirect to the overview
-                            $this->redirect(BackendModel::createURLForAction('graph') . '&report=edited&var=' . urlencode($values['block']) . '&highlight=row-' . $id);
-                    }
+                                // everything is saved, so redirect to the overview
+                                $this->redirect(BackendModel::createURLForAction('graph') . '&report=edited&var=' . urlencode($values['block']) . '&highlight=row-' . $id);
+                        }
 		}
 	}
 }
