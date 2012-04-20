@@ -43,7 +43,7 @@ class BackendCurrencyConverterEdit extends BackendBaseActionEdit
 		$this->frm->addText('yaxistitle', $this->record['yaxis_title']);
 
 		// submit dialog
-                $this->frm->addButton('change', 'update');
+                $this->frm->addButton('change', 'update', 'submit', 'inputButton button mainButton');
 	}
 
         protected function parse()

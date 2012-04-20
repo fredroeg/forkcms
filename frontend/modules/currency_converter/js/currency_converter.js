@@ -1,7 +1,7 @@
 /**
  * All the settings to create the highchart
  *
- * @author	Lowie Benoot <frederick.roegiers@wijs.be>
+ * @author	Frederick Roegiers <frederick.roegiers@wijs.be>
  */
 
 jsFrontend.currency_converter =
@@ -107,7 +107,6 @@ jsFrontend.currency_converter =
 
                 data: returnRates()
 
-
             }]
 
         });
@@ -137,24 +136,6 @@ jsFrontend.currency_converter =
             }
             return(dates);
         }
-
-/*
-function otherwayTemp()
-{
-    var key = '';
-    var val = '';
-    for (var p in window.data.value)
-    {
-        if (window.data.value.hasOwnProperty(p)) {
-            key += p;
-            val += window.data.value[p];
-        }
-    }
-    alert (key + " " + val);
-}
-*/
-
-
     }
 }
 

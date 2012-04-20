@@ -6,7 +6,6 @@
 </div>
 {form:edit}
 
-<h3>{$lblGraphSettings|ucfirst}</h3>
 <div id="changeSettingsForm>
 
         <script type="text/javascript">
@@ -21,40 +20,51 @@
 		//]]>
 	</script>
 
+        <div class="box horizontal">
+		<div class="heading">
+			<h3>{$lblGraphSettings|ucfirst}</h3>
+		</div>
+		<div class="options">
+                        <input type="hidden" name="id" id="formId" value="{$id}" />
 
-        <input type="hidden" name="id" id="formId" value="{$id}" />
+                        <p>
+                            <label for="block">{$lblBlock|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
+                            {$txtBlock} {$txtBlockError}
+                        </p>
+                        <p>
+                            <label for="type">{$lblType|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
+                            {$ddmType} {$ddmTypeError}
+                        </p>
+                        <p>
+                            <label for="theme">{$lblTheme|ucfirst}</label>
+                            {$ddmTheme} {$ddmThemeError}
+                        </p>
+                        <p>
+                            <label for="title">{$lblTitle|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
+                            {$txtTitle} {$txtTitleError}
+                        </p>
+                        <p>
+                            <label for="subtitle">{$lblSubtitle|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
+                            {$txtSubtitle} {$txtSubtitleError}
+                        </p>
+                        <p>
+                            <label for="xaxistitle">{$lblXAxisTitle|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
+                            {$txtXaxistitle} {$txtXaxistitleError}
+                        </p>
+                        <p>
+                            <label for="yaxistitle">{$lblYAxisTitle|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
+                            {$txtYaxistitle} {$txtYaxistitleError}
+                        </p>
+                        <p>
 
-        <p>
-            <label for="block">{$lblBlock|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
-            {$txtBlock} {$txtBlockError}
-        </p>
-        <p>
-            <label for="type">{$lblType|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
-            {$ddmType} {$ddmTypeError}
-        </p>
-        <p>
-            <label for="theme">{$lblTheme|ucfirst}</label>
-            {$ddmTheme} {$ddmThemeError}
-        </p>
-        <p>
-            <label for="title">{$lblTitle|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
-            {$txtTitle} {$txtTitleError}
-        </p>
-        <p>
-            <label for="subtitle">{$lblSubtitle|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
-            {$txtSubtitle} {$txtSubtitleError}
-        </p>
-        <p>
-            <label for="xaxistitle">{$lblXAxisTitle|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
-            {$txtXaxistitle} {$txtXaxistitleError}
-        </p>
-        <p>
-            <label for="yaxistitle">{$lblYAxisTitle|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
-            {$txtYaxistitle} {$txtYaxistitleError}
-        </p>
-        <p>
-            {$btnChange}
-        </p>
+                        </p>
+                </div>
+                <div class="fullwidthOptions">
+                        <div class="buttonHolderRight">
+                            {$btnChange}
+                        </div>
+                </div>
+	</div>
 </div>
 {/form:edit}
 
