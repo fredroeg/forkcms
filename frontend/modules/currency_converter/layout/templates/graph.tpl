@@ -14,7 +14,8 @@
 
 <script>
     graphDataObj = new Object();
-    graphDataObj.graphValues = {$val};
+    graphDataObj.rateValues = {$rate};
+    graphDataObj.dateValues = {$date};
     graphDataObj.graphCurrency = "{$cur}";
     graphDataObj.graphType = "{$type}";
     graphDataObj.graphTitle = "{$title}";

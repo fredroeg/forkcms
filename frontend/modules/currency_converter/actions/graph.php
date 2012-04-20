@@ -50,18 +50,24 @@ class FrontendCurrencyConverterGraph extends FrontendBaseBlock
     {
         $cur = $this->frm->getField('currency')->getValue();
         $evolutionArray = FrontendCurrencyConverterModel::getEvolutionOfCurrency($cur);
-        $tempArray = array();
+
+        $rateArray = array();
+        $dateArray = array();
+
         foreach ($evolutionArray as $value)
         {
-            $tempArray[$value['exchangetable_last_updated']] = $value['rate'];
+            array_push($rateArray, $value['rate']);
+            array_push($dateArray, $value['exchangetable_last_updated']);
         }
 
-        $tableData = json_encode($tempArray);
+        $rateData = json_encode($rateArray);
+        $dateData = json_encode($dateArray);
 
         $grSetArr = FrontendCurrencyConverterModel::getGraphSettings();
 
         //Assign all the values to the template. Later on we will use them to draw the graph
-        $this->tpl->assign('val', $tableData);
+        $this->tpl->assign('rate', $rateData);
+        $this->tpl->assign('date', $dateData);
         $this->tpl->assign('cur', $cur);
         $this->tpl->assign('type', $grSetArr['type']);
         $this->tpl->assign('title', $grSetArr['title']);

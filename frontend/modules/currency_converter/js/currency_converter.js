@@ -8,6 +8,7 @@ jsFrontend.currency_converter =
 {
     init : function ()
     {
+
         var chart;
 
         chart = new Highcharts.Chart({
@@ -39,7 +40,7 @@ jsFrontend.currency_converter =
 
                 },
 
-                categories: returnKeys()
+                categories: returnDates()
 
 
             },
@@ -104,16 +105,16 @@ jsFrontend.currency_converter =
 
                 name: window.graphDataObj.graphCurrency,
 
-                data: returnNumbers()
+                data: returnRates()
 
 
             }]
 
         });
 
-        function returnNumbers()
+        function returnRates()
         {
-            var windowData = window.graphDataObj.graphValues;
+            var windowData = window.graphDataObj.rateValues;
 
             var numbers = [];
             for(var x in windowData)
@@ -124,10 +125,17 @@ jsFrontend.currency_converter =
             return(numbers);
         }
 
-        function returnKeys()
+        function returnDates()
         {
-            var windowData = window.graphDataObj.graphValues;
-            return Object.keys(windowData);
+            var windowData = window.graphDataObj.dateValues;
+
+            var dates = [];
+            for(var x in windowData)
+            {
+                var date = windowData[x];
+                dates.push(date);
+            }
+            return(dates);
         }
 
 /*
