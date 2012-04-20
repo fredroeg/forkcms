@@ -32,7 +32,7 @@ class BackendCurrencyConverterIndex extends BackendBaseActionIndex
         protected function parse()
         {
             // add datagrid
-		$this->tpl->assign('dataGrid', ($this->dataGrid->getNumResults() != 0) ? $this->dataGrid->getContent() : false);
+            $this->tpl->assign('dataGrid', ($this->dataGrid->getNumResults() != 0) ? $this->dataGrid->getContent() : false);
         }
 
 

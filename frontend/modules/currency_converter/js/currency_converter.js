@@ -27,8 +27,14 @@ jsFrontend.currency_converter =
             },
 
             xAxis: {
+                title: {
+
+                    text: 'date'
+
+                },
 
                 categories: returnKeys()
+
 
             },
 
@@ -115,7 +121,6 @@ jsFrontend.currency_converter =
         function returnKeys()
         {
             var windowData = window.graphDataObj.graphValues;
-
             return Object.keys(windowData);
         }
 

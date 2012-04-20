@@ -11,4 +11,8 @@ class BackendCurrencyConverterModel
     const QRY_BROWSE =
 		'SELECT i.currency, i.rate, i.last_changed
 		 FROM currency_converter_exchangerates AS i';
+
+    const QRY_SETTINGS =
+		'SELECT *
+		 FROM currency_converter_graphsettings AS j';
 }

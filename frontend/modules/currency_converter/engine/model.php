@@ -116,9 +116,6 @@ class FrontendCurrencyConverterModel
      */
     private static function updateExchangeTable($timeId)
     {
-        //A boolean to check whether something is inserted at all
-        $insertedBool = false;
-
         //Get the database
         $db = FrontendModel::getDB();
 
@@ -135,35 +132,14 @@ class FrontendCurrencyConverterModel
             $currency = (string) $cube->attributes()->currency;
             $rate = (string) $cube->attributes()->rate;
 
-            //Get the rate of the record from the database
-            $rateDB =$db->getVar("SELECT rate FROM " . self::DB_EXCHANGERATES_TABLE .
-                                " WHERE currency = ?
-                                  ORDER BY time_id DESC", $currency);
+            $record["rate"] = $rate;
+            $record["currency"] = $currency;
+            $record["time_id"] = $timeId;
+            $record["last_changed"] = date('Y-m-d H:i:s');
 
-            // Check if the rate of the xml is different from the rate in the database
-            if($rate != $rateDB)
-            {
-                $record["rate"] = $rate;
-                $record["currency"] = $currency;
-                $record["time_id"] = $timeId;
-                $record["last_changed"] = date('Y-m-d H:i:s');
-
-                $db->insert(self::DB_EXCHANGERATES_TABLE, $record);
-
-                //If something is inserted
-                $insertedBool = true;
-           }
-
-            //RETURN BOOLEAN
-            if($insertedBool)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-
+            $db->insert(self::DB_EXCHANGERATES_TABLE, $record);
         }
+
+        return true;
     }
 }

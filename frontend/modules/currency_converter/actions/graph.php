@@ -14,7 +14,7 @@ class FrontendCurrencyConverterGraph extends FrontendBaseBlock
         $this->addJS('highcharts/highcharts.js');
 
         //Theming
-        $this->addJS('highcharts/themes/grid.js');
+        $this->addJS('highcharts/themes/highroller.js');
 
         $this->loadTemplate();
         $this->createForm();
