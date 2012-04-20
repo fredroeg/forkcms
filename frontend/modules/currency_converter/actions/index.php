@@ -14,15 +14,11 @@ class FrontendCurrencyConverterIndex extends FrontendBaseBlock
         $this->addJS('highcharts/highcharts.js');
 
         //Theming
-        //
         $this->addJS('highcharts/themes/grid.js');
 
         $this->loadTemplate();
         $this->createForm();
         $this->validateForm();
-
-        $this->createChart();
-        $this->createEvolutionChart();
 
         $this->display();
     }
@@ -88,27 +84,5 @@ class FrontendCurrencyConverterIndex extends FrontendBaseBlock
         // assign the message to the template
         $this->tpl->assign('convertIsSuccess', true);
         $this->tpl->assign('convertSucces', $succesmessage);
-    }
-
-    private function createChart()
-    {
-        $chartArray = FrontendCurrencyConverterModel::getExchangeRate();
-
-        $tableData = json_encode($chartArray);
-        //$this->tpl->assign('val', $tableData);
-    }
-
-    //With this function we will be able to view the evolution of a currency
-    private function createEvolutionChart()
-    {
-        $evolutionArray = FrontendCurrencyConverterModel::getEvolutionOfCurrency("USD");
-        $tempArray = array();
-        foreach ($evolutionArray as $value)
-        {
-            
-            $tempArray[$value['exchangetable_last_updated']] = $value['rate'];
-        }
-        $tableData = json_encode($tempArray);
-        $this->tpl->assign('val', $tableData);
     }
 }
