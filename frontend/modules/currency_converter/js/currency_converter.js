@@ -10,26 +10,26 @@ jsFrontend.currency_converter =
 
                 renderTo: 'linechart',
 
-                type: 'line'
+                type: window.graphDataObj.graphType
 
             },
 
             title: {
 
-                text: 'Evolution of a currency'
+                text: window.graphDataObj.graphTitle
 
             },
 
             subtitle: {
 
-                text: 'Compared to euro'
+                text: window.graphDataObj.graphSubtitle
 
             },
 
             xAxis: {
                 title: {
 
-                    text: 'date'
+                    text: window.graphDataObj.graphXaxistitle
 
                 },
 
@@ -42,7 +42,7 @@ jsFrontend.currency_converter =
 
                 title: {
 
-                    text: 'currency rate'
+                    text: window.graphDataObj.graphYaxistitle
 
                 }
 

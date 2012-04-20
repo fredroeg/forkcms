@@ -16,6 +16,12 @@
     graphDataObj = new Object();
     graphDataObj.graphValues = {$val};
     graphDataObj.graphCurrency = "{$cur}";
+    graphDataObj.graphTheme = "{$theme}";
+    graphDataObj.graphType = "{$type}";
+    graphDataObj.graphTitle = "{$title}";
+    graphDataObj.graphSubtitle = "{$subtitle}";
+    graphDataObj.graphXaxistitle = "{$xaxistitle}";
+    graphDataObj.graphYaxistitle = "{$yaxistitle}";
 </script>
 
 <!-- HighRoller: linechart div container -->

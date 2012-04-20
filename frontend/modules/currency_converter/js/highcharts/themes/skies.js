@@ -9,7 +9,6 @@ Highcharts.theme = {
 		className: 'skies',
 		borderWidth: 0,
 		plotShadow: true,
-		plotBackgroundImage: '/test/gfx/skies.jpg',
 		plotBackgroundColor: {
 			linearGradient: [0, 0, 250, 500],
 			stops: [

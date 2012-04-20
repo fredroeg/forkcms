@@ -74,6 +74,18 @@ class FrontendCurrencyConverterModel
         return $evol;
     }
 
+    public static function getGraphSettings()
+    {
+        $db = FrontendModel::getDB();
+        $settings = (array) $db->getRecord('
+                SELECT *
+                FROM currency_converter_graphsettings
+                WHERE id = ?', 1);
+
+        return $settings;
+    }
+
+
     /**
      * Check if the table is still up to date
      *
