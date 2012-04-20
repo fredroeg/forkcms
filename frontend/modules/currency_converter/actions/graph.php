@@ -56,7 +56,9 @@ class FrontendCurrencyConverterGraph extends FrontendBaseBlock
         //$this->tpl->assign('val', $tableData);
     }
 
-    //With this function we will be able to view the evolution of a currency
+    /**
+     * With this function we will be able to view the evolution of a currency
+     */
     private function createEvolutionChart()
     {
         $cur = $this->frm->getField('currency')->getValue();
@@ -64,11 +66,12 @@ class FrontendCurrencyConverterGraph extends FrontendBaseBlock
         $tempArray = array();
         foreach ($evolutionArray as $value)
         {
-
             $tempArray[$value['exchangetable_last_updated']] = $value['rate'];
         }
+
         $tableData = json_encode($tempArray);
         $this->tpl->assign('val', $tableData);
+        $this->tpl->assign('cur', $cur);
     }
 
 

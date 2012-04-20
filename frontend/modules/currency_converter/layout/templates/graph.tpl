@@ -13,10 +13,9 @@
 </section>
 
 <script>
-    data =
-    {
-        value: {$val}
-    }
+    graphDataObj = new Object();
+    graphDataObj.graphValues = {$val};
+    graphDataObj.graphCurrency = "{$cur}";
 </script>
 
 <!-- HighRoller: linechart div container -->

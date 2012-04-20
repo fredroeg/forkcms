@@ -90,7 +90,7 @@ jsFrontend.currency_converter =
 
                 series: [{
 
-                name: 'US DOLLAR',
+                name: window.graphDataObj.graphCurrency,
 
                 data: returnNumbers()
 
@@ -101,7 +101,8 @@ jsFrontend.currency_converter =
 
         function returnNumbers()
         {
-            var windowData = window.data.value;
+            var windowData = window.graphDataObj.graphValues;
+
             var numbers = [];
             for(var x in windowData)
             {
@@ -113,8 +114,7 @@ jsFrontend.currency_converter =
 
         function returnKeys()
         {
-
-            var windowData = window.data.value;
+            var windowData = window.graphDataObj.graphValues;
 
             return Object.keys(windowData);
         }
