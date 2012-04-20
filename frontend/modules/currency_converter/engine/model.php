@@ -7,10 +7,9 @@
  */
 class FrontendCurrencyConverterModel
 {
-    //CONSTANTS
-    const CURRENCY_XML_URL = "http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml";
-    const DB_EXCHANGERATES_TABLE = "currency_converter_exchangerates";
-    const DB_UPDATE_TABLE = "currency_converter_update";
+    const CURRENCY_XML_URL = 'http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml';
+    const DB_EXCHANGERATES_TABLE = 'currency_converter_exchangerates';
+    const DB_UPDATE_TABLE = 'currency_converter_update';
 
     /**
      * Get all currencies for the dropdownlist.
@@ -25,7 +24,6 @@ class FrontendCurrencyConverterModel
             self::checkLastUpdatedTable();
         }
 
-
         $db = FrontendModel::getDB();
 
         $currencies = (array) $db->getPairs(
@@ -34,7 +32,6 @@ class FrontendCurrencyConverterModel
                 ' ORDER BY currency ASC');
 
         return $currencies;
-
     }
 
     public static function getExchangeRate()
@@ -44,7 +41,6 @@ class FrontendCurrencyConverterModel
         $exchangeRates = (array) $db->getPairs(
                 'SELECT currency, rate
                  FROM ' . self::DB_EXCHANGERATES_TABLE);
-
 
         return $exchangeRates;
     }
@@ -59,9 +55,9 @@ class FrontendCurrencyConverterModel
         $db = FrontendModel::getDB();
 
         $rate = $db->getVar(
-                "SELECT rate
-                 FROM " . self::DB_EXCHANGERATES_TABLE .
-                 " WHERE currency = ? ORDER BY time_id DESC", $currency);
+                'SELECT rate
+                 FROM ' . self::DB_EXCHANGERATES_TABLE .
+                 ' WHERE currency = ? ORDER BY time_id DESC', $currency);
 
         return $rate;
     }
@@ -70,15 +66,13 @@ class FrontendCurrencyConverterModel
     {
         $db = FrontendModel::getDB();
         $evol = $db->getRecords(
-                "SELECT *
-                 FROM " . self::DB_EXCHANGERATES_TABLE .
-                " AS A INNER JOIN currency_converter_update AS U ON A.time_id  = U.currency_converter_update_id" .
-                " WHERE currency = ? ORDER BY time_id ASC", $currency);
+                'SELECT *
+                 FROM ' . self::DB_EXCHANGERATES_TABLE .
+                ' AS A INNER JOIN currency_converter_update AS U ON A.time_id  = U.currency_converter_update_id' .
+                ' WHERE currency = ? ORDER BY time_id ASC', $currency);
 
         return $evol;
     }
-
-
 
     /**
      * Check if the table is still up to date
@@ -89,9 +83,9 @@ class FrontendCurrencyConverterModel
         $db = FrontendModel::getDB();
 
         $lastUpdated = $db->getRecord(
-                "SELECT * FROM currency_converter_update
+                'SELECT * FROM currency_converter_update
                  ORDER BY currency_converter_update_id
-                 DESC LIMIT 1");
+                 DESC LIMIT 1');
 
         // if the date is different, it means that the table has to be updated
         if($lastUpdated['exchangetable_last_updated'] != date('Y-m-d'))
@@ -101,8 +95,8 @@ class FrontendCurrencyConverterModel
             // things have changed -> update the table
             if(self::updateExchangeTable($timeId))
             {
-                $record["exchangetable_last_updated"] = date("Y-m-d");
-                $record["currency_converter_update_id"] = $timeId;
+                $record['exchangetable_last_updated'] = date('Y-m-d');
+                $record['currency_converter_update_id'] = $timeId;
 
                 $db->insert(self::DB_UPDATE_TABLE, $record);
             }
@@ -116,10 +110,8 @@ class FrontendCurrencyConverterModel
      */
     private static function updateExchangeTable($timeId)
     {
-        //Get the database
         $db = FrontendModel::getDB();
 
-        // displays all the file nodes
         if(!$xml=simplexml_load_file(self::CURRENCY_XML_URL))
         {
             //If it fails to load the file, return false
@@ -132,14 +124,13 @@ class FrontendCurrencyConverterModel
             $currency = (string) $cube->attributes()->currency;
             $rate = (string) $cube->attributes()->rate;
 
-            $record["rate"] = $rate;
-            $record["currency"] = $currency;
-            $record["time_id"] = $timeId;
-            $record["last_changed"] = date('Y-m-d H:i:s');
+            $record['rate'] = $rate;
+            $record['currency'] = $currency;
+            $record['time_id'] = $timeId;
+            $record['last_changed'] = date('Y-m-d H:i:s');
 
             $db->insert(self::DB_EXCHANGERATES_TABLE, $record);
         }
-
         return true;
     }
 }

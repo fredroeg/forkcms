@@ -7,9 +7,7 @@
  */
 class BackendCurrencyConverterGraph extends BackendBaseActionIndex
 {
-
-
-	/**
+        /**
 	 * Execute the action
 	 */
 	public function execute()
@@ -38,9 +36,7 @@ class BackendCurrencyConverterGraph extends BackendBaseActionIndex
 
         protected function parse()
         {
-            // add datagrid
-            $this->tpl->assign('dgGraphSettings', ($this->dataGrid->getNumResults() != 0) ? $this->dataGrid->getContent() : false);
+                // add datagrid
+                $this->tpl->assign('dgGraphSettings', ($this->dataGrid->getNumResults() != 0) ? $this->dataGrid->getContent() : false);
         }
-
-
 }

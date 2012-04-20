@@ -43,7 +43,6 @@ class FrontendCurrencyConverterIndex extends FrontendBaseBlock
 
     private function validateForm()
     {
-        // submitted
         if($this->frm->isSubmitted())
         {
             // amount is required and has to be numeric or float
@@ -51,7 +50,6 @@ class FrontendCurrencyConverterIndex extends FrontendBaseBlock
             {
                 $this->frm->getField('amount')->isFloat('Only decimal values please!');
             }
-
             if($this->frm->isCorrect())
             {
                 $this->calculate();
@@ -64,7 +62,6 @@ class FrontendCurrencyConverterIndex extends FrontendBaseBlock
      */
     private function calculate()
     {
-        // get the submitted values
         $amount = $this->frm->getField('amount')->getValue();
         $curSource = $this->frm->getField('currencySource')->getValue();
         $curTarget = $this->frm->getField('currencyTarget')->getValue();

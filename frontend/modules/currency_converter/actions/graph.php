@@ -10,17 +10,14 @@ class FrontendCurrencyConverterGraph extends FrontendBaseBlock
     {
         parent::execute();
 
-        //Add the javascript file
         $this->addJS('highcharts/highcharts.js');
 
-        //Theming
         $this->addJS('highcharts/themes/highroller.js');
 
         $this->loadTemplate();
         $this->createForm();
         $this->validateForm();
 
-        //$this->createChart();
         $this->display();
     }
 
@@ -46,14 +43,6 @@ class FrontendCurrencyConverterGraph extends FrontendBaseBlock
         {
             $this->createEvolutionChart();
         }
-    }
-
-    private function createChart()
-    {
-        $chartArray = FrontendCurrencyConverterModel::getExchangeRate();
-
-        $tableData = json_encode($chartArray);
-        //$this->tpl->assign('val', $tableData);
     }
 
     /**

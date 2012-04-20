@@ -7,9 +7,9 @@
 
 <h3>{$lblGraphSettings|ucfirst}</h3>
 {option:dgGraphSettings}
-	<div class="datagridHolder">
+        <div class="datagridHolder">
             {$dgGraphSettings}
-	</div>
+        </div>
 {/option:dgGraphSettings}
 
 

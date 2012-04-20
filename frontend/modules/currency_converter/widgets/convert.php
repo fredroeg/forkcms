@@ -30,8 +30,8 @@ class FrontendCurrencyConverterWidgetConvert extends FrontendBaseWidget
     {
         $this->frm = new FrontendForm('convert', null, null, 'convertForm');
         $this->frm->addText('amount');
-        $this->frm->addDropdown('currencySource', FrontendCurrencyConverterModel::getCurrencies());
-        $this->frm->addDropdown('currencyTarget', FrontendCurrencyConverterModel::getCurrencies());
+        $this->frm->addDropdown('currencySource', FrontendCurrencyConverterModel::getCurrencies(true));
+        $this->frm->addDropdown('currencyTarget', FrontendCurrencyConverterModel::getCurrencies(false));
     }
 
     private function validateForm()

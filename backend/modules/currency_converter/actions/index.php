@@ -7,8 +7,6 @@
  */
 class BackendCurrencyConverterIndex extends BackendBaseActionIndex
 {
-
-
 	/**
 	 * Execute the action
 	 */
@@ -18,7 +16,6 @@ class BackendCurrencyConverterIndex extends BackendBaseActionIndex
                 $this->loadDataGrid();
 		$this->parse();
 		$this->display();
-
 	}
 
 	private function loadDataGrid()
@@ -26,7 +23,6 @@ class BackendCurrencyConverterIndex extends BackendBaseActionIndex
 		$this->dataGrid = new BackendDataGridDB(BackendCurrencyConverterModel::QRY_BROWSE, BL::getWorkingLanguage());
 		//$this->dataGrid->setHeaderLabels(array('currency' => SpoonFilter::ucfirst(BL::getLabel('Currency')), 'rate' => SpoonFilter::ucfirst(BL::getLabel('Rate'))));
 		$this->dataGrid->setSortingColumns(array('currency', 'rate', 'last_changed'), 'currency');
-
 	}
 
         protected function parse()
@@ -34,6 +30,4 @@ class BackendCurrencyConverterIndex extends BackendBaseActionIndex
             // add datagrid
             $this->tpl->assign('dataGrid', ($this->dataGrid->getNumResults() != 0) ? $this->dataGrid->getContent() : false);
         }
-
-
 }
