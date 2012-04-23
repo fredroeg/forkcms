@@ -17,7 +17,9 @@ jsFrontend.currency_converter =
 
                 renderTo: 'linechart',
 
-                type: window.graphDataObj.graphType
+                type: window.graphDataObj.graphType,
+
+                zoomType: 'x'
 
             },
 

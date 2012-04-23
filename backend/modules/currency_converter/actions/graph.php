@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This is the index-action (default)
+ * This is the graph-action
  *
  * @author Frederick Roegiers <frederick.roegiers@wijs.be>
  */
