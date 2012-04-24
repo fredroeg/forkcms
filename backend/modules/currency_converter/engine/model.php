@@ -8,7 +8,7 @@
 class BackendCurrencyConverterModel
 {
 	const QRY_BROWSE =
-		    'SELECT i.currency, i.rate, i.last_changed, i.link_id, i.time_id
+		    'SELECT *
 		     FROM currency_converter_exchangerates AS i';
 
 	const QRY_SETTINGS =
