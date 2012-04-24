@@ -291,7 +291,7 @@ class FrontendCurrencyConverterModel
      *
      * @return string
      */
-    private static function returnActiveExchangeRate($field)
+    public static function returnActiveExchangeRate($field)
     {
         $db = FrontendModel::getDB();
 

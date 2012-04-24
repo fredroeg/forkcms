@@ -102,4 +102,64 @@ class BackendCurrencyConverterModel
 		return $id;
 	}
 
+        /**
+	 * Update an existing item.
+	 *
+	 * @param int $id The id for the new active source.
+	 * @return int
+	 */
+	public static function updateSource($id)
+	{
+		$id = (int) $id;
+		$db = BackendModel::getDB(true);
+
+                $reset['active'] = 0;
+                $value['active'] = 1;
+
+		// update item
+		$db->update('currency_converter_exchangerates_source', $reset);
+                $db->update('currency_converter_exchangerates_source', $value, 'id = ?', $id);
+	}
+
+        /**
+         * With this function we get the urls
+         *
+         * @return string
+         */
+        public static function returnLinks()
+        {
+            $db = FrontendModel::getDB();
+
+            $links = (array) $db->getPairs(
+                    'SELECT id, link
+                     FROM currency_converter_exchangerates_source'
+                    );
+
+            $rbtArray = array();
+            foreach ($links as $id => $link)
+            {
+                $rbtArray[] = array('label' => $link, 'value' => $id);
+            }
+
+            return $rbtArray;
+        }
+
+        /**
+         * With this function we get the active urlid
+         *
+         * @return string
+         */
+        public static function returnActiveLink()
+        {
+            $db = FrontendModel::getDB();
+
+            $link = $db->getVar(
+                    'SELECT id
+                     FROM currency_converter_exchangerates_source
+                     WHERE active = 1'
+                    );
+
+
+            return $link;
+        }
 }

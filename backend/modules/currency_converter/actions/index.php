@@ -14,7 +14,10 @@ class BackendCurrencyConverterIndex extends BackendBaseActionIndex
 	{
 		parent::execute();
                 $this->loadDataGrid();
-		$this->parse();
+                $this->loadForm();
+                $this->validateForm();
+                $this->parse();
+
 		$this->display();
 	}
 
@@ -25,8 +28,41 @@ class BackendCurrencyConverterIndex extends BackendBaseActionIndex
 		$this->dataGrid->setSortingColumns(array('currency', 'rate', 'last_changed'), 'currency');
 	}
 
+        private function loadForm()
+        {
+            $this->frm = new BackendForm('source');
+            //$this->frm->addDropdown('type', BackendCurrencyConverterModel::getEnumValues('type'), $this->record['type']);
+            $this->frm->addRadiobutton('ersource', BackendCurrencyConverterModel::returnLinks(), BackendCurrencyConverterModel::returnActiveLink());
+            // submit dialog
+            $this->frm->addButton('change', 'update', 'submit', 'inputButton button mainButton');
+        }
+
+        private function validateForm()
+	{
+		if($this->frm->isSubmitted())
+		{
+                        $this->frm->cleanupFields();
+
+                        // shorten the fields
+                        $rbtSource = $this->frm->getField('ersource');
+
+                        // validate the fields
+                        $rbtSource->isFilled(BL::getError('ersourceIsRequired'));
+
+                        if($this->frm->isCorrect())
+                        {
+                                // build array
+                                $activeId = $rbtSource->getValue();
+
+                                // insert the item
+                                BackendCurrencyConverterModel::updateSource($activeId);
+                        }
+		}
+	}
+
         protected function parse()
         {
+            $this->frm->parse($this->tpl);
             // add datagrid
             $this->tpl->assign('dataGrid', ($this->dataGrid->getNumResults() != 0) ? $this->dataGrid->getContent() : false);
         }
