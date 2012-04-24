@@ -6,80 +6,80 @@
  */
 class FrontendCurrencyConverterIndex extends FrontendBaseBlock
 {
-    public function execute()
-    {
-        parent::execute();
+	public function execute()
+	{
+		parent::execute();
 
-        //Add the javascript file
-        $this->addJS('highcharts/highcharts.js');
+		//Add the javascript file
+		$this->addJS('highcharts/highcharts.js');
 
-        //Theming
-        $this->addJS('highcharts/themes/grid.js');
+		//Theming
+		$this->addJS('highcharts/themes/grid.js');
 
-        $this->loadTemplate();
-        $this->createForm();
-        $this->validateForm();
+		$this->loadTemplate();
+		$this->createForm();
+		$this->validateForm();
 
-        $this->display();
-    }
+		$this->display();
+	}
 
-    private function display()
-    {
-        $this->parse();
-    }
+	private function display()
+	{
+		$this->parse();
+	}
 
-    private function parse()
-    {
-        $this->frm->parse($this->tpl);
-    }
+	private function parse()
+	{
+		$this->frm->parse($this->tpl);
+	}
 
-    private function createForm()
-    {
-        $this->frm = new FrontendForm('index', null, null, 'indexForm');
-        $this->frm->addText('amount');
-        $this->frm->addDropdown('currencySource', FrontendCurrencyConverterModel::getCurrencies(true));
-        $this->frm->addDropdown('currencyTarget', FrontendCurrencyConverterModel::getCurrencies(false));
-    }
+	private function createForm()
+	{
+		$this->frm = new FrontendForm('index', null, null, 'indexForm');
+		$this->frm->addText('amount');
+		$this->frm->addDropdown('currencySource', FrontendCurrencyConverterModel::getCurrencies(true));
+		$this->frm->addDropdown('currencyTarget', FrontendCurrencyConverterModel::getCurrencies(false));
+	}
 
-    private function validateForm()
-    {
-        if($this->frm->isSubmitted())
-        {
-            // amount is required and has to be numeric or float
-            if($this->frm->getField('amount')->isFilled('Please fill in the amount'))
-            {
-                $this->frm->getField('amount')->isFloat('Only decimal values please!');
-            }
-            if($this->frm->isCorrect())
-            {
-                $this->calculate();
-            }
-        }
-    }
+	private function validateForm()
+	{
+		if($this->frm->isSubmitted())
+		{
+			// amount is required and has to be numeric or float
+			if($this->frm->getField('amount')->isFilled('Please fill in the amount'))
+			{
+			    $this->frm->getField('amount')->isFloat('Only decimal values please!');
+			}
+			if($this->frm->isCorrect())
+			{
+			    $this->calculate();
+			}
+		}
+	}
 
-    /**
-     * Calculate the exchange rate
-     */
-    private function calculate()
-    {
-        $amount = $this->frm->getField('amount')->getValue();
-        $curSource = $this->frm->getField('currencySource')->getValue();
-        $curTarget = $this->frm->getField('currencyTarget')->getValue();
+	/**
+	 * Calculate the exchange rate
+	 */
+	private function calculate()
+	{
+		$amount = $this->frm->getField('amount')->getValue();
+		$curSource = $this->frm->getField('currencySource')->getValue();
+		$curTarget = $this->frm->getField('currencyTarget')->getValue();
 
-        $rateSource = FrontendCurrencyConverterModel::getRateByCurrency($curSource);
-        $rateTarget = FrontendCurrencyConverterModel::getRateByCurrency($curTarget);
+		$rateSource = FrontendCurrencyConverterModel::getRateByCurrency($curSource);
+		$rateTarget = FrontendCurrencyConverterModel::getRateByCurrency($curTarget);
 
-        // calculate the exchange
-        $exchange = $rateTarget / $rateSource;
+		// calculate the exchange
+		$exchange = $rateTarget / $rateSource;
 
-        // calculate the exchange rate
-        $converted = $amount * $exchange;
+		// calculate the exchange rate
+		$converted = $amount * $exchange;
 
-        // make a succes message
-        $succesmessage = $amount . " " . $curSource . " = " . $converted . " " . $curTarget;
+		// make a succes message
+		$succesmessage = $amount . " " . $curSource . " = " . $converted . " " . $curTarget;
 
-        // assign the message to the template
-        $this->tpl->assign('convertIsSuccess', true);
-        $this->tpl->assign('convertSucces', $succesmessage);
-    }
+		// assign the message to the template
+		$this->tpl->assign('convertIsSuccess', true);
+		$this->tpl->assign('convertSucces', $succesmessage);
+	}
 }

@@ -22,7 +22,7 @@
             </div>
             <div class="options">
                     <p>
-                        Exchange Rate Source*<br />
+                        Exchange Rate Source<abbr title="{$lblRequiredField}">*</abbr><br />
                         {iteration:ersource}
                             <label for="{$ersource.id}">{$ersource.rbtErsource} {$ersource.label}</label>
                         {/iteration:ersource}

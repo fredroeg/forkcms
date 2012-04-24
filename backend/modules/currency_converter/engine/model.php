@@ -7,26 +7,26 @@
  */
 class BackendCurrencyConverterModel
 {
-        const QRY_BROWSE =
-                    'SELECT i.currency, i.rate, i.last_changed, i.link_id, i.time_id
-                     FROM currency_converter_exchangerates AS i';
+	const QRY_BROWSE =
+		    'SELECT i.currency, i.rate, i.last_changed, i.link_id, i.time_id
+		     FROM currency_converter_exchangerates AS i';
 
-        const QRY_SETTINGS =
-                    'SELECT *
-                     FROM currency_converter_graphsettings AS j';
+	const QRY_SETTINGS =
+		    'SELECT *
+		     FROM currency_converter_graphsettings AS j';
 
-        /**
-         * Does the item exist.
-         *
-         * @param int $id Id of a form.
-         * @return bool
-         */
-        public static function exists($id)
-        {
-                return (BackendModel::getDB()->getVar('SELECT COUNT(f.id) FROM currency_converter_graphsettings AS f WHERE f.id = ?', (int) $id) >= 1);
-        }
+	/**
+	 * Does the item exist.
+	 *
+	 * @param int $id Id of a form.
+	 * @return bool
+	 */
+	public static function exists($id)
+	{
+		return (BackendModel::getDB()->getVar('SELECT COUNT(f.id) FROM currency_converter_graphsettings AS f WHERE f.id = ?', (int) $id) >= 1);
+	}
 
-        /**
+	/**
 	 * Get all data for a given id.
 	 *
 	 * @param int $id The id for the record to get.
@@ -39,7 +39,7 @@ class BackendCurrencyConverterModel
 		return $return;
 	}
 
-        /**
+	/**
 	 * Get errors (optional by type).
 	 *
 	 * @param string[optional] $type Type of error.
@@ -70,21 +70,21 @@ class BackendCurrencyConverterModel
 		}
 	}
 
-        public static function getEnumValues($field)
-        {
-            $enums = (array) BackendModel::getDB()->getEnumValues('currency_converter_graphsettings', $field);
+	public static function getEnumValues($field)
+	{
+		$enums = (array) BackendModel::getDB()->getEnumValues('currency_converter_graphsettings', $field);
 
-            //We make an improved array to populate the dropdownbox in a better way
-            $imprEnumsarray = array();
-            foreach ($enums as $enum)
-            {
-                $imprEnumsarray[$enum] = $enum;
-            }
+		//We make an improved array to populate the dropdownbox in a better way
+		$imprEnumsarray = array();
+		foreach ($enums as $enum)
+		{
+		    $imprEnumsarray[$enum] = $enum;
+		}
 
-            return $imprEnumsarray;
-        }
+		return $imprEnumsarray;
+	}
 
-        /**
+	/**
 	 * Update an existing item.
 	 *
 	 * @param int $id The id for the item to update.
@@ -102,7 +102,7 @@ class BackendCurrencyConverterModel
 		return $id;
 	}
 
-        /**
+	/**
 	 * Update an existing item.
 	 *
 	 * @param int $id The id for the new active source.
@@ -113,53 +113,53 @@ class BackendCurrencyConverterModel
 		$id = (int) $id;
 		$db = BackendModel::getDB(true);
 
-                $reset['active'] = 0;
-                $value['active'] = 1;
+		$reset['active'] = 0;
+		$value['active'] = 1;
 
 		// update item
 		$db->update('currency_converter_exchangerates_source', $reset);
-                $db->update('currency_converter_exchangerates_source', $value, 'id = ?', $id);
+		$db->update('currency_converter_exchangerates_source', $value, 'id = ?', $id);
 	}
 
-        /**
-         * With this function we get the urls
-         *
-         * @return string
-         */
-        public static function returnLinks()
-        {
-            $db = FrontendModel::getDB();
+	/**
+	 * With this function we get the urls
+	 *
+	 * @return array
+	 */
+	public static function getExchangeRateLinks()
+	{
+		$db = FrontendModel::getDB();
 
-            $links = (array) $db->getPairs(
-                    'SELECT id, link
-                     FROM currency_converter_exchangerates_source'
-                    );
+		$links = (array) $db->getPairs(
+			'SELECT id, link
+			 FROM currency_converter_exchangerates_source'
+			);
 
-            $rbtArray = array();
-            foreach ($links as $id => $link)
-            {
-                $rbtArray[] = array('label' => $link, 'value' => $id);
-            }
+		$rbtArray = array();
+		foreach ($links as $id => $link)
+		{
+		    $rbtArray[] = array('label' => $link, 'value' => $id);
+		}
 
-            return $rbtArray;
-        }
+		return $rbtArray;
+	}
 
-        /**
-         * With this function we get the active urlid
-         *
-         * @return string
-         */
-        public static function returnActiveLink()
-        {
-            $db = FrontendModel::getDB();
+	/**
+	 * With this function we get the active urlid
+	 *
+	 * @return string
+	 */
+	public static function getActiveLink()
+	{
+		$db = FrontendModel::getDB();
 
-            $link = $db->getVar(
-                    'SELECT id
-                     FROM currency_converter_exchangerates_source
-                     WHERE active = 1'
-                    );
+		$link = $db->getVar(
+			'SELECT id
+			 FROM currency_converter_exchangerates_source
+			 WHERE active = 1'
+			);
 
 
-            return $link;
-        }
+		return $link;
+	}
 }
