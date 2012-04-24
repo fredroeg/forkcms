@@ -5,8 +5,11 @@
 	<h2>{$lblSea|ucfirst}</h2>
 </div>
 
-<div class="loginGoogle">
-	<a href='{$login}'>Login using google account</a>
+<div class="fields">
+    <ul>
+	
+    </ul>
+
 </div>
 
 {include:{$BACKEND_CORE_PATH}/layout/templates/structure_end_module.tpl}
