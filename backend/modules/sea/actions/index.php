@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * This is the index-action (default)
+ *
+ * @author Frederick Roegiers <frederick.roegiers@wijs.be>
+ */
+class BackendSeaIndex extends BackendBaseActionIndex
+{
+	public function execute()
+	{
+		parent::execute();
+		$this->parse();
+		$this->display();
+	}
+
+
+	protected function parse()
+	{
+
+	}
+
+}
