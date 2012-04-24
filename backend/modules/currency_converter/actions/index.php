@@ -24,14 +24,12 @@ class BackendCurrencyConverterIndex extends BackendBaseActionIndex
 	private function loadDataGrid()
 	{
 		$this->dataGrid = new BackendDataGridDB(BackendCurrencyConverterModel::QRY_BROWSE, BL::getWorkingLanguage());
-		//$this->dataGrid->setHeaderLabels(array('currency' => SpoonFilter::ucfirst(BL::getLabel('Currency')), 'rate' => SpoonFilter::ucfirst(BL::getLabel('Rate'))));
-		$this->dataGrid->setSortingColumns(array('currency', 'rate', 'last_changed'), 'currency');
+		$this->dataGrid->setSortingColumns(array('currency', 'rate', 'last_changed', 'link_id', 'time_id'), 'currency');
 	}
 
         private function loadForm()
         {
             $this->frm = new BackendForm('source');
-            //$this->frm->addDropdown('type', BackendCurrencyConverterModel::getEnumValues('type'), $this->record['type']);
             $this->frm->addRadiobutton('ersource', BackendCurrencyConverterModel::returnLinks(), BackendCurrencyConverterModel::returnActiveLink());
             // submit dialog
             $this->frm->addButton('change', 'update', 'submit', 'inputButton button mainButton');

@@ -280,6 +280,7 @@ class FrontendCurrencyConverterModel
         $record['rate'] = "1";
         $record['currency'] = "EUR";
         $record['time_id'] = $timeId;
+        $record['link_id'] = 1;
 
         $db->insert(self::DB_EXCHANGERATES_TABLE, $record);
 
