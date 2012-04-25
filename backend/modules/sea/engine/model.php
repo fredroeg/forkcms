@@ -20,15 +20,29 @@ class BackendSeaModel
 		return $APISettings;
 	}
 
+	public static function getTimeStampAccessToken()
+	{
+		$timeStampAT = BackendModel::getDB()->getVar(
+			'SELECT timestamp
+			 FROM sea_settings
+			 WHERE name = ?', 'access_token'
+			 );
+		return $timeStampAT;
+	}
+
 	/**
-	 * Update the access token we achieved from Google
+	 * Update the access token (and the refresh token) we achieved from Google
 	 *
 	 * @param string $accessToken
 	 * @return boolean
 	 */
-	public static function updateAccessToken($accessToken)
+	public static function updateTokens($accessToken, $refreshToken)
 	{
 		BackendModel::getDB()->update('sea_settings', array('value' => $accessToken), 'name = ?', 'access_token');
+		if($refreshToken != null)
+		{
+		    BackendModel::getDB()->update('sea_settings', array('value' => $refreshToken), 'name = ?', 'refresh_token');
+		}
 		return true;
 	}
 }

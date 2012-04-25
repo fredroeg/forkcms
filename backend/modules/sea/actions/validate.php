@@ -18,9 +18,9 @@ class BackendSeaValidate extends BackendBaseActionIndex
 		//Oauth 2.0: exchange token for token in the db so multiple calls can be made to api
 		if(isset($_REQUEST['code']))
 		{
-		    if(BackendSeaHelper::getOAuth2Token($_REQUEST['code']))
+		    if(BackendSeaHelper::getOAuth2Token($_REQUEST['code'], false))
 		    {
-			SpoonHTTP::redirect(BackendModel::createURLForAction('showdata'));
+			$this->redirect('showdata');
 		    }
 		}
 	}
