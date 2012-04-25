@@ -3,6 +3,6 @@
 ldpath
 .settings
 .*.swp
-backend/cache/navigation/
+backend/
 nbproject/
-.buildpath
+.dbuildpath

@@ -22,7 +22,14 @@ class BackendSeaIndex extends BackendBaseActionIndex
 
 	private function makeConnection()
 	{
-	    $url = BackendSeaHelper::loginWithOAuth();
-	    $this->tpl->assign('login', $url);
+		if(isset($_SESSION['access_token']))
+		{
+			SpoonHTTP::redirect(BackendModel::createURLForAction('showdata'));
+		}
+		else
+		{
+			$url = BackendSeaHelper::loginWithOAuth();
+			$this->tpl->assign('login', $url);
+		}
 	}
 }
