@@ -215,7 +215,7 @@ class GoogleAnalyticsSea
 	 * @param	mixed[optional] $dimensions		The optional dimensions as string or as array.
 	 * @param	array[optional] $parameters		The extra parameters for google.
 	 */
-	public function getAnalyticsResults($metrics, $startTimestamp, $endTimestamp, $dimensions = array())
+	public function getAnalyticsResults($metrics, $startTimestamp, $endTimestamp, $dimensions = array(), array $parameters = array())
 	{
 		// check required parameters
 		if(!isset($this->sessionToken, $this->tableId, $metrics, $startTimestamp, $endTimestamp)) return array('aggregates' => array(), 'entries' => array());
@@ -225,6 +225,7 @@ class GoogleAnalyticsSea
 		$startDate = $startTimestamp;
 		$endDate = $endTimestamp;
 		$dimensions = (array) $dimensions;
+		$parameters = (array) $parameters;
 
 		// build url
 		$URL = self::API_URL .'/data/ga?ids='. $this->tableId;
@@ -233,11 +234,18 @@ class GoogleAnalyticsSea
 		$URL .= '&end-date='. $endDate;
 		$URL .= '&dimensions='. implode(',', $dimensions);
 
+		// add parameters
+		if(count($parameters) > 0)
+		{
+			// loop them and combine key and urlencoded value (but don't encode the colons)
+			foreach($parameters as $key => $value) $parameters[$key] = $key .'='. str_replace(array('%3A', '%3D%3D'), array(':', '=='), urlencode($value));
+
+			// append to array
+			$URL .= '&'. implode('&', $parameters);
+		}
 
 		// do the call
 		$result = $this->doCall($URL, $this->sessionToken);
-
-
 
 		// return the result
 		return $result;
