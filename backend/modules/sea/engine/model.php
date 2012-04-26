@@ -65,13 +65,13 @@ class BackendSeaModel
 
 		$data['period_id'] = $periodId;
 		$data['visits'] = $seaData['visits'];
-		$data['impressions_amount'] = $seaData['impressions'];
+		$data['impressions'] = $seaData['impressions'];
 		$data['clicks_amount'] = $seaData['adClicks'];
 		$data['click_through_rate'] = $seaData['CTR'];
 		$data['cost_per_click'] = $seaData['CPC'];
-		$data['cost_total'] = $seaData['costs'];
+		$data['costs'] = $seaData['costs'];
 
-		BackendModel::getDB()->insert('sea_data', $data);
+		BackendModel::getDB()->insert('sea_period_data', $data);
 
 		return true;
 	}

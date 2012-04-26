@@ -46,7 +46,6 @@ class BackendSeaHelp
 			 );
 		}
 
-
 		//Insert this data in the database
 		if(BackendSeaModel::insertSEAData($period, $seaDataArray))
 		{
