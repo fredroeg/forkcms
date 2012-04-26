@@ -10,7 +10,7 @@ class BackendSeaShowdata extends BackendBaseActionIndex
 	public function execute()
 	{
 		parent::execute();
-		$this->testKeywords();
+		$this->seaDataDump();
 		$this->parse();
 		$this->display();
 	}
@@ -20,50 +20,22 @@ class BackendSeaShowdata extends BackendBaseActionIndex
 		parent::parse();
 	}
 
-	//Just a test function to mess around and get some feeling with it
-	private function testKeywords()
+	private function seaDataDump()
 	{
-		$metrics = array('adCost', 'visits');
-		$dimensions = array('medium', 'date');
+		//Define the period
 		$startTimestamp = '2012-03-01';
 		$endTimestamp = '2012-03-31';
+		$period = array($startTimestamp, $endTimestamp);
 
-
-		$returnedTestKeywords = BackendSeaHelp::getKeywords($metrics, $startTimestamp, $endTimestamp, $dimensions);
-
-		spoon::dump(json_decode($returnedTestKeywords));
-
-		$decoded = json_decode($returnedTestKeywords, true);
-		$totalSEAVisits = 0;
-
-		foreach ($decoded['rows'] as $key => $row)
+		//Check if we already stored the data for that period in the database. (if not -> insert it!)
+		if(BackendSeaModel::checkPeriod($period))
 		{
-		    if((int) $row[2] != 0)
-		    {
-			$totalSEAVisits += $row[3];
-		    }
+			spoon::dump('We already stored this data in the database');
 		}
-
-		var_dump($totalSEAVisits);
-
-		//spoon::dump($totalCost);
-
-
-
-		//Test to display the keywords
-		$specialArray = array();
-		foreach ($decoded['rows'] as $key => $row)
+		else
 		{
-		    $specialArray[$key]['medium'] = $row[0];
-		    $specialArray[$key]['source'] = $row[1];
-		    $specialArray[$key]['keyword'] = $row[2];
-		    $specialArray[$key]['visits'] = $row[3];
-		    $specialArray[$key]['bounces'] = $row[4];
-
+			$seaData = BackendSeaHelp::getAllData($period);
+			spoon::dump($seaData);
 		}
-
-		$this->tpl->assign('columnheaders', $decoded['columnHeaders']);
-		$this->tpl->assign('columncontent', $specialArray);
-
 	}
 }

@@ -45,4 +45,26 @@ class BackendSeaModel
 		}
 		return true;
 	}
+
+	public static function insertSEAData($period, $seaData)
+	{
+
+	}
+	
+	/**
+	 * Check in the database if we already stored the data from that period
+	 *
+	 * @param array $period
+	 * @return boolean
+	 */
+	public static function checkPeriod($period)
+	{
+		$numRows = BackendModel::getDB()->getNumRows(
+			'SELECT *
+			 FROM sea_period
+			 WHERE period_start = ? AND period_end = ?', $period
+			 );
+		$return = ($numRows > 0) ? (true) : (false);
+		return $return;
+	}
 }
