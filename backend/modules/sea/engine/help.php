@@ -48,10 +48,10 @@ class BackendSeaHelp
 
 
 		//Insert this data in the database
-		BackendSeaModel::insertSEAData($period, $seaDataArray);
-
-		//temp return voor the dump
-		return $seaDataArray;
+		if(BackendSeaModel::insertSEAData($period, $seaDataArray))
+		{
+			return true;
+		}
 	}
 
 	/**

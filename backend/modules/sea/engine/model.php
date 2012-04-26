@@ -20,6 +20,12 @@ class BackendSeaModel
 		return $APISettings;
 	}
 
+	/**
+	 * Function to get the timestamp of the token.
+	 * It's important to check if the access token is still valid
+	 *
+	 * @return timestamp
+	 */
 	public static function getTimeStampAccessToken()
 	{
 		$timeStampAT = BackendModel::getDB()->getVar(
@@ -46,11 +52,30 @@ class BackendSeaModel
 		return true;
 	}
 
+	/**
+	 * Insert the data in the database
+	 *
+	 * @param int $period
+	 * @param array $seaData
+	 * @return boolean
+	 */
 	public static function insertSEAData($period, $seaData)
 	{
+		$periodId = BackendModel::getDB()->insert('sea_period', array('period_start' => $period[0], 'period_end' => $period[1]));
 
+		$data['period_id'] = $periodId;
+		$data['visits'] = $seaData['visits'];
+		$data['impressions_amount'] = $seaData['impressions'];
+		$data['clicks_amount'] = $seaData['adClicks'];
+		$data['click_through_rate'] = $seaData['CTR'];
+		$data['cost_per_click'] = $seaData['CPC'];
+		$data['cost_total'] = $seaData['costs'];
+
+		BackendModel::getDB()->insert('sea_data', $data);
+
+		return true;
 	}
-	
+
 	/**
 	 * Check in the database if we already stored the data from that period
 	 *

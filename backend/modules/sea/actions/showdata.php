@@ -34,8 +34,10 @@ class BackendSeaShowdata extends BackendBaseActionIndex
 		}
 		else
 		{
-			$seaData = BackendSeaHelp::getAllData($period);
-			spoon::dump($seaData);
+			if(BackendSeaHelp::getAllData($period))
+			{
+			    spoon::dump("Yay :)!");
+			}
 		}
 	}
 }
