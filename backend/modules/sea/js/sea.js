@@ -1,66 +1,97 @@
 jsBackend.sea =
 {
-    init : function ()
-    {
-	var chart;
-        chart = new Highcharts.Chart({
-            chart: {
-                renderTo: 'linechart',
-                type: 'line',
-                marginRight: 130,
-                marginBottom: 25
-            },
-            title: {
-                text: 'Monthly Average Temperature',
-                x: -20 //center
-            },
-            subtitle: {
-                text: 'Source: WorldClimate.com',
-                x: -20
-            },
-            xAxis: {
-                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-            },
-            yAxis: {
-                title: {
-                    text: 'Temperature (°C)'
-                },
-                plotLines: [{
-                    value: 0,
-                    width: 1,
-                    color: '#808080'
-                }]
-            },
-            tooltip: {
-                formatter: function() {
-                        return '<b>'+ this.series.name +'</b><br/>'+
-                        this.x +': '+ this.y +'°C';
-                }
-            },
-            legend: {
-                layout: 'vertical',
-                align: 'right',
-                verticalAlign: 'top',
-                x: -10,
-                y: 100,
-                borderWidth: 0
-            },
-            series: [{
-                name: 'Tokyo',
-                data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6]
-            }, {
-                name: 'New York',
-                data: [-0.2, 0.8, 5.7, 11.3, 17.0, 22.0, 24.8, 24.1, 20.1, 14.1, 8.6, 2.5]
-            }, {
-                name: 'Berlin',
-                data: [-0.9, 0.6, 3.5, 8.4, 13.5, 17.0, 18.6, 17.9, 14.3, 9.0, 3.9, 1.0]
-            }, {
-                name: 'London',
-                data: [3.9, 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 16.6, 14.2, 10.3, 6.6, 4.8]
-            }]
-        });
-    }
+	init: function()
+	{
+		// variables
+		$chartSingleMetricPerDay = $('#chartSingleMetricPerDay');
+
+		jsBackend.sea.charts.init();
+		jsBackend.sea.chartSingleMetricPerDay.init();
+	}
+}
+
+jsBackend.sea.charts =
+{
+	init: function()
+	{
+		if($chartSingleMetricPerDay.length > 0)
+		{
+			Highcharts.setOptions(
+			{
+				colors: ['#058DC7', '#50b432', '#ED561B', '#EDEF00', '#24CBE5', '#64E572', '#FF9655'],
+				title: { text: '' },
+				legend:
+				{
+					layout: 'vertical',
+					backgroundColor: '#FEFEFE',
+					borderWidth: 0,
+					shadow: false,
+					symbolPadding: 12,
+					symbolWidth: 10,
+					itemStyle: { cursor: 'pointer', color: '#000', lineHeight: '18px' },
+					itemHoverStyle: { color: '#666' },
+					style: { right: '0', top: '0', bottom: 'auto', left: 'auto' }
+				}
+			});
+		}
+	}
+}
+
+jsBackend.sea.chartSingleMetricPerDay =
+{
+	chart: '',
+
+	init: function()
+	{
+		if($chartSingleMetricPerDay.length > 0) { jsBackend.sea.chartSingleMetricPerDay.create(); }
+	},
+
+	// add new chart
+	create: function()
+	{
+		var xAxisItems = $('#dataChartSingleMetricPerDay ul.series ul.data li');
+		var xAxisValues = [];
+		var xAxisCategories = [];
+		var counter = 0;
+		var interval = Math.ceil(xAxisItems.length / 10);
+
+		xAxisItems.each(function()
+		{
+			xAxisValues.push($(this).children('span.fulldate').html());
+			var text = $(this).children('span.date').html();
+			if(xAxisItems.length > 10 && counter%interval > 0) text = ' ';
+			xAxisCategories.push(text);
+			counter++;
+		});
+
+		var singleMetricName = $('#dataChartSingleMetricPerDay ul.series span.name').html();
+		var singleMetricValues = $('#dataChartSingleMetricPerDay ul.series span.value');
+		var singleMetricData = [];
+
+		singleMetricValues.each(function() { singleMetricData.push(parseInt($(this).html())); });
+
+		jsBackend.sea.chartSingleMetricPerDay.chart = new Highcharts.Chart(
+		{
+			chart: { renderTo: 'chartSingleMetricPerDay', margin: [60, 0, 30, 40], defaultSeriesType: 'line' },
+			xAxis: { lineColor: '#CCC', lineWidth: 1, categories: xAxisCategories, color: '#000' },
+			yAxis: { min: 0, max: $('#dataChartSingleMetricPerDay #maxYAxis').html(), tickInterval: ($('#dataChartSingleMetricPerDay #tickInterval').html() == '' ? null : $('#dataChartSingleMetricPerDay #tickInterval').html()), title: { text: '' } },
+			credits: { enabled: false },
+			tooltip: { formatter: function() { return '<b>'+ this.series.name +'</b><br/>'+ xAxisValues[this.point.x] +': '+ this.y; } },
+			plotOptions:
+			{
+				area: { marker: { enabled: false, states: { hover: { enabled: true, symbol: 'circle', radius: 5, lineWidth: 1 } } } },
+				column: { pointPadding: 0.2, borderWidth: 0 },
+				series: { fillOpacity: 0.3 }
+			},
+			series: [{ name: singleMetricName, data: singleMetricData }]
+		});
+	},
+
+	// destroy chart
+	destroy: function()
+	{
+		jsBackend.sea.chartSingleMetricPerDay.chart.destroy();
+	}
 }
 
 $(jsBackend.sea.init);

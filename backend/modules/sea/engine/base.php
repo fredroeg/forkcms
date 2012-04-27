@@ -35,7 +35,8 @@ class BackendSeaBase extends BackendBaseActionIndex
 	public function execute()
 	{
 		parent::execute();
-		$this->header->addJS('highcharts/highcharts.js');
+		$this->header->addJS('highcharts.js');
+		//$this->header->addJS('highcharts.js', 'core', false);
 		$this->setDates();
 	}
 

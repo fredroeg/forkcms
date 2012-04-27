@@ -12,6 +12,7 @@ class BackendSeaShowdata extends BackendSeaBase
 		parent::execute();
 		$this->checkStatus();
 		$this->seaDataDump();
+		$this->parseLineChartData();
 		$this->parse();
 		$this->display();
 	}
@@ -53,5 +54,37 @@ class BackendSeaShowdata extends BackendSeaBase
 		$this->tpl->assign('conversions', $periodDataArray['conversions']);
 		$this->tpl->assign('conversionPercentage', $periodDataArray['conversion_percentage'] . '&#37;');
 		$this->tpl->assign('costPerConversion', $periodDataArray['cost_per_conversion']);
+	}
+
+	/**
+	 * Parses the data to make the line-chart
+	 */
+	private function parseLineChartData()
+	{
+		$startTimestamp = date('Y-m-d', SpoonSession::get('sea_start_timestamp'));
+		$endTimestamp = date('Y-m-d', SpoonSession::get('sea_end_timestamp'));
+
+		$maxYAxis = 2;
+		$metric = 'visits';
+		$graphData = array();
+
+		$metricsPerDay = (array) BackendSeaModel::getMetricsPerDay($metric, $startTimestamp, $endTimestamp);
+
+		$graphData[0]['title'] = $metric;
+		$graphData[0]['label'] = SpoonFilter::ucfirst(BL::lbl(SpoonFilter::toCamelCase($metric)));
+		$graphData[0]['data'] = array();
+
+
+		foreach($metricsPerDay as $key => $data)
+		{
+			// build array
+			$graphData[0]['data'][$key]['date'] = $key;
+			$graphData[0]['data'][$key]['value'] = $data;
+		}
+
+
+		$this->tpl->assign('maxYAxis', $maxYAxis);
+		$this->tpl->assign('tickInterval', ($maxYAxis == 2 ? '1' : ''));
+		$this->tpl->assign('graphData', $graphData);
 	}
 }
