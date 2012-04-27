@@ -29,7 +29,7 @@ class BackendSeaModel
 	public static function getTimeStampAccessToken()
 	{
 		$timeStampAT = (string) BackendModel::getDB()->getVar(
-			'SELECT date
+			'SELECT UNIX_TIMESTAMP(date) AS date
 			 FROM sea_settings
 			 WHERE name = ?', 'access_token'
 			 );
@@ -45,9 +45,7 @@ class BackendSeaModel
 	public static function updateTokens($accessToken, $refreshToken)
 	{
 		$datetime = BackendModel::getUTCDate();
-		spoon::dump($datetime);
-		
-		BackendModel::getDB()->update('sea_settings', array('value' => $accessToken), 'name = ?', 'access_token');
+		BackendModel::getDB()->update('sea_settings', array('value' => $accessToken, 'date' => $datetime), 'name = ?', 'access_token');
 		if($refreshToken != null)
 		{
 		    BackendModel::getDB()->update('sea_settings', array('value' => $refreshToken, 'date' => $datetime), 'name = ?', 'refresh_token');

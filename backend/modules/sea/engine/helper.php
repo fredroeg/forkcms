@@ -109,10 +109,11 @@ class BackendSeaHelper
 	 */
 	public static function checkStatus()
 	{
-		$timestamp = strtotime('+1 hour', strtotime(BackendSeaModel::getTimeStampAccessToken()));
-		if($timestamp < strtotime('now'))
+		$timestamp = strtotime('+1 hour', BackendSeaModel::getTimeStampAccessToken());
+		// stored time + 1 hour is greater than this time => the access token is still up to date
+		if($timestamp > BackendModel::getUTCDate())
 		{
-
+			// still oke, return true
 			return true;
 		}
 		else
@@ -122,11 +123,13 @@ class BackendSeaHelper
 			{
 				if(BackendSeaHelper::getOAuth2Token($APISettingsArray['refresh_token'], true))
 				{
+					// it's up to date again, return true
 					return true;
 				}
 			}
 			else
 			{
+				// first time, so no refresh or access token, return false (need auth with google)
 				return false;
 			}
 		}
