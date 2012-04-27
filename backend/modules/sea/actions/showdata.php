@@ -10,6 +10,7 @@ class BackendSeaShowdata extends BackendBaseActionIndex
 	public function execute()
 	{
 		parent::execute();
+		$this->checkStatus();
 		$this->seaDataDump();
 		$this->parse();
 		$this->display();
@@ -18,6 +19,15 @@ class BackendSeaShowdata extends BackendBaseActionIndex
 	protected function parse()
 	{
 		parent::parse();
+	}
+
+	private function checkStatus()
+	{
+		$redirect = BackendSeaHelper::checkStatus();
+		if(!$redirect)
+		{
+			$this->redirect('index');
+		}
 	}
 
 	private function seaDataDump()

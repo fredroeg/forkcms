@@ -95,7 +95,7 @@ class BackendSeaHelper
 			return true;
 		}
 
-		BackendSeaModel::updateTokens($accessToken, null);
+		BackendSeaModel::updateTokens($accessToken);
 		return true;
 	}
 

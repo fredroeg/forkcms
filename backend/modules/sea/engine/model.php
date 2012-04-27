@@ -40,13 +40,14 @@ class BackendSeaModel
 	 * Update the access token (and the refresh token) we achieved from Google
 	 *
 	 * @param string $accessToken
+	 * @param string $refreshToken
 	 * @return boolean
 	 */
-	public static function updateTokens($accessToken, $refreshToken)
+	public static function updateTokens($accessToken, $refreshToken = null)
 	{
 		$datetime = BackendModel::getUTCDate();
 		BackendModel::getDB()->update('sea_settings', array('value' => $accessToken, 'date' => $datetime), 'name = ?', 'access_token');
-		if($refreshToken != null)
+		if(isset($refreshToken))
 		{
 		    BackendModel::getDB()->update('sea_settings', array('value' => $refreshToken, 'date' => $datetime), 'name = ?', 'refresh_token');
 		}
