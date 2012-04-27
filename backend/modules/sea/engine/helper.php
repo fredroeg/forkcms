@@ -98,4 +98,38 @@ class BackendSeaHelper
 		BackendSeaModel::updateTokens($accessToken, null);
 		return true;
 	}
+
+	/**
+	 * This function checks
+	 *	- if the access token is older than 3600 seconds
+	 *	- if we already have got a refresh token
+	 *
+	 * depending on the situation there will be a different action
+	 *
+	 */
+	public static function checkStatus()
+	{
+		$timestamp = strtotime('+1 hour', strtotime(BackendSeaModel::getTimeStampAccessToken()));
+		if($timestamp < strtotime('now'))
+		{
+
+			return true;
+		}
+		else
+		{
+			$APISettingsArray = BackendSeaModel::getAPISettings();
+			if(isset($APISettingsArray['refresh_token']) && $APISettingsArray['refresh_token'] != null)
+			{
+				if(BackendSeaHelper::getOAuth2Token($APISettingsArray['refresh_token'], true))
+				{
+					return true;
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+
 }

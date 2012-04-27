@@ -10,15 +10,21 @@ class BackendSeaHelp
 
 	public static function getAllData($period)
 	{
+		// first data collection
 		$metrics = array('adCost', 'visits', 'impressions', 'adClicks', 'CTR', 'CPC');
 		$dimensions = array('medium', 'date');
+		$returnedData = self::getData($metrics, $period, $dimensions);
+		$decoded = json_decode($returnedData, true);
 
-		$returnedTestKeywords = self::getSEADataPerDay($metrics, $period, $dimensions);
-		$decoded = json_decode($returnedTestKeywords, true);
+		// second data collection
+		$metrics = array('goalCompletionsAll', 'goalConversionRateAll', 'costPerConversion');
+		$dimensions = array('date');
+		$returnedData = self::getData($metrics, $period, $dimensions);
+		$decodedConversions = json_decode($returnedData, true);
+		//spoon::dump($decodedConversions);
 
 		//Create a new array to store all our valuable information
 		$seaDataArray = array();
-
 		//Total Results
 		$seaDataArray['visits'] = $decoded['totalsForAllResults']['ga:visits'];
 		//Total Costs
@@ -31,11 +37,17 @@ class BackendSeaHelp
 		$seaDataArray['CTR'] = $decoded['totalsForAllResults']['ga:CTR'];
 		//Cost-Per-Click
 		$seaDataArray['CPC'] = $decoded['totalsForAllResults']['ga:CPC'];
+		//Conversions
+		$seaDataArray['conversions'] = $decodedConversions['totalsForAllResults']['ga:goalCompletionsAll'];
+		//Conversion rate (or conv. percentage)
+		$seaDataArray['conversion_percentage'] = $decodedConversions['totalsForAllResults']['ga:goalConversionRateAll'];
+		//Cost per conversion
+		$seaDataArray['cost_per_conversion'] = $decodedConversions['totalsForAllResults']['ga:costPerConversion'];
+
 
 		//Data per day
 		foreach ($decoded['rows'] as $key => $row)
 		{
-			//Visits per day
 			$seaDataArray['dayStats'][$row[1]] = array(
 				'cost' => $row[2],
 				'visits' => $row[3],
@@ -43,6 +55,14 @@ class BackendSeaHelp
 				'adClicks' => $row[5],
 				'CTR' => $row[6],
 				'CPC' => $row[7],
+			 );
+		}
+		foreach ($decodedConversions['rows'] as $key => $row)
+		{
+			$seaDataArray['dayStats'][$row[0]] += array(
+				'conversions' => $row[1],
+				'conversion_percentage' => $row[2],
+				'cost_per_conversion' => $row[3]
 			 );
 		}
 
@@ -83,7 +103,7 @@ class BackendSeaHelp
 	 * @param int[optional]		$index The index to start getting data from.
 	 * @return array
 	 */
-	private static function getSEADataPerDay($metrics, $period, $dimensions, $sort = null, $limit = null, $index = 1)
+	private static function getData($metrics, $period, $dimensions = null, $sort = null, $limit = null, $index = 1)
 	{
 		//set the timestamps from the period
 		$startTimestamp = $period[0];
@@ -95,9 +115,12 @@ class BackendSeaHelp
 		$gaMetrics = array();
 		foreach($metrics as $metric) $gaMetrics[] = 'ga:' . $metric;
 
-		// set metrics
 		$gaDimensions = array();
-		foreach($dimensions as $dimension) $gaDimensions[] = 'ga:' . $dimension;
+		// set dimensions
+		if(isset($dimensions))
+		{
+			foreach($dimensions as $dimension) $gaDimensions[] = 'ga:' . $dimension;
+		}
 
 		// set parameters
 		$parameters = array();

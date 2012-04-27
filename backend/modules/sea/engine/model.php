@@ -24,12 +24,12 @@ class BackendSeaModel
 	 * Function to get the timestamp of the token.
 	 * It's important to check if the access token is still valid
 	 *
-	 * @return timestamp
+	 * @return string
 	 */
 	public static function getTimeStampAccessToken()
 	{
-		$timeStampAT = BackendModel::getDB()->getVar(
-			'SELECT timestamp
+		$timeStampAT = (string) BackendModel::getDB()->getVar(
+			'SELECT date
 			 FROM sea_settings
 			 WHERE name = ?', 'access_token'
 			 );
@@ -44,10 +44,13 @@ class BackendSeaModel
 	 */
 	public static function updateTokens($accessToken, $refreshToken)
 	{
+		$datetime = BackendModel::getUTCDate();
+		spoon::dump($datetime);
+		
 		BackendModel::getDB()->update('sea_settings', array('value' => $accessToken), 'name = ?', 'access_token');
 		if($refreshToken != null)
 		{
-		    BackendModel::getDB()->update('sea_settings', array('value' => $refreshToken), 'name = ?', 'refresh_token');
+		    BackendModel::getDB()->update('sea_settings', array('value' => $refreshToken, 'date' => $datetime), 'name = ?', 'refresh_token');
 		}
 		return true;
 	}
@@ -61,8 +64,10 @@ class BackendSeaModel
 	 */
 	public static function insertSEAData($period, $seaData)
 	{
+		// first we insert our period
 		$periodId = BackendModel::getDB()->insert('sea_period', array('period_start' => $period[0], 'period_end' => $period[1]));
 
+		// then we insert all the data from that period
 		$data['period_id'] = $periodId;
 		$data['visits'] = $seaData['visits'];
 		$data['impressions'] = $seaData['impressions'];
@@ -70,10 +75,40 @@ class BackendSeaModel
 		$data['click_through_rate'] = $seaData['CTR'];
 		$data['cost_per_click'] = $seaData['CPC'];
 		$data['costs'] = $seaData['costs'];
+		$data['conversions'] = $seaData['conversions'];
+		$data['conversion_percentage'] = $seaData['conversion_percentage'];
+		$data['cost_per_conversion'] = $seaData['cost_per_conversion'];
 
-		BackendModel::getDB()->insert('sea_period_data', $data);
+		//BackendModel::getDB()->insert('sea_period_data', $data);
 
-		return true;
+		// at last we insert day-related data
+		//if(self::insertSEADayData($seaData['dayStats'])) return true;
+	}
+
+	private static function insertSEADayData($dayData)
+	{
+	    foreach ($dayData as $day => $data)
+	    {
+		    $query =
+			    'INSERT IGNORE INTO sea_day_data (day, cost, visits, impressions, clicks, click_through_rate, cost_per_click, conversions, conversion_percentage, cost_per_conversion)
+			    VALUES (:day, :cost, :visits, :impressions, :clicks, :click_through_rate, :cost_per_click, :conversions, :conversion_percentage, :cost_per_conversion)';
+
+		    $record = array();
+		    $record['day'] = $day;
+		    $record['cost'] = $data['cost'];
+		    $record['visits'] = $data['visits'];
+		    $record['impressions'] = $data['impressions'];
+		    $record['clicks'] = $data['adClicks'];
+		    $record['click_through_rate'] = $data['CTR'];
+		    $record['cost_per_click'] = $data['CPC'];
+		    $record['conversions'] = $data['conversions'];
+		    $record['conversion_percentage'] = $data['conversion_percentage'];
+		    $record['cost_per_conversion'] = $data['cost_per_conversion'];
+
+		    BackendModel::getDB()->execute($query, $record);
+	    }
+
+	    return true;
 	}
 
 	/**
