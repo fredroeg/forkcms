@@ -37,6 +37,37 @@ class BackendSeaModel
 	}
 
 	/**
+	 * Get the id from a certain period
+	 *
+	 * @param array $period
+	 * @return int
+	 */
+	public static function getPeriodId($period)
+	{
+	    return (int) BackendModel::getDB()->getVar(
+			'SELECT period_id
+			 FROM sea_period
+			 WHERE period_start = ? AND period_end = ?',
+			 $period
+			);
+	}
+
+	/**
+	 *
+	 * @param int $periodId
+	 * @return array
+	 */
+	public static function getSEAData($periodId)
+	{
+	    return (array) BackendModel::getDB()->getRecord(
+			'SELECT *
+			 FROM sea_period_data
+			 WHERE period_id = ?',
+			 $periodId
+			);
+	}
+
+	/**
 	 * Update the access token (and the refresh token) we achieved from Google
 	 *
 	 * @param string $accessToken
@@ -78,10 +109,10 @@ class BackendSeaModel
 		$data['conversion_percentage'] = $seaData['conversion_percentage'];
 		$data['cost_per_conversion'] = $seaData['cost_per_conversion'];
 
-		//BackendModel::getDB()->insert('sea_period_data', $data);
+		BackendModel::getDB()->insert('sea_period_data', $data);
 
 		// at last we insert day-related data
-		//if(self::insertSEADayData($seaData['dayStats'])) return true;
+		if(self::insertSEADayData($seaData['dayStats'])) return true;
 	}
 
 	private static function insertSEADayData($dayData)

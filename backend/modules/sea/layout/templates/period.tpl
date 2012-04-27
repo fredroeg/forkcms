@@ -18,10 +18,4 @@
 		{$txtStartDateError}
 		{$txtEndDateError}
 	{/form:periodPickerForm}
-
-	{option:liveDataURL}
-		<div class="buttonHolderRight">
-			<a href="{$liveDataURL}" title="{$lblGetLiveData|ucfirst}" class="submitButton button inputButton mainButton icon iconRefresh"><span>{$lblGetLiveData|ucfirst}</span></a>
-		</div>
-	{/option:liveDataURL}
 </div>

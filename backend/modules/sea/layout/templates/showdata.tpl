@@ -7,6 +7,22 @@
 
 <div class="box">
 		{include:{$BACKEND_MODULE_PATH}/layout/templates/period.tpl}
+		<div class="options content">
+			<div class="analyticsColWrapper clearfix">
+				<div class="analyticsCol">
+					<p><strong>{$visits}</strong> {$lblVisits|ucfirst}</p>
+				</div>
+				<div class="analyticsCol">
+					<p><strong>{$conversions}</strong> {$lblConversions|ucfirst}</p>
+				</div>
+				<div class="analyticsCol">
+					<p><strong>{$conversionPercentage}</strong> {$lblConversionPercentage|ucfirst}</p>
+				</div>
+				<div class="analyticsCol">
+					<p><strong>{$costPerConversion}</strong> {$lblCostPerConversion|ucfirst}</p>
+				</div>
+			</div>
+		</div>
 </div>
 
 {include:{$BACKEND_CORE_PATH}/layout/templates/structure_end_module.tpl}

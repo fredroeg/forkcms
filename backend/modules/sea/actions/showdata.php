@@ -38,16 +38,20 @@ class BackendSeaShowdata extends BackendSeaBase
 		$period = array($startTimestamp, $endTimestamp);
 
 		//Check if we already stored the data for that period in the database. (if not -> insert it!)
-		if(BackendSeaModel::checkPeriod($period))
+		if(!BackendSeaModel::checkPeriod($period))
 		{
-		    var_dump("ja");
+			BackendSeaHelp::getAllData($period);
 		}
-		else
-		{
-			if(BackendSeaHelp::getAllData($period))
-			{
-			    var_dump("nee");
-			}
-		}
+
+		$this->getDataFromThisPeriod(BackendSeaModel::getPeriodId($period));
+	}
+
+	private function getDataFromThisPeriod($periodId)
+	{
+		$periodDataArray = BackendSeaModel::getSEAData($periodId);
+		$this->tpl->assign('visits', $periodDataArray['visits']);
+		$this->tpl->assign('conversions', $periodDataArray['conversions']);
+		$this->tpl->assign('conversionPercentage', $periodDataArray['conversion_percentage']);
+		$this->tpl->assign('costPerConversion', $periodDataArray['cost_per_conversion']);
 	}
 }
