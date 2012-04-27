@@ -5,7 +5,7 @@
  *
  * @author Frederick Roegiers <frederick.roegiers@wijs.be>
  */
-class BackendSeaShowdata extends BackendBaseActionIndex
+class BackendSeaShowdata extends BackendSeaBase
 {
 	public function execute()
 	{
@@ -33,20 +33,20 @@ class BackendSeaShowdata extends BackendBaseActionIndex
 	private function seaDataDump()
 	{
 		//Define the period
-		$startTimestamp = '2012-03-01';
-		$endTimestamp = '2012-03-31';
+		$startTimestamp = date('Y-m-d', SpoonSession::get('sea_start_timestamp'));
+		$endTimestamp = date('Y-m-d', SpoonSession::get('sea_end_timestamp'));
 		$period = array($startTimestamp, $endTimestamp);
 
 		//Check if we already stored the data for that period in the database. (if not -> insert it!)
 		if(BackendSeaModel::checkPeriod($period))
 		{
-			spoon::dump('We already stored this data in the database');
+		    var_dump("ja");
 		}
 		else
 		{
 			if(BackendSeaHelp::getAllData($period))
 			{
-			    spoon::dump("Yay :)!");
+			    var_dump("nee");
 			}
 		}
 	}

@@ -5,23 +5,8 @@
 	<h2>{$lblSea|ucfirst}</h2>
 </div>
 
-<div id="returnedData">
-<table>
-    <tr>
-    {iteration:columnheaders}
-	<th>{$columnheaders.name}</th>
-    {/iteration:columnheaders}
-    </tr>
-    {iteration:columncontent}
-    <tr>
-	<td>{$columncontent.medium}</td>
-	<td>{$columncontent.source}</td>
-	<td>{$columncontent.keyword}</td>
-	<td>{$columncontent.visits}</td>
-	<td>{$columncontent.bounces}</td>
-    </tr>
-    {/iteration:columncontent}
-</table>
+<div class="box">
+		{include:{$BACKEND_MODULE_PATH}/layout/templates/period.tpl}
 </div>
 
 {include:{$BACKEND_CORE_PATH}/layout/templates/structure_end_module.tpl}

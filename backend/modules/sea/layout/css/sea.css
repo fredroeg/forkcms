@@ -10,3 +10,10 @@
 {
     width: 100px;
 }
+
+
+/* Datefields */
+
+#periodPickerForm input.inputText {
+	width: 140px;
+}
