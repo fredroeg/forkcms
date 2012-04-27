@@ -23,7 +23,11 @@
 				</div>
 			</div>
 		</div>
+		<div class="options content">
+			<div id="linechart"></div>
+		</div>
 </div>
+
 
 {include:{$BACKEND_CORE_PATH}/layout/templates/structure_end_module.tpl}
 {include:{$BACKEND_CORE_PATH}/layout/templates/footer.tpl}

@@ -51,7 +51,7 @@ class BackendSeaShowdata extends BackendSeaBase
 		$periodDataArray = BackendSeaModel::getSEAData($periodId);
 		$this->tpl->assign('visits', $periodDataArray['visits']);
 		$this->tpl->assign('conversions', $periodDataArray['conversions']);
-		$this->tpl->assign('conversionPercentage', $periodDataArray['conversion_percentage']);
+		$this->tpl->assign('conversionPercentage', $periodDataArray['conversion_percentage'] . '&#37;');
 		$this->tpl->assign('costPerConversion', $periodDataArray['cost_per_conversion']);
 	}
 }
