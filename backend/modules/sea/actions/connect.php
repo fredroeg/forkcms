@@ -18,16 +18,6 @@ class BackendSeaConnect extends BackendBaseActionEdit
 		$this->display();
 	}
 
-	private function checkStatus()
-	{
-		$redirect = BackendSeaHelper::checkStatus();
-
-		if($redirect != false)
-		{
-			//$this->redirect('showdata');
-		}
-	}
-
 	private function getData()
 	{
 		$this->record = BackendSeaModel::getAPISettings();
@@ -72,8 +62,28 @@ class BackendSeaConnect extends BackendBaseActionEdit
 
                                 // everything is saved, so redirect to the overview
                                 //$this->redirect(BackendModel::createURLForAction('graph') . '&report=edited&var=' . urlencode($values['block']) . '&highlight=row-' . $id);
-                        }
+
+				$this->checkStatus();
+			}
 		}
+	}
+
+	private function checkStatus()
+	{
+		$redirect = BackendSeaHelper::checkStatus();
+
+		if($redirect != false)
+		{
+
+		}
+		$accounts = BackendSeaHelp::getAccounts()->items;
+		$accountArray = array();
+		foreach ($accounts as $account)
+		{
+		    $accountArray['name'] = $account->name;
+		    $accountArray['id'] = $account->id;
+		}
+		spoon::dump($accountArray);
 	}
 
 	protected function parse()

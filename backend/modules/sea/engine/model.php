@@ -105,6 +105,12 @@ class BackendSeaModel
 		return true;
 	}
 
+	/**
+	 * Update the client-id en client-id-secret
+	 *
+	 * @param array $values
+	 * @return boolean
+	 */
 	public static function updateIds($values)
 	{
 		$datetime = BackendModel::getUTCDate();
@@ -112,6 +118,7 @@ class BackendSeaModel
 		{
 			BackendModel::getDB()->update('sea_settings', array('value' => $value, 'date' => $datetime), 'name = ?', $name);
 		}
+		return true;
 	}
 
 	/**

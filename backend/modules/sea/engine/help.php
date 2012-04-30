@@ -135,6 +135,15 @@ class BackendSeaHelp
 		return self::getGoogleAnalyticsInstance()->getAnalyticsResults($gaMetrics, $startTimestamp, $endTimestamp, $gaDimensions, $parameters);
 	}
 
+	public static function getAccounts()
+	{
+		$apiSettings = BackendSeaModel::getAPISettings();
+		$accessToken = $apiSettings['access_token'];
+
+		$returned =  self::getGoogleAnalyticsInstance()->getAnalyticsAccountList($accessToken);
+		return $returned;
+	}
+
 	/**
 	 * Form for periodpicker
 	 *

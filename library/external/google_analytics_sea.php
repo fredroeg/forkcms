@@ -82,7 +82,6 @@ class GoogleAnalyticsSea
 		$URL = (string) $URL;
 		$token = (string) $token;
 
-
 		$this->curl = curl_init($URL);
 
 		// set options
@@ -153,8 +152,7 @@ class GoogleAnalyticsSea
 		// try to make the call
 		try
 		{
-			$response = $this->doCall(self::API_URL .'/accounts/default', $sessionToken);
-			spoon::dump($response);
+			$response = $this->doCall(self::API_URL .'/management/accounts', $sessionToken);
 		}
 
 		// catch possible exception
@@ -163,45 +161,7 @@ class GoogleAnalyticsSea
 			return array();
 		}
 
-		// no accounts - return an empty array
-		if($response == 'No Analytics account was found for the currently logged-in user') return array();
-
-		// unauthorized
-		if($response == 'UNAUTHORIZED') return $response;
-
-		// load with SimpleXML
-		$simpleXML = @simplexml_load_string(str_replace(array('dxp:', 'openSearch:', 'ga:'), '', $response));
-
-		// something went wrong
-		if(!isset($simpleXML->entry)) return 'ERROR';
-
-		// init vars
-		$i = 0;
-		$profiles = array();
-
-		// loop entries
-		foreach($simpleXML->entry as $entry)
-		{
-			// init entry array
-			$profile = array();
-
-			// build array
-			$profile['id'] = (string) $entry->id;
-			$profile['title'] = (string) $entry->title;
-			$profile['tableId'] = 'ga:'. (string) $entry->tableId;
-
-			// loop properties and save them
-			foreach($entry->property as $property) $profile[(string) $property['name']] = (string) $property['value'];
-
-			// save profile in profiles array
-			$profiles[$i] = $profile;
-
-			// increment counter
-			$i++;
-		}
-
-		// return the profiles
-		return (array) $profiles;
+		return json_decode($response);
 	}
 
 
