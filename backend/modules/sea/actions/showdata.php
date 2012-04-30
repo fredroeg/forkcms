@@ -54,6 +54,12 @@ class BackendSeaShowdata extends BackendSeaBase
 		$this->tpl->assign('conversions', $periodDataArray['conversions']);
 		$this->tpl->assign('conversionPercentage', $periodDataArray['conversion_percentage'] . '&#37;');
 		$this->tpl->assign('costPerConversion', $periodDataArray['cost_per_conversion']);
+		$this->tpl->assign('impressions', $periodDataArray['impressions']);
+		$this->tpl->assign('clicks', $periodDataArray['clicks_amount']);
+		$this->tpl->assign('ctr', $periodDataArray['click_through_rate']);
+		$this->tpl->assign('costPerClick', $periodDataArray['cost_per_click']);
+		//$this->tpl->assign('position', $periodDataArray['position']);
+		$this->tpl->assign('cost', $periodDataArray['costs']);
 	}
 
 	/**

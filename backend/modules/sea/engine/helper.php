@@ -112,6 +112,7 @@ class BackendSeaHelper
 		$timestamp = strtotime('+1 hour', BackendSeaModel::getTimeStampAccessToken());
 		$now = strtotime(BackendModel::getUTCDate());
 		// stored time + 1 hour is greater than this time => the access token is still up to date
+		// Still something is wrong...
 		if($timestamp > $now)
 		{
 			// still oke, return true

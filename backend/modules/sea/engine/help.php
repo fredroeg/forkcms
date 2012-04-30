@@ -188,8 +188,8 @@ class BackendSeaHelp
 					// startdate cannot be before 2005 (earliest valid google startdate)
 					if($newStartDate < mktime(0, 0, 0, 1, 1, 2005)) $valid = false;
 
-					// enddate cannot be in the future
-					elseif($newEndDate > time()) $valid = false;
+					// end can not be today or in the future
+					elseif($newEndDate >= mktime(0, 0, 0)) $valid = false;
 
 					// enddate cannot be before the startdate
 					elseif($newStartDate > $newEndDate) $valid = false;
@@ -256,8 +256,8 @@ class BackendSeaHelp
 				// startTimestamp cannot be before 2005 (earliest valid google startdate)
 				elseif($startTimestamp < mktime(0, 0, 0, 1, 1, 2005)) $valid = false;
 
-				// end can not be in the future
-				elseif($endTimestamp > time()) $valid = false;
+				// end can not be today or in the future
+				elseif($endTimestamp >= mktime(0, 0, 0)) $valid = false;
 			}
 
 			// valid dates
@@ -278,7 +278,7 @@ class BackendSeaHelp
 
 			// set sessions
 			SpoonSession::set('sea_start_timestamp', strtotime('-1' . $interval, mktime(0, 0, 0)));
-			SpoonSession::set('sea_end_timestamp', mktime(0, 0, 0));
+			SpoonSession::set('sea_end_timestamp', mktime(0, 0, 0, date('m'), date('d')-1, date('Y')));
 		}
 	}
 }

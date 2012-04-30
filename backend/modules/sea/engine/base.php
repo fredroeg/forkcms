@@ -45,8 +45,8 @@ class BackendSeaBase extends BackendBaseActionIndex
 	protected function parse()
 	{
 		// period picker
-		if(isset($this->pagePath)) BackendAnalyticsHelper::parsePeriodPicker($this->tpl, $this->startTimestamp, $this->endTimestamp, array('page_path' => $this->pagePath));
-		else BackendAnalyticsHelper::parsePeriodPicker($this->tpl, $this->startTimestamp, $this->endTimestamp);
+		if(isset($this->pagePath)) BackendSeaHelp::parsePeriodPicker($this->tpl, $this->startTimestamp, $this->endTimestamp, array('page_path' => $this->pagePath));
+		else BackendSeaHelp::parsePeriodPicker($this->tpl, $this->startTimestamp, $this->endTimestamp);
 	}
 
 	/**

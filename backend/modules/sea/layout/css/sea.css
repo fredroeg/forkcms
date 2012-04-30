@@ -19,42 +19,48 @@
 
 /* Analytics top data */
 
-.analyticsColWrapper { padding: 4px 10px; }
-.analyticsColWrapper:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }
+.analyticsColWrapper, .seaColWrapper { padding: 4px 10px; }
+.analyticsColWrapper:after, .seaColWrapper:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }
 
-	.analyticsCol {
-		float: left;
-		max-width: 243px;
-		width: 25%;
-	}
+.analyticsCol {
+float: left;
+max-width: 243px;
+width: 25%;
+}
 
-		.analyticsCol strong {
-			font-size: 16px;
-			font-weight: 700;
-		}
+.analyticsCol strong, .seaCol strong {
+	font-size: 16px;
+	font-weight: 700;
+}
 
-		.analyticsCol a {
-			font-size: 11px;
-			font-weight: 700;
-			border: 0;
-			color: #0077cc; /* I'm changing the link color to match the Google Analytics layout */
-			border: none;
-		}
+.analyticsCol a, .seaCol a {
+	font-size: 11px;
+	font-weight: 700;
+	border: 0;
+	color: #0077cc; /* I'm changing the link color to match the Google Analytics layout */
+	border: none;
+}
 
-		.analyticsCol a:link,
-		.analyticsCol a:visited {
-			color: #0077cc;
-		}
+.analyticsCol a:link, .seaCol a:link,
+.analyticsCol a:visited, .seaCol a:visited {
+	color: #0077cc;
+}
 
-		.analyticsCol a:hover,
-		.analyticsCol a:active {
-			color: #001a77;
-		}
+.analyticsCol a:hover, .seaCol a:hover,
+.analyticsCol a:active, .seaCol a:active {
+	color: #001a77;
+}
 
-		.analyticsCol small {
-			color: #999;
-			font-size: 11px;
-		}
+.analyticsCol small, .seaCol small {
+	color: #999;
+	font-size: 11px;
+}
+
+.seaCol {
+float: left;
+max-width: 324px;
+width: 33.3%;
+}
 
 /* Analytics icon buttons */
 

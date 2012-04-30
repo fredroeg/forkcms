@@ -48,6 +48,23 @@
 			{/option:graphData}
 			<div id="linechart"></div>
 		</div>
+		<div class="options content">
+			<h3>{$lblStatisticsThisMonth|ucfirst}</h3>
+			<div class="seaColWrapper clearfix">
+				<div class="seaCol">
+					<p><strong>{$impressions}</strong> {$lblImpressions|ucfirst}</p>
+					<p><strong>{$clicks}</strong> {$lblClicks|ucfirst}</p>
+				</div>
+				<div class="seaCol">
+					<p><strong>{$ctr}</strong> {$lblCTR|ucfirst}</p>
+					<p><strong>{$costPerClick}</strong> {$lblCostPerClick|ucfirst}</p>
+				</div>
+				<div class="seaCol">
+					<p><strong>{$position}</strong> {$lblPosition|ucfirst}</p>
+					<p><strong>{$cost}</strong> {$lblCost|ucfirst}</p>
+				</div>
+			</div>
+		</div>
 </div>
 
 
