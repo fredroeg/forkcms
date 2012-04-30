@@ -128,6 +128,12 @@ jsBackend.sea.chartDoubleMetricPerDay =
 
 		metric2Values.each(function() {metric2Data.push(parseFloat($(this).html()));});
 
+		var metric3Name = $('#dataChartDoubleMetricPerDay ul.series li#metric3serie span.name').html();
+		var metric3Values = $('#dataChartDoubleMetricPerDay ul.series li#metric3serie span.value');
+		var metric3Data = [];
+
+		metric3Values.each(function() {metric3Data.push(parseFloat($(this).html()));});
+
 
 		var containerWidth = $('#chartDoubleMetricPerDay').width();
 
@@ -145,7 +151,7 @@ jsBackend.sea.chartDoubleMetricPerDay =
 				column: {pointPadding: 0.2, borderWidth: 0},
 				series: {fillOpacity: 0.3}
 			},
-			series: [{name: metric1Name, data: metric1Data, type: 'area'}, {name: metric2Name, data: metric2Data}]
+			series: [{name: metric1Name, data: metric1Data}, {name: metric2Name, data: metric2Data}, {name: metric3Name, data: metric3Data}]
 		});
 	},
 

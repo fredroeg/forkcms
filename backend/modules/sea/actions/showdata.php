@@ -104,7 +104,7 @@ class BackendSeaShowdata extends BackendSeaBase
 		$endTimestamp = date('Y-m-d', SpoonSession::get('sea_end_timestamp'));
 
 		$maxYAxis = 2;
-		$metricsArr = array('cost_per_click', 'cost_per_conversion');
+		$metricsArr = array('cost_per_click', 'cost_per_conversion', 'cost_per_mimpressions');
 		$graphData = array();
 
 		$metricsPerDay = (array) BackendSeaModel::getMetricsPerDay($metricsArr, $startTimestamp, $endTimestamp);

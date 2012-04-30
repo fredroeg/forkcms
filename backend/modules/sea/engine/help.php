@@ -11,7 +11,7 @@ class BackendSeaHelp
 	public static function getAllData($period)
 	{
 		// first data collection
-		$metrics = array('adCost', 'visits', 'impressions', 'adClicks', 'CTR', 'CPC');
+		$metrics = array('adCost', 'visits', 'impressions', 'adClicks', 'CTR', 'CPC', 'CPM');
 		$dimensions = array('medium', 'date');
 		$returnedData = self::getData($metrics, $period, $dimensions);
 		$decoded = json_decode($returnedData, true);
@@ -36,12 +36,15 @@ class BackendSeaHelp
 		$seaDataArray['CTR'] = $decoded['totalsForAllResults']['ga:CTR'];
 		//Cost-Per-Click
 		$seaDataArray['CPC'] = $decoded['totalsForAllResults']['ga:CPC'];
+		//Cost per 1000 impressions
+		$seaDataArray['CPM'] = $decoded['totalsForAllResults']['ga:CPM'];
 		//Conversions
 		$seaDataArray['conversions'] = $decodedConversions['totalsForAllResults']['ga:goalCompletionsAll'];
 		//Conversion rate (or conv. percentage)
 		$seaDataArray['conversion_percentage'] = $decodedConversions['totalsForAllResults']['ga:goalConversionRateAll'];
 		//Cost per conversion
 		$seaDataArray['cost_per_conversion'] = $decodedConversions['totalsForAllResults']['ga:costPerConversion'];
+
 
 
 		//Data per day
@@ -54,6 +57,7 @@ class BackendSeaHelp
 				'adClicks' => $row[5],
 				'CTR' => $row[6],
 				'CPC' => $row[7],
+				'CPM' => $row[8]
 			 );
 		}
 		foreach ($decodedConversions['rows'] as $key => $row)
