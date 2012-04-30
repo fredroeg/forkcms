@@ -18,8 +18,8 @@ jsBackend.sea.charts =
 		{
 			Highcharts.setOptions(
 			{
-				colors: ['#058DC7', '#50b432', '#ED561B', '#EDEF00', '#24CBE5', '#64E572', '#FF9655'],
-				title: { text: '' },
+				colors: ['#ED561B', '#50b432', '#058DC7', '#EDEF00', '#24CBE5', '#64E572', '#FF9655'],
+				title: { text: 'SEA Visits/Period' },
 				legend:
 				{
 					layout: 'vertical',
@@ -57,10 +57,7 @@ jsBackend.sea.chartSingleMetricPerDay =
 
 		xAxisItems.each(function()
 		{
-			xAxisValues.push($(this).children('span.fulldate').html());
-			var text = $(this).children('span.date').html();
-			if(xAxisItems.length > 10 && counter%interval > 0) text = ' ';
-			xAxisCategories.push(text);
+			xAxisValues.push($(this).children('span.date').html());
 			counter++;
 		});
 
@@ -72,9 +69,9 @@ jsBackend.sea.chartSingleMetricPerDay =
 
 		jsBackend.sea.chartSingleMetricPerDay.chart = new Highcharts.Chart(
 		{
-			chart: { renderTo: 'chartSingleMetricPerDay', margin: [60, 0, 30, 40], defaultSeriesType: 'line' },
-			xAxis: { lineColor: '#CCC', lineWidth: 1, categories: xAxisCategories, color: '#000' },
-			yAxis: { min: 0, max: $('#dataChartSingleMetricPerDay #maxYAxis').html(), tickInterval: ($('#dataChartSingleMetricPerDay #tickInterval').html() == '' ? null : $('#dataChartSingleMetricPerDay #tickInterval').html()), title: { text: '' } },
+			chart: { renderTo: 'chartSingleMetricPerDay', margin: [60, 0, 30, 40], defaultSeriesType: 'area' },
+			xAxis: { lineColor: '#CCC', lineWidth: 1, categories: xAxisValues, color: '#000' },
+			yAxis: { title: { text: '' } },
 			credits: { enabled: false },
 			tooltip: { formatter: function() { return '<b>'+ this.series.name +'</b><br/>'+ xAxisValues[this.point.x] +': '+ this.y; } },
 			plotOptions:
@@ -85,6 +82,7 @@ jsBackend.sea.chartSingleMetricPerDay =
 			},
 			series: [{ name: singleMetricName, data: singleMetricData }]
 		});
+
 	},
 
 	// destroy chart

@@ -110,8 +110,9 @@ class BackendSeaHelper
 	public static function checkStatus()
 	{
 		$timestamp = strtotime('+1 hour', BackendSeaModel::getTimeStampAccessToken());
+		$now = strtotime(BackendModel::getUTCDate());
 		// stored time + 1 hour is greater than this time => the access token is still up to date
-		if($timestamp > BackendModel::getUTCDate())
+		if($timestamp > $now)
 		{
 			// still oke, return true
 			return true;

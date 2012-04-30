@@ -46,7 +46,7 @@
 				</div>
 				<div id="chartSingleMetricPerDay">&nbsp;</div>
 			{/option:graphData}
-			<!--<div id="linechart"></div>-->
+			<div id="linechart"></div>
 		</div>
 </div>
 
