@@ -105,6 +105,15 @@ class BackendSeaModel
 		return true;
 	}
 
+	public static function updateIds($values)
+	{
+		$datetime = BackendModel::getUTCDate();
+		foreach($values as $name => $value)
+		{
+			BackendModel::getDB()->update('sea_settings', array('value' => $value, 'date' => $datetime), 'name = ?', $name);
+		}
+	}
+
 	/**
 	 * Insert the data in the database
 	 *
