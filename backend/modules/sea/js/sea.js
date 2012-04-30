@@ -1,3 +1,11 @@
+/**
+ * Interaction for the analytics module
+ *
+ * Based on the analytics-script file from Annelies Vanextergem and Thomas Deceuninck
+ * @author Frederick Roegiers <frederick.roegiers@wijs.be>
+ *
+ */
+
 jsBackend.sea =
 {
 	init: function()
@@ -53,7 +61,6 @@ jsBackend.sea.chartSingleMetricPerDay =
 	{
 		var xAxisItems = $('#dataChartSingleMetricPerDay ul.series ul.data li');
 		var xAxisValues = [];
-		var xAxisCategories = [];
 		var counter = 0;
 		var interval = Math.ceil(xAxisItems.length / 10);
 
@@ -151,7 +158,9 @@ jsBackend.sea.chartDoubleMetricPerDay =
 				column: {pointPadding: 0.2, borderWidth: 0},
 				series: {fillOpacity: 0.3}
 			},
-			series: [{name: metric1Name, data: metric1Data}, {name: metric2Name, data: metric2Data}, {name: metric3Name, data: metric3Data}]
+			series: [   {name: metric1Name, data: metric1Data},
+				    {name: metric2Name, data: metric2Data},
+				    {name: metric3Name, data: metric3Data}]
 		});
 	},
 

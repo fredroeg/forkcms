@@ -26,8 +26,8 @@ class BackendSeaIndex extends BackendBaseActionIndex
 
 	public function display($template = null)
 	{
-	    parent::display($template);
-	    $url = BackendSeaHelper::loginWithOAuth();
-	    $this->tpl->assign('login', $url);
+		parent::display($template);
+		$url = BackendSeaHelper::loginWithOAuth();
+		$this->tpl->assign('login', $url);
 	}
 }

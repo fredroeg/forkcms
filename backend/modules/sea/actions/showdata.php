@@ -23,6 +23,9 @@ class BackendSeaShowdata extends BackendSeaBase
 		parent::parse();
 	}
 
+	/**
+	 * Check if our access token is still valid
+	 */
 	private function checkStatus()
 	{
 		$redirect = BackendSeaHelper::checkStatus();
@@ -32,6 +35,9 @@ class BackendSeaShowdata extends BackendSeaBase
 		}
 	}
 
+	/**
+	 * Check if we have the necessary data in the db, otherwise insert the missing data
+	 */
 	private function seaDataDump()
 	{
 		//Define the period
@@ -48,6 +54,11 @@ class BackendSeaShowdata extends BackendSeaBase
 		$this->getDataFromThisPeriod(BackendSeaModel::getPeriodId($period));
 	}
 
+	/**
+	 * Get all the data from that period, and assign it to the template
+	 *
+	 * @param array $periodId
+	 */
 	private function getDataFromThisPeriod($periodId)
 	{
 		$periodDataArray = BackendSeaModel::getSEAData($periodId);
@@ -64,7 +75,7 @@ class BackendSeaShowdata extends BackendSeaBase
 	}
 
 	/**
-	 * Parses the data to make the line-chart
+	 * Parses the data to make a single line-chart
 	 */
 	private function parseLineChartData()
 	{
@@ -96,7 +107,7 @@ class BackendSeaShowdata extends BackendSeaBase
 	}
 
 	/**
-	 * Parses the data to make the line-chart
+	 * Parses the data to make a multi line-chart
 	 */
 	private function parseMultiLineChartData()
 	{

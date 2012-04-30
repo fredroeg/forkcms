@@ -96,44 +96,42 @@ class BackendSeaHelper
 		}
 
 		BackendSeaModel::updateTokens($accessToken);
+		SpoonSession::set('accessTokenCreated', time());
 		return true;
 	}
 
-	/**
-	 * This function checks
-	 *	- if the access token is older than 3600 seconds
-	 *	- if we already have got a refresh token
-	 *
-	 * depending on the situation there will be a different action
-	 *
-	 */
 	public static function checkStatus()
 	{
-		$timestamp = strtotime('+1 hour', BackendSeaModel::getTimeStampAccessToken());
-		$now = strtotime(BackendModel::getUTCDate());
-		// stored time + 1 hour is greater than this time => the access token is still up to date
-		// Still something is wrong...
-		if($timestamp > $now)
+		if (!isset($_SESSION['accessTokenCreated']))
 		{
-			// still oke, return true
-			return true;
+			return self::renewAccessToken();
+		}
+		else if (time() - $_SESSION['accessTokenCreated'] > 3600)
+		{
+			return self::renewAccessToken();
 		}
 		else
 		{
-			$APISettingsArray = BackendSeaModel::getAPISettings();
-			if(isset($APISettingsArray['refresh_token']) && $APISettingsArray['refresh_token'] != null)
+		    return true;
+		}
+	}
+
+	private static function renewAccessToken()
+	{
+		$APISettingsArray = BackendSeaModel::getAPISettings();
+		if(isset($APISettingsArray['refresh_token']) && $APISettingsArray['refresh_token'] != null)
+		{
+			if(BackendSeaHelper::getOAuth2Token($APISettingsArray['refresh_token'], true))
 			{
-				if(BackendSeaHelper::getOAuth2Token($APISettingsArray['refresh_token'], true))
-				{
-					// it's up to date again, return true
-					return true;
-				}
+				SpoonSession::set('accessTokenCreated', time());
+				// it's up to date again, return true
+				return true;
 			}
-			else
-			{
-				// first time, so no refresh or access token, return false (need auth with google)
-				return false;
-			}
+		}
+		else
+		{
+			// first time, so no refresh or access token, return false (need auth with google)
+			return false;
 		}
 	}
 
