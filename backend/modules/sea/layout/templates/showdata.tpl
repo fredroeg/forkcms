@@ -26,8 +26,6 @@
 		<div class="options content">
 			{option:graphData}
 				<div id="dataChartSingleMetricPerDay" class="hidden">
-					<span id="maxYAxis">{$maxYAxis}</span>
-					<span id="tickInterval">{$tickInterval}</span>
 					<span id="yAxisTitle">{$lblVisits|ucfirst}</span>
 					<ul class="series">
 						{iteration:graphData}
@@ -46,7 +44,6 @@
 				</div>
 				<div id="chartSingleMetricPerDay">&nbsp;</div>
 			{/option:graphData}
-			<div id="linechart"></div>
 		</div>
 		<div class="options content">
 			<h3>{$lblStatisticsThisMonth|ucfirst}</h3>
@@ -64,6 +61,36 @@
 					<p><strong>{$cost}</strong> {$lblCost|ucfirst}</p>
 				</div>
 			</div>
+		</div>
+		<div class="options content">
+		<div class="analyticsGraphWrapper">
+		    <div class="analyticsLeftCol">
+		    </div>
+		    <div class="analyticsRightCol">
+		    <h3>Highchart</h3>
+		    {option:graphDataMulti}
+			    <div id="dataChartDoubleMetricPerDay" class="hidden">
+					<span id="yAxisTitle">{$lblVisits|ucfirst}</span>
+					<ul class="series">
+						{iteration:graphDataMulti}
+							<li class="serie" id="metric{$graphDataMulti.i}serie">
+								<span class="name">{$graphDataMulti.label}</span>
+								<ul class="data">
+									{iteration:graphDataMulti.data}
+										<li>
+											<span class="date">{$graphDataMulti.data.date|date:'d M':{$INTERFACE_LANGUAGE}|ucwords}</span>
+											<span class="value">{$graphDataMulti.data.value}</span>
+										</li>
+									{/iteration:graphDataMulti.data}
+								</ul>
+							</li>
+						{/iteration:graphDataMulti}
+					</ul>
+			    </div>
+			    <div id="chartDoubleMetricPerDay">&nbsp;</div>
+		    {/option:graphDataMulti}
+		    </div
+</div>
 		</div>
 </div>
 

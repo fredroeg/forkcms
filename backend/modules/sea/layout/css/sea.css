@@ -82,14 +82,14 @@ width: 33.3%;
 
 	.analyticsLeftCol {
 		float: left;
-		max-width: 491px;
-		width: 49.3%;
+		max-width: 291px;
+		width: 30%;
 	}
 
 	.analyticsRightCol {
 		float: right;
-		max-width: 491px;
-		width: 49.3%;
+		max-width: 680px;
+		width: 70%;
 	}
 
 		a.analyticsBacklink {

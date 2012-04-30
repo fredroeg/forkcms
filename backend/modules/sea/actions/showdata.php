@@ -13,6 +13,7 @@ class BackendSeaShowdata extends BackendSeaBase
 		$this->checkStatus();
 		$this->seaDataDump();
 		$this->parseLineChartData();
+		$this->parseMultiLineChartData();
 		$this->parse();
 		$this->display();
 	}
@@ -74,7 +75,7 @@ class BackendSeaShowdata extends BackendSeaBase
 		$metric = 'visits';
 		$graphData = array();
 
-		$metricsPerDay = (array) BackendSeaModel::getMetricsPerDay($metric, $startTimestamp, $endTimestamp);
+		$metricsPerDay = (array) BackendSeaModel::getMetricPerDay($metric, $startTimestamp, $endTimestamp);
 
 		$graphData[0]['title'] = $metric;
 		$graphData[0]['label'] = SpoonFilter::ucfirst(BL::lbl(SpoonFilter::toCamelCase($metric)));
@@ -92,5 +93,39 @@ class BackendSeaShowdata extends BackendSeaBase
 		$this->tpl->assign('maxYAxis', $maxYAxis);
 		$this->tpl->assign('tickInterval', ($maxYAxis == 2 ? '1' : ''));
 		$this->tpl->assign('graphData', $graphData);
+	}
+
+	/**
+	 * Parses the data to make the line-chart
+	 */
+	private function parseMultiLineChartData()
+	{
+		$startTimestamp = date('Y-m-d', SpoonSession::get('sea_start_timestamp'));
+		$endTimestamp = date('Y-m-d', SpoonSession::get('sea_end_timestamp'));
+
+		$maxYAxis = 2;
+		$metricsArr = array('cost_per_click', 'cost_per_conversion');
+		$graphData = array();
+
+		$metricsPerDay = (array) BackendSeaModel::getMetricsPerDay($metricsArr, $startTimestamp, $endTimestamp);
+
+		foreach($metricsArr as $i => $metric)
+		{
+			// build graph data array
+			$graphData[$i] = array();
+			$graphData[$i]['title'] = $metric;
+			$graphData[$i]['label'] = SpoonFilter::ucfirst(BL::lbl(SpoonFilter::toCamelCase($metric)));
+			$graphData[$i]['i'] = $i + 1;
+			$graphData[$i]['data'] = array();
+
+			foreach($metricsPerDay as $j => $data)
+			{
+				// build array
+				$graphData[$i]['data'][$j]['date'] =  $data['day'];
+				$graphData[$i]['data'][$j]['value'] = (string) $data[$metric];
+			}
+		}
+
+		$this->tpl->assign('graphDataMulti', $graphData);
 	}
 }
