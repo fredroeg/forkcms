@@ -195,4 +195,9 @@ class BackendSeaModel
 		$return = ($numRows > 0) ? (true) : (false);
 		return $return;
 	}
+
+	public static function truncateTables()
+	{
+		BackendModel::getDB()->truncate(array('sea_period_data', 'sea_period', 'sea_day_data'));
+	}
 }

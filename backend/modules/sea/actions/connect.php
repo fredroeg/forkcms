@@ -100,6 +100,9 @@ class BackendSeaConnect extends BackendBaseActionEdit
                                 // insert the item
                                 $id = (int) BackendSeaModel::updateIds($values);
 
+				// truncate the tables
+				$this->truncateTables($values['table_id']);
+
 				// check if nees authentication (only when the inputfields have been changed)
 				$this->authNeeded($values['client_id'], $values['client_secret']);
 			}
@@ -141,8 +144,27 @@ class BackendSeaConnect extends BackendBaseActionEdit
 	{
 		if($this->clientId != $clientId || $this->clientSecret != $clientSecret)
 		{
+			BackendSeaModel::truncateTables();
+
 			$url = BackendSeaHelper::loginWithOAuth();
 			$this->redirect($url);
+		}
+		else
+		{
+			$this->redirect('connect');
+		}
+	}
+
+	/**
+	 * Truncate the tables if the user has selected a different profile
+	 *
+	 * @param string $tableId
+	 */
+	private function truncateTables($tableId)
+	{
+		if($this->tableId != $tableId)
+		{
+			BackendSeaModel::truncateTables();
 		}
 	}
 

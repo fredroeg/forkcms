@@ -129,7 +129,7 @@ class BackendSeaHelper
 		}
 		else
 		{
-			spoonHTTP::redirect('connect');
+			return false;
 		}
 	}
 
