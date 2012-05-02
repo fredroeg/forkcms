@@ -48,7 +48,15 @@ class BackendSeaConnect extends BackendBaseActionEdit
                 $this->frm->addText('clientId', $this->clientId);
 		$this->frm->addText('clientIdSecret', $this->clientSecret);
 
-		$this->frm->addDropdown('tableId', $this->getTableIds(), $this->record['table_id']);
+		if($this->clientId != '' && $this->clientSecret != '' && $this->tableId != '')
+		{
+		    $this->frm->addRadiobutton('profileId', $this->getProfileIds(), $this->record['table_id']);
+		}
+		else
+		{
+		    $this->frm->addRadiobutton('profileId', $this->getProfileIds());
+		}
+
 
 		// submit dialog
                 $this->frm->addButton('change', 'update', 'submit', 'inputButton button mainButton');
@@ -58,7 +66,7 @@ class BackendSeaConnect extends BackendBaseActionEdit
 		// 2nd time = table selected
 		if($this->tableId == '' && $this->clientId != '' && $this->clientSecret != '')
 		{
-		    $this->tpl->assign("profileError", "Please update again with a profile");
+		    $this->tpl->assign("profileError", "Good! Now, please select a profile and update again");
 		}
 	}
 
@@ -71,11 +79,13 @@ class BackendSeaConnect extends BackendBaseActionEdit
                         // shorten the fields;
                         $txtClientId = $this->frm->getField('clientId');
                         $txtClientIdSecret = $this->frm->getField('clientIdSecret');
-			$ddmTableId = $this->frm->getField('tableId');
+			$ddmTableId = $this->frm->getField('profileId');
+
+
 
                         // validate the fields
-                        $txtClientId->isFilled(BL::getError('BlockIsRequired'));
-                        $txtClientIdSecret->isFilled(BL::getError('TitleIsRequired'));
+                        $txtClientId->isFilled(BL::getError('ClientIdIsRequired'));
+                        $txtClientIdSecret->isFilled(BL::getError('ClientIdSecretIsRequired'));
 
                         if($this->frm->isCorrect())
                         {
@@ -99,7 +109,7 @@ class BackendSeaConnect extends BackendBaseActionEdit
 	 *
 	 * @return array
 	 */
-	private function getTableIds()
+	private function getProfileIds()
 	{
 		if($this->record['client_id'] != '')
 		{
@@ -107,14 +117,14 @@ class BackendSeaConnect extends BackendBaseActionEdit
 			$accountArray = array();
 			foreach ($accounts as $account)
 			{
-				$accountArray['ga:' . $account->id] = $account->name;
+				$accountArray[] = array('value' => 'ga:' . $account->id, 'label' => $account->name);
 			}
 			return $accountArray;
 		}
 		else
 		{
 			//todo msg from db
-			return array('' => 'Update with id\'s before selecting a profile');
+			return array(array('value' => '', 'label' => 'Update with id\'s before selecting a profile'));
 		}
 	}
 

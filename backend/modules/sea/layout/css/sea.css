@@ -141,6 +141,6 @@ width: 33.3%;
 
 /* URL Input */
 
-input {
+input[type=text] {
 	width: 320px;
 }

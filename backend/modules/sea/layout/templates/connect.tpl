@@ -21,9 +21,12 @@
                             {$txtClientIdSecret} {$txtClientIdSecretError}
                         </p>
 			<p>
-			    <label for="tableid">{$lblTableId|ucfirst}</label>
-			    {$ddmTableId}
-			</p>
+			{option:profileId}
+			<label>{$lblProfile|ucfirst}</label>
+			{iteration:profileId}
+			    <label for="{$profileId.id}">{$profileId.rbtProfileId} {$profileId.label}</label>
+			{/iteration:profileId}
+			{/option:profileId}
 			{option:profileError}
 			<div class='errorMessage'>
 			    {$profileError}

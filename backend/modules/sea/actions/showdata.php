@@ -2,6 +2,7 @@
 
 /**
  * This is the showdata-action
+ * It displays all the highcharts, the sea-statistics, ...
  *
  * @author Frederick Roegiers <frederick.roegiers@wijs.be>
  */
@@ -28,10 +29,9 @@ class BackendSeaShowdata extends BackendSeaBase
 	 */
 	private function checkStatus()
 	{
-		$redirect = BackendSeaHelper::checkStatus();
-		if(!$redirect)
+		if(!BackendSeaHelper::checkStatus())
 		{
-			$this->redirect('index');
+			$this->redirect('connect');
 		}
 	}
 
