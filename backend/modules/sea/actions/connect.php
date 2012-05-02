@@ -35,7 +35,6 @@ class BackendSeaConnect extends BackendBaseActionEdit
 		$this->parse();
 		$this->display();
 	}
-
 	private function getData()
 	{
 		$this->record = BackendSeaModel::getAPISettings();
@@ -123,7 +122,7 @@ class BackendSeaConnect extends BackendBaseActionEdit
 			$accountArray = array();
 			foreach ($accounts as $account)
 			{
-				$accountArray[] = array('value' => 'ga:' . $account->id, 'label' => $account->name);
+				$accountArray[] = array('value' => $account->id, 'label' => $account->name);
 			}
 			return $accountArray;
 		}

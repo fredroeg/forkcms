@@ -22,6 +22,9 @@ class BackendSeaHelp
 		$returnedData = self::getData($metrics, $period, $dimensions);
 		$decodedConversions = json_decode($returnedData, true);
 
+		// third data collection
+		$goals = self::getGoals();
+
 		//Create a new array to store all our valuable information
 		$seaDataArray = array();
 		//Total Results
@@ -44,8 +47,8 @@ class BackendSeaHelp
 		$seaDataArray['conversion_percentage'] = $decodedConversions['totalsForAllResults']['ga:goalConversionRateAll'];
 		//Cost per conversion
 		$seaDataArray['cost_per_conversion'] = $decodedConversions['totalsForAllResults']['ga:costPerConversion'];
-
-
+		//Goals
+		$seaDataArray['goals'] = $goals;
 
 		//Data per day
 		foreach ($decoded['rows'] as $key => $row)
@@ -86,7 +89,7 @@ class BackendSeaHelp
 		$APIsettingArray = BackendSeaModel::getAPISettings();
 
 		$accessToken = $APIsettingArray['access_token'];
-		$tableId = $APIsettingArray['table_id'];
+		$tableId = 'ga:' . $APIsettingArray['table_id'];
 
 		// require the GoogleAnalytics class
 		require_once 'external/google_analytics_sea.php';
@@ -142,6 +145,24 @@ class BackendSeaHelp
 
 		$returned =  self::getGoogleAnalyticsInstance()->getAnalyticsAccountList($accessToken);
 		return $returned;
+	}
+
+	public static function getGoals()
+	{
+		$apiSettings = BackendSeaModel::getAPISettings();
+		$accessToken = $apiSettings['access_token'];
+
+		$returnedDecodedString =  self::getGoogleAnalyticsInstance()->getGoals($accessToken);
+
+		$goalarray = array();
+		foreach($returnedDecodedString->items as $goal)
+		{
+		    if($goal->profileId == $apiSettings['table_id'])
+		    {
+			array_push($goalarray, $goal->name);
+		    }
+		}
+		return $goalarray;
 	}
 
 	/**

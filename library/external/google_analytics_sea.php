@@ -164,8 +164,24 @@ class GoogleAnalyticsSea
 		return json_decode($response);
 	}
 
+	public function getGoals($sessionToken)
+	{
+		// try to make the call
+		try
+		{
+			$response = $this->doCall(self::API_URL .'/management/accounts/~all/webproperties/~all/profiles/~all/goals', $sessionToken);
+		}
 
-	/**
+		// catch possible exception
+		catch(Exception $e)
+		{
+			return array();
+		}
+
+		return json_decode($response);
+	}
+
+		/**
 	 * Makes a call to Google.
 	 *
 	 * @return	array
