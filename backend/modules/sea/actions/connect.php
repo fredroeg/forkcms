@@ -26,6 +26,9 @@ class BackendSeaConnect extends BackendBaseActionEdit
 	public function execute()
 	{
 		parent::execute();
+
+		BackendSeaHelper::checkStatus();
+
 		$this->getData();
 		$this->loadForm();
 		$this->validateForm();
