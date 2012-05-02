@@ -5,13 +5,12 @@
 	<h2>{$lblSea|ucfirst}</h2>
 </div>
 {form:connectform}
-<div id="changeSettingsForm>
-        <div class="box horizontal">
+        <div class="box vertical">
 		<div class="heading">
-			<h3>{$lblGoogleConsoleSettings|ucfirst}</h3
-			<p>{$msgConsoleInfo}</p>
+			<h3>{$lblGoogleConsoleSettings|ucfirst}</h3>
 		</div>
 		<div class="options">
+			<p>{$msgConsoleInfo}</p>
                         <p>
                             <label for="clientid">{$lblClientId|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
                             {$txtClientId} {$txtClientIdError}
@@ -39,7 +38,6 @@
                         </div>
                 </div>
 	</div>
-</div>
 {/form:connectform}
 
 {include:{$BACKEND_CORE_PATH}/layout/templates/structure_end_module.tpl}

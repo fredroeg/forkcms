@@ -108,7 +108,7 @@ class BackendSeaHelper
 	public static function checkStatus()
 	{
 		$APISettingsArray = BackendSeaModel::getAPISettings();
-		if(($APISettingsArray['client_id'] != '') && ($APISettingsArray['client_secret'] != ''))
+		if(($APISettingsArray['client_id'] != '') && ($APISettingsArray['client_secret'] != '') && ($APISettingsArray['table_id'] != ''))
 		{
 			if (!isset($_SESSION['accessTokenCreated']))
 			{
