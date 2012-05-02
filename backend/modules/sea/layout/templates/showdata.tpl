@@ -46,7 +46,10 @@
 			{/option:graphData}
 		</div>
 		<div class="options content">
+			<div class="heading">
 			<h3>{$lblStatisticsThisMonth|ucfirst}</h3>
+			</div>
+			<div class="options">
 			<div class="seaColWrapper clearfix">
 				<div class="seaCol">
 					<p><strong>{$impressions}</strong> {$lblImpressions|ucfirst}</p>
@@ -61,13 +64,29 @@
 					<p><strong>{$cost}</strong> {$lblCost|ucfirst}</p>
 				</div>
 			</div>
+			</div>
 		</div>
 		<div class="options content">
 		<div class="analyticsGraphWrapper">
 		    <div class="analyticsLeftCol">
+		    <div class="heading">
+			    <h3>Goals</h3>
+		    </div>
+		    <div class="options">
+		    {option:goals}
+			<ul>
+			{iteration:goals}
+			    <li>{$goals.goal_name}</li>
+			{/iteration:goals}
+			</ul>
+		    {/option:goals}
+		    </div>
 		    </div>
 		    <div class="analyticsRightCol">
-		    <h3>Highchart</h3>
+		    <div class="heading">
+			    <h3>Cost/... Highchart</h3>
+		    </div>
+		    <div class="options">
 		    {option:graphDataMulti}
 			    <div id="dataChartDoubleMetricPerDay" class="hidden">
 					<span id="yAxisTitle">{$lblVisits|ucfirst}</span>
@@ -89,6 +108,7 @@
 			    </div>
 			    <div id="chartDoubleMetricPerDay">&nbsp;</div>
 		    {/option:graphDataMulti}
+		    </div>
 		    </div
 </div>
 		</div>

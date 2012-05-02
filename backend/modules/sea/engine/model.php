@@ -44,12 +44,12 @@ class BackendSeaModel
 	 */
 	public static function getPeriodId($period)
 	{
-	    return (int) BackendModel::getDB()->getVar(
-			'SELECT period_id
-			 FROM sea_period
-			 WHERE period_start = ? AND period_end = ?',
-			 $period
-			);
+		return (int) BackendModel::getDB()->getVar(
+			    'SELECT period_id
+			     FROM sea_period
+			     WHERE period_start = ? AND period_end = ?',
+			     $period
+			    );
 	}
 
 	/**
@@ -59,32 +59,39 @@ class BackendSeaModel
 	 */
 	public static function getSEAData($periodId)
 	{
-	    return (array) BackendModel::getDB()->getRecord(
-			'SELECT *
-			 FROM sea_period_data
-			 WHERE period_id = ?',
-			 $periodId
-			);
+		return (array) BackendModel::getDB()->getRecord(
+			    'SELECT *
+			     FROM sea_period_data
+			     WHERE period_id = ?',
+			     $periodId
+			    );
+	}
+
+	public static function getGoals()
+	{
+		return (array) BackendModel::getDB()->getRecords(
+			    'SELECT *
+			     FROM sea_goals');
 	}
 
 	public static function getMetricPerDay($metric, $startTimestamp, $endTimestamp)
 	{
-	    return (array) BackendModel::getDB()->getPairs(
-			'SELECT day, ' . $metric . '
-			 FROM sea_day_data
-			 WHERE day >= ? AND day <= ?',
-			 array($startTimestamp, $endTimestamp)
-			);
+		return (array) BackendModel::getDB()->getPairs(
+			    'SELECT day, ' . $metric . '
+			     FROM sea_day_data
+			     WHERE day >= ? AND day <= ?',
+			     array($startTimestamp, $endTimestamp)
+			    );
 	}
 
 	public static function getMetricsPerDay($metrics, $startTimestamp, $endTimestamp)
 	{
-	    return (array) BackendModel::getDB()->getRecords(
-			'SELECT day, ' . implode(",", $metrics) . '
-			 FROM sea_day_data
-			 WHERE day >= ? AND day <= ?',
-			 array($startTimestamp, $endTimestamp)
-			);
+		return (array) BackendModel::getDB()->getRecords(
+			    'SELECT day, ' . implode(",", $metrics) . '
+			     FROM sea_day_data
+			     WHERE day >= ? AND day <= ?',
+			     array($startTimestamp, $endTimestamp)
+			    );
 	}
 
 	/**
@@ -119,6 +126,11 @@ class BackendSeaModel
 			BackendModel::getDB()->update('sea_settings', array('value' => $value, 'date' => $datetime), 'name = ?', $name);
 		}
 		return true;
+	}
+
+	public static function deleteProfileId()
+	{
+		BackendModel::getDB()->update('sea_settings', array('value' => ''), 'name = ?', 'table_id');
 	}
 
 	/**
@@ -213,6 +225,6 @@ class BackendSeaModel
 
 	public static function truncateTables()
 	{
-		BackendModel::getDB()->truncate(array('sea_period_data', 'sea_period', 'sea_day_data'));
+		BackendModel::getDB()->truncate(array('sea_period_data', 'sea_period', 'sea_day_data', 'sea_goals'));
 	}
 }

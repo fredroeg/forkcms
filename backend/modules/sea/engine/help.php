@@ -51,31 +51,36 @@ class BackendSeaHelp
 		$seaDataArray['goals'] = $goals;
 
 		//Data per day
-		foreach ($decoded['rows'] as $key => $row)
+		if (array_key_exists('rows', $decoded))
 		{
-			$seaDataArray['dayStats'][$row[1]] = array(
-				'cost' => $row[2],
-				'visits' => $row[3],
-				'impressions' => $row[4],
-				'adClicks' => $row[5],
-				'CTR' => $row[6],
-				'CPC' => $row[7],
-				'CPM' => $row[8]
-			 );
-		}
-		foreach ($decodedConversions['rows'] as $key => $row)
-		{
-			$seaDataArray['dayStats'][$row[0]] += array(
-				'conversions' => $row[1],
-				'conversion_percentage' => $row[2],
-				'cost_per_conversion' => $row[3]
-			 );
-		}
-
-		//Insert this data in the database
-		if(BackendSeaModel::insertSEAData($period, $seaDataArray))
-		{
-			return true;
+			foreach ($decoded['rows'] as $key => $row)
+			{
+				$seaDataArray['dayStats'][$row[1]] = array(
+					'cost' => $row[2],
+					'visits' => $row[3],
+					'impressions' => $row[4],
+					'adClicks' => $row[5],
+					'CTR' => $row[6],
+					'CPC' => $row[7],
+					'CPM' => $row[8]
+				 );
+			}
+			if (array_key_exists('rows', $decodedConversions))
+			{
+				foreach ($decodedConversions['rows'] as $key => $row)
+				{
+					$seaDataArray['dayStats'][$row[0]] += array(
+						'conversions' => $row[1],
+						'conversion_percentage' => $row[2],
+						'cost_per_conversion' => $row[3]
+					 );
+				}
+			}
+			//Insert this data in the database
+			if(BackendSeaModel::insertSEAData($period, $seaDataArray))
+			{
+				return true;
+			}
 		}
 	}
 

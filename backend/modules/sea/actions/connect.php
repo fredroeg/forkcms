@@ -52,11 +52,11 @@ class BackendSeaConnect extends BackendBaseActionEdit
 
 		if($this->clientId != '' && $this->clientSecret != '' && $this->tableId != '')
 		{
-		    $this->frm->addRadiobutton('profileId', $this->getProfileIds(), $this->record['table_id']);
+			$this->frm->addRadiobutton('profileId', $this->getProfileIds(), $this->record['table_id']);
 		}
 		else
 		{
-		    $this->frm->addRadiobutton('profileId', $this->getProfileIds());
+			$this->frm->addRadiobutton('profileId', $this->getProfileIds());
 		}
 
 
@@ -68,7 +68,7 @@ class BackendSeaConnect extends BackendBaseActionEdit
 		// 2nd time = table selected
 		if($this->tableId == '' && $this->clientId != '' && $this->clientSecret != '')
 		{
-		    $this->tpl->assign("profileError", "Good! Now, please select a profile and update again");
+			$this->tpl->assign("profileError", "Good! Now, please select a profile and update again");
 		}
 	}
 
@@ -144,6 +144,7 @@ class BackendSeaConnect extends BackendBaseActionEdit
 		if($this->clientId != $clientId || $this->clientSecret != $clientSecret)
 		{
 			BackendSeaModel::truncateTables();
+			BackendSeaModel::deleteProfileId();
 
 			$url = BackendSeaHelper::loginWithOAuth();
 			$this->redirect($url);

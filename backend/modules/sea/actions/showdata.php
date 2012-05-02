@@ -52,6 +52,7 @@ class BackendSeaShowdata extends BackendSeaBase
 		}
 
 		$this->getDataFromThisPeriod(BackendSeaModel::getPeriodId($period));
+		$this->getGoals();
 	}
 
 	/**
@@ -62,16 +63,27 @@ class BackendSeaShowdata extends BackendSeaBase
 	private function getDataFromThisPeriod($periodId)
 	{
 		$periodDataArray = BackendSeaModel::getSEAData($periodId);
-		$this->tpl->assign('visits', $periodDataArray['visits']);
-		$this->tpl->assign('conversions', $periodDataArray['conversions']);
-		$this->tpl->assign('conversionPercentage', $periodDataArray['conversion_percentage'] . '&#37;');
-		$this->tpl->assign('costPerConversion', $periodDataArray['cost_per_conversion']);
-		$this->tpl->assign('impressions', $periodDataArray['impressions']);
-		$this->tpl->assign('clicks', $periodDataArray['clicks_amount']);
-		$this->tpl->assign('ctr', $periodDataArray['click_through_rate']);
-		$this->tpl->assign('costPerClick', $periodDataArray['cost_per_click']);
-		//$this->tpl->assign('position', $periodDataArray['position']);
-		$this->tpl->assign('cost', $periodDataArray['costs']);
+
+		if(!empty ($periodDataArray))
+		{
+			$this->tpl->assign('visits', $periodDataArray['visits']);
+			$this->tpl->assign('conversions', $periodDataArray['conversions']);
+			$this->tpl->assign('conversionPercentage', $periodDataArray['conversion_percentage'] . '&#37;');
+			$this->tpl->assign('costPerConversion', $periodDataArray['cost_per_conversion']);
+			$this->tpl->assign('impressions', $periodDataArray['impressions']);
+			$this->tpl->assign('clicks', $periodDataArray['clicks_amount']);
+			$this->tpl->assign('ctr', $periodDataArray['click_through_rate']);
+			$this->tpl->assign('costPerClick', $periodDataArray['cost_per_click']);
+			//$this->tpl->assign('position', $periodDataArray['position']);
+			$this->tpl->assign('cost', $periodDataArray['costs']);
+		}
+	}
+
+	private function getGoals()
+	{
+
+		$goals = BackendSeaModel::getGoals();
+		$this->tpl->assign('goals', $goals);
 	}
 
 	/**
