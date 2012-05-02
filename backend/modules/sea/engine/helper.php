@@ -31,6 +31,7 @@ class BackendSeaHelper
 			$accessType,
 			$approvalPrompt);
 
+		// redirect immediately to google
 		spoonHTTP::redirect($loginUrl);
 	}
 
@@ -100,6 +101,10 @@ class BackendSeaHelper
 		return true;
 	}
 
+	/**
+	 * Depending on the current state, we have to renew the access token and redirect to a certain page
+	 * @return boolean
+	 */
 	public static function checkStatus()
 	{
 		$APISettingsArray = BackendSeaModel::getAPISettings();
@@ -128,6 +133,12 @@ class BackendSeaHelper
 		}
 	}
 
+	/**
+	 * function to check whether there is a refresh token
+	 * then renew the access token or authenticate with Google
+	 *
+	 * @return boolean
+	 */
 	private static function renewAccessToken()
 	{
 		$APISettingsArray = BackendSeaModel::getAPISettings();
@@ -142,8 +153,8 @@ class BackendSeaHelper
 		}
 		else
 		{
-			// first time, so no refresh or access token, return false (need auth with google)
-			return self::loginWithOAuth();
+			// first time, so no refresh or access token --> (need auth with google)
+			self::loginWithOAuth();
 		}
 	}
 

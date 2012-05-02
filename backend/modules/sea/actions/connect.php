@@ -8,8 +8,18 @@
  */
 class BackendSeaConnect extends BackendBaseActionEdit
 {
+	/**
+	 * Client Id
+	 *
+	 * @var string
+	 */
 	private $clientId;
 
+	/**
+	 * Client Secret
+	 *
+	 * @var string
+	 */
 	private $clientSecret;
 
 
@@ -43,6 +53,9 @@ class BackendSeaConnect extends BackendBaseActionEdit
 		// submit dialog
                 $this->frm->addButton('change', 'update', 'submit', 'inputButton button mainButton');
 
+		// the user has to update 2 times
+		// 1st time = authentication
+		// 2nd time = table selected
 		if($this->tableId == '' && $this->clientId != '' && $this->clientSecret != '')
 		{
 		    $this->tpl->assign("profileError", "Please update again with a profile");
@@ -60,7 +73,6 @@ class BackendSeaConnect extends BackendBaseActionEdit
                         $txtClientIdSecret = $this->frm->getField('clientIdSecret');
 			$ddmTableId = $this->frm->getField('tableId');
 
-
                         // validate the fields
                         $txtClientId->isFilled(BL::getError('BlockIsRequired'));
                         $txtClientIdSecret->isFilled(BL::getError('TitleIsRequired'));
@@ -75,11 +87,18 @@ class BackendSeaConnect extends BackendBaseActionEdit
                                 // insert the item
                                 $id = (int) BackendSeaModel::updateIds($values);
 
+				// check if nees authentication (only when the inputfields have been changed)
 				$this->authNeeded($values['client_id'], $values['client_secret']);
 			}
 		}
 	}
 
+	/**
+	 * Get all the id's and names from the different profiles in your account
+	 * return an array to display it in a dropdownlist
+	 *
+	 * @return array
+	 */
 	private function getTableIds()
 	{
 		if($this->record['client_id'] != '')
@@ -94,21 +113,23 @@ class BackendSeaConnect extends BackendBaseActionEdit
 		}
 		else
 		{
+			//todo msg from db
 			return array('' => 'Update with id\'s before selecting a profile');
 		}
 	}
 
-	private function checkStatus()
-	{
-		$url = BackendSeaHelper::loginWithOAuth();
-		$this->redirect($url);
-	}
-
+	/**
+	 * Function to determine if it's necessary to authenticate with Google
+	 *
+	 * @param string $clientId
+	 * @param string $clientSecret
+	 */
 	private function authNeeded($clientId, $clientSecret)
 	{
 		if($this->clientId != $clientId || $this->clientSecret != $clientSecret)
 		{
-			$this->checkStatus();
+			$url = BackendSeaHelper::loginWithOAuth();
+			$this->redirect($url);
 		}
 	}
 
