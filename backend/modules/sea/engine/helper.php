@@ -7,7 +7,7 @@
 class BackendSeaHelper
 {
 	/**
-	 * This helperfunction returns a URM.
+	 * This helperfunction returns a URL.
 	 * This URL will redirect us to google (button to grant access)
 	 *
 	 * @return string
@@ -31,7 +31,7 @@ class BackendSeaHelper
 			$accessType,
 			$approvalPrompt);
 
-		return $loginUrl;
+		spoonHTTP::redirect($loginUrl);
 	}
 
 	/**
@@ -102,24 +102,36 @@ class BackendSeaHelper
 
 	public static function checkStatus()
 	{
-		if (!isset($_SESSION['accessTokenCreated']))
+		$APISettingsArray = BackendSeaModel::getAPISettings();
+		if(($APISettingsArray['client_id'] != '') && ($APISettingsArray['client_secret'] != ''))
 		{
-			return self::renewAccessToken();
-		}
-		else if (time() - $_SESSION['accessTokenCreated'] > 3600)
-		{
-			return self::renewAccessToken();
+			if (!isset($_SESSION['accessTokenCreated']))
+			{
+				return self::renewAccessToken();
+			}
+			else if (time() - $_SESSION['accessTokenCreated'] > 3600)
+			{
+				return self::renewAccessToken();
+			}
+			else if (($APISettingsArray['access_token'] == '') || ($APISettingsArray['refresh_token'] == ''))
+			{
+				return self::renewAccessToken();
+			}
+			else
+			{
+			    return true;
+			}
 		}
 		else
 		{
-		    return true;
+			spoonHTTP::redirect('connect');
 		}
 	}
 
 	private static function renewAccessToken()
 	{
 		$APISettingsArray = BackendSeaModel::getAPISettings();
-		if(isset($APISettingsArray['refresh_token']) && $APISettingsArray['refresh_token'] != null)
+		if($APISettingsArray['refresh_token'] != '')
 		{
 			if(BackendSeaHelper::getOAuth2Token($APISettingsArray['refresh_token'], true))
 			{
@@ -131,7 +143,7 @@ class BackendSeaHelper
 		else
 		{
 			// first time, so no refresh or access token, return false (need auth with google)
-			return false;
+			return self::loginWithOAuth();
 		}
 	}
 

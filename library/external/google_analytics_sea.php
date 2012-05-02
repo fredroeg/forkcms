@@ -152,7 +152,7 @@ class GoogleAnalyticsSea
 		// try to make the call
 		try
 		{
-			$response = $this->doCall(self::API_URL .'/management/accounts', $sessionToken);
+			$response = $this->doCall(self::API_URL .'/management/accounts/~all/webproperties/~all/profiles', $sessionToken);
 		}
 
 		// catch possible exception

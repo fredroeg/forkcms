@@ -8,6 +8,11 @@
  */
 class BackendSeaConnect extends BackendBaseActionEdit
 {
+	private $clientId;
+
+	private $clientSecret;
+
+
 	public function execute()
 	{
 		parent::execute();
@@ -21,17 +26,27 @@ class BackendSeaConnect extends BackendBaseActionEdit
 	private function getData()
 	{
 		$this->record = BackendSeaModel::getAPISettings();
+
+		$this->clientId = $this->record['client_id'];
+		$this->clientSecret = $this->record['client_secret'];
+		$this->tableId = $this->record['table_id'];
 	}
 
 	private function loadForm()
 	{
 		$this->frm = new BackendForm('connectform');
+                $this->frm->addText('clientId', $this->clientId);
+		$this->frm->addText('clientIdSecret', $this->clientSecret);
 
-                $this->frm->addText('clientId', $this->record['client_id']);
-		$this->frm->addText('clientIdSecret', $this->record['client_secret']);
+		$this->frm->addDropdown('tableId', $this->getTableIds(), $this->record['table_id']);
 
 		// submit dialog
                 $this->frm->addButton('change', 'update', 'submit', 'inputButton button mainButton');
+
+		if($this->tableId == '' && $this->clientId != '' && $this->clientSecret != '')
+		{
+		    $this->tpl->assign("profileError", "Please update again with a profile");
+		}
 	}
 
 	private function validateForm()
@@ -43,6 +58,8 @@ class BackendSeaConnect extends BackendBaseActionEdit
                         // shorten the fields;
                         $txtClientId = $this->frm->getField('clientId');
                         $txtClientIdSecret = $this->frm->getField('clientIdSecret');
+			$ddmTableId = $this->frm->getField('tableId');
+
 
                         // validate the fields
                         $txtClientId->isFilled(BL::getError('BlockIsRequired'));
@@ -53,37 +70,46 @@ class BackendSeaConnect extends BackendBaseActionEdit
                                 // build array
                                 $values['client_id'] = $txtClientId->getValue();
                                 $values['client_secret'] = $txtClientIdSecret->getValue();
+				$values['table_id'] = $ddmTableId->getValue();
 
                                 // insert the item
                                 $id = (int) BackendSeaModel::updateIds($values);
 
-                                // trigger event
-                                //BackendModel::triggerEvent($this->getModule(), 'after_edit', array('item' => $values));
-
-                                // everything is saved, so redirect to the overview
-                                //$this->redirect(BackendModel::createURLForAction('graph') . '&report=edited&var=' . urlencode($values['block']) . '&highlight=row-' . $id);
-
-				$this->checkStatus();
+				$this->authNeeded($values['client_id'], $values['client_secret']);
 			}
+		}
+	}
+
+	private function getTableIds()
+	{
+		if($this->record['client_id'] != '')
+		{
+			$accounts = BackendSeaHelp::getAccounts()->items;
+			$accountArray = array();
+			foreach ($accounts as $account)
+			{
+				$accountArray['ga:' . $account->id] = $account->name;
+			}
+			return $accountArray;
+		}
+		else
+		{
+			return array('' => 'Update with id\'s before selecting a profile');
 		}
 	}
 
 	private function checkStatus()
 	{
-		$redirect = BackendSeaHelper::checkStatus();
+		$url = BackendSeaHelper::loginWithOAuth();
+		$this->redirect($url);
+	}
 
-		if($redirect != false)
+	private function authNeeded($clientId, $clientSecret)
+	{
+		if($this->clientId != $clientId || $this->clientSecret != $clientSecret)
 		{
-
+			$this->checkStatus();
 		}
-		$accounts = BackendSeaHelp::getAccounts()->items;
-		$accountArray = array();
-		foreach ($accounts as $account)
-		{
-		    $accountArray['name'] = $account->name;
-		    $accountArray['id'] = $account->id;
-		}
-		spoon::dump($accountArray);
 	}
 
 	protected function parse()

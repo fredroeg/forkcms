@@ -21,12 +21,12 @@ class BackendSeaValidate extends BackendBaseActionIndex
 		{
 			if(BackendSeaHelper::getOAuth2Token($_REQUEST['code'], false))
 			{
-			    $this->redirect('showdata');
+				$this->redirect('connect');
 			}
 		}
 		else
 		{
-			$this->redirect('index');
+			$this->redirect('connect');
 		}
 	}
 }

@@ -28,7 +28,7 @@ jsBackend.sea.charts =
 		{
 			Highcharts.setOptions(
 			{
-				colors: ['#ED561B', '#50b432', '#058DC7', '#EDEF00', '#24CBE5', '#64E572', '#FF9655'],
+				colors: ['#FFD400', '#50b432', '#058DC7', '#EDEF00', '#24CBE5', '#64E572', '#FF9655'],
 				title: {text: ''},
 				legend:
 				{

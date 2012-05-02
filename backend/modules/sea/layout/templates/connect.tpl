@@ -6,7 +6,6 @@
 </div>
 {form:connectform}
 <div id="changeSettingsForm>
-
         <div class="box horizontal">
 		<div class="heading">
 			<h3>{$lblGoogleConsoleSettings|ucfirst}</h3
@@ -18,9 +17,18 @@
                             {$txtClientId} {$txtClientIdError}
                         </p>
                         <p>
-                            <label for="clientidsecret">{$lblClientIdSecret|ucfirst}<abbr title="{$lblClientIdSecret}">*</abbr></label>
+                            <label for="clientidsecret">{$lblClientIdSecret|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
                             {$txtClientIdSecret} {$txtClientIdSecretError}
                         </p>
+			<p>
+			    <label for="tableid">{$lblTableId|ucfirst}</label>
+			    {$ddmTableId}
+			</p>
+			{option:profileError}
+			<div class='errorMessage'>
+			    {$profileError}
+			</div>
+			{/option:profileError}
                 </div>
                 <div class="fullwidthOptions">
                         <div class="buttonHolderRight">

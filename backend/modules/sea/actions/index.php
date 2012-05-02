@@ -18,16 +18,13 @@ class BackendSeaIndex extends BackendBaseActionIndex
 	private function checkStatus()
 	{
 		$redirect = BackendSeaHelper::checkStatus();
-		if($redirect != false)
+		if (!$redirect)
+		{
+			$this->redirect('connect');
+		}
+		else
 		{
 			$this->redirect('showdata');
 		}
-	}
-
-	public function display($template = null)
-	{
-		parent::display($template);
-		$url = BackendSeaHelper::loginWithOAuth();
-		$this->tpl->assign('login', $url);
 	}
 }
