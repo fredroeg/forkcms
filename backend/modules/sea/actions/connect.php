@@ -34,6 +34,8 @@ class BackendSeaConnect extends BackendBaseActionEdit
 	{
 		parent::execute();
 
+		BackendSeaHelper::checkStatus();
+
 		$this->getError();
 		$this->getData();
 		$this->loadForm();
@@ -193,7 +195,6 @@ class BackendSeaConnect extends BackendBaseActionEdit
 	/**
 	 * Truncate the tables if the user has selected a different profile
 	 *
-	 * @param string $tableId
 	 */
 	private function truncateTables()
 	{

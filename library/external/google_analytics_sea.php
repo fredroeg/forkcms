@@ -2,23 +2,20 @@
 
 /**
  * GoogleAnalytics SEA class
- * Based on the GoogleAnalyticsClass of Annelies, but updated with the latest method
+ * Based on the GoogleAnalyticsClass of Annelies
  *
  * This source file can be used to communicate with Google via OAuth2.0 (http://google.com)
  *
  *
- * @author		Frederick Roegiers <frederick.roegiers@wijs.be>
+ * @author Frederick Roegiers <frederick.roegiers@wijs.be>
  */
 class GoogleAnalyticsSea
 {
 	// internal constant to enable/disable debugging
 	const DEBUG = false;
 
-
 	// api url
 	const API_URL = 'https://www.googleapis.com/analytics/v3';
-	const API_URL_MANAGEMENT = '';
-
 
 	/**
 	 * cURL instance
@@ -27,7 +24,6 @@ class GoogleAnalyticsSea
 	 */
 	private $curl;
 
-
 	/**
 	 * The session token
 	 *
@@ -35,14 +31,12 @@ class GoogleAnalyticsSea
 	 */
 	private $sessionToken = null;
 
-
 	/**
 	 * The table id
 	 *
 	 * @var	string
 	 */
 	private $tableId = null;
-
 
 	/**
 	 * Creates an instance of GoogleAnalytics, setting the session token and table id.

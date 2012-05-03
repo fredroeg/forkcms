@@ -64,6 +64,8 @@ class BackendSeaShowdata extends BackendSeaBase
 	{
 		$periodDataArray = BackendSeaModel::getSEAData($periodId);
 
+		// we check if the array isn't empty
+		// possible if the adwords account isn't coupled with the GA account
 		if(!empty ($periodDataArray))
 		{
 			$this->tpl->assign('visits', $periodDataArray['visits']);
@@ -79,16 +81,17 @@ class BackendSeaShowdata extends BackendSeaBase
 		}
 		else
 		{
-			$this->tpl->assign('visits', 0);
-			$this->tpl->assign('conversions', 0);
-			$this->tpl->assign('conversionPercentage', 0 . '&#37;');
-			$this->tpl->assign('costPerConversion', 0);
-			$this->tpl->assign('impressions', 0);
-			$this->tpl->assign('clicks', 0);
-			$this->tpl->assign('ctr', 0);
-			$this->tpl->assign('costPerClick', 0);
-			$this->tpl->assign('position', 0);
-			$this->tpl->assign('cost', 0);
+			$value = 0;
+			$this->tpl->assign('visits', $value);
+			$this->tpl->assign('conversions', $value);
+			$this->tpl->assign('conversionPercentage', $value . '&#37;');
+			$this->tpl->assign('costPerConversion', $value);
+			$this->tpl->assign('impressions', $value);
+			$this->tpl->assign('clicks', $value);
+			$this->tpl->assign('ctr', $value);
+			$this->tpl->assign('costPerClick', $value);
+			$this->tpl->assign('position', $value);
+			$this->tpl->assign('cost', $value);
 		}
 	}
 
