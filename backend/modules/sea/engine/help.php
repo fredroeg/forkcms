@@ -7,7 +7,6 @@
  */
 class BackendSeaHelp
 {
-
 	public static function getAllData($period)
 	{
 		// first data collection
@@ -15,7 +14,7 @@ class BackendSeaHelp
 		$dimensions = array('medium', 'date');
 		$returnedData = self::getData($metrics, $period, $dimensions);
 		$decoded = json_decode($returnedData, true);
-
+		
 		// second data collection
 		$metrics = array('goalCompletionsAll', 'goalConversionRateAll', 'costPerConversion');
 		$dimensions = array('date');

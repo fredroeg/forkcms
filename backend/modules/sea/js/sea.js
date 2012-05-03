@@ -61,14 +61,19 @@ jsBackend.sea.chartSingleMetricPerDay =
 	{
 		var xAxisItems = $('#dataChartSingleMetricPerDay ul.series ul.data li');
 		var xAxisValues = [];
+		var xAxisCategories = [];
 		var counter = 0;
 		var interval = Math.ceil(xAxisItems.length / 10);
 
 		xAxisItems.each(function()
 		{
 			xAxisValues.push($(this).children('span.date').html());
+			var text = $(this).children('span.date').html();
+			if(xAxisItems.length > 10 && counter%interval > 0) text = ' ';
+			xAxisCategories.push(text);
 			counter++;
 		});
+
 
 		var singleMetricName = $('#dataChartSingleMetricPerDay ul.series span.name').html();
 		var singleMetricValues = $('#dataChartSingleMetricPerDay ul.series span.value');
@@ -79,7 +84,7 @@ jsBackend.sea.chartSingleMetricPerDay =
 		jsBackend.sea.chartSingleMetricPerDay.chart = new Highcharts.Chart(
 		{
 			chart: {renderTo: 'chartSingleMetricPerDay', margin: [60, 0, 30, 40], defaultSeriesType: 'area'},
-			xAxis: {lineColor: '#CCC', lineWidth: 1, categories: xAxisValues, color: '#000'},
+			xAxis: {lineColor: '#CCC', lineWidth: 1, categories: xAxisCategories, color: '#000'},
 			yAxis: {title: {text: ''}},
 			credits: {enabled: false},
 			tooltip: {formatter: function() {return '<b>'+ this.series.name +'</b><br/>'+ xAxisValues[this.point.x] +': '+ this.y;}},
@@ -115,11 +120,16 @@ jsBackend.sea.chartDoubleMetricPerDay =
 	{
 		var xAxisItems = $('#dataChartDoubleMetricPerDay ul.series li.serie:first-child ul.data li');
 		var xAxisValues = [];
+		var xAxisCategories = [];
 		var counter = 0;
+		var interval = Math.ceil(xAxisItems.length / 10);
 
 		xAxisItems.each(function()
 		{
 			xAxisValues.push($(this).children('span.date').html());
+			var text = $(this).children('span.date').html();
+			if(xAxisItems.length > 10 && counter%interval > 0) text = ' ';
+			xAxisCategories.push(text);
 			counter++;
 		});
 
@@ -147,7 +157,7 @@ jsBackend.sea.chartDoubleMetricPerDay =
 		jsBackend.sea.chartDoubleMetricPerDay.chart = new Highcharts.Chart(
 		{
 			chart: {renderTo: 'chartDoubleMetricPerDay', height: 400, width: containerWidth, margin: [60, 0, 30, 40], defaultSeriesType: 'line'},
-			xAxis: {lineColor: '#CCC', lineWidth: 1, categories: xAxisValues, color: '#000'},
+			xAxis: {lineColor: '#CCC', lineWidth: 1, categories: xAxisCategories, color: '#000'},
 			yAxis: {title: {text: ''}},
 			credits: {enabled: false},
 			tooltip: {formatter: function() {return '<b>'+ this.series.name +'</b><br/>'+ xAxisValues[this.point.x] +': '+ this.y;}},
