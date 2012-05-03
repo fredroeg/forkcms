@@ -14,6 +14,10 @@ class BackendSeaValidate extends BackendBaseActionIndex
 		$this->validateOAuth();
 	}
 
+	/**
+	 * Get the redirected code.
+	 * With that code we can obtain the OAuth2.0 token
+	 */
 	private function validateOAuth()
 	{
 		//Oauth 2.0: exchange token for access-token in the db so multiple calls can be made to api

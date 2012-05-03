@@ -13,11 +13,10 @@ class BackendSeaModel
 	 */
 	public static function getAPISettings()
 	{
-		$APISettings = BackendModel::getDB()->getPairs(
+		return BackendModel::getDB()->getPairs(
 			'SELECT name, value
-			 FROM sea_settings
-			    ');
-		return $APISettings;
+			 FROM sea_settings'
+			 );
 	}
 
 	/**
@@ -28,12 +27,11 @@ class BackendSeaModel
 	 */
 	public static function getTimeStampAccessToken()
 	{
-		$timeStampAT = (string) BackendModel::getDB()->getVar(
+		return (string) BackendModel::getDB()->getVar(
 			'SELECT UNIX_TIMESTAMP(date) AS date
 			 FROM sea_settings
 			 WHERE name = ?', 'access_token'
 			 );
-		return $timeStampAT;
 	}
 
 	/**
@@ -45,11 +43,11 @@ class BackendSeaModel
 	public static function getPeriodId($period)
 	{
 		return (int) BackendModel::getDB()->getVar(
-			    'SELECT period_id
-			     FROM sea_period
-			     WHERE period_start = ? AND period_end = ?',
-			     $period
-			    );
+			'SELECT period_id
+			 FROM sea_period
+			 WHERE period_start = ? AND period_end = ?',
+			 $period
+			);
 	}
 
 	/**
@@ -60,38 +58,38 @@ class BackendSeaModel
 	public static function getSEAData($periodId)
 	{
 		return (array) BackendModel::getDB()->getRecord(
-			    'SELECT *
-			     FROM sea_period_data
-			     WHERE period_id = ?',
-			     $periodId
-			    );
+			'SELECT *
+			 FROM sea_period_data
+			 WHERE period_id = ?',
+			 $periodId
+			);
 	}
 
 	public static function getGoals()
 	{
 		return (array) BackendModel::getDB()->getRecords(
-			    'SELECT *
-			     FROM sea_goals');
+			'SELECT *
+			 FROM sea_goals');
 	}
 
 	public static function getMetricPerDay($metric, $startTimestamp, $endTimestamp)
 	{
 		return (array) BackendModel::getDB()->getPairs(
-			    'SELECT day, ' . $metric . '
-			     FROM sea_day_data
-			     WHERE day >= ? AND day <= ?',
-			     array($startTimestamp, $endTimestamp)
-			    );
+			'SELECT day, ' . $metric . '
+			 FROM sea_day_data
+			 WHERE day >= ? AND day <= ?',
+			 array($startTimestamp, $endTimestamp)
+			);
 	}
 
 	public static function getMetricsPerDay($metrics, $startTimestamp, $endTimestamp)
 	{
 		return (array) BackendModel::getDB()->getRecords(
-			    'SELECT day, ' . implode(",", $metrics) . '
-			     FROM sea_day_data
-			     WHERE day >= ? AND day <= ?',
-			     array($startTimestamp, $endTimestamp)
-			    );
+			'SELECT day, ' . implode(",", $metrics) . '
+			 FROM sea_day_data
+			 WHERE day >= ? AND day <= ?',
+			 array($startTimestamp, $endTimestamp)
+			);
 	}
 
 	/**
@@ -107,7 +105,7 @@ class BackendSeaModel
 		BackendModel::getDB()->update('sea_settings', array('value' => $accessToken, 'date' => $datetime), 'name = ?', 'access_token');
 		if(isset($refreshToken))
 		{
-		    BackendModel::getDB()->update('sea_settings', array('value' => $refreshToken, 'date' => $datetime), 'name = ?', 'refresh_token');
+			BackendModel::getDB()->update('sea_settings', array('value' => $refreshToken, 'date' => $datetime), 'name = ?', 'refresh_token');
 		}
 		return true;
 	}

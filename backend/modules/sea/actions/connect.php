@@ -115,8 +115,6 @@ class BackendSeaConnect extends BackendBaseActionEdit
                         $txtClientIdSecret = $this->frm->getField('clientIdSecret');
 			$ddmTableId = $this->frm->getField('profileId');
 
-
-
                         // validate the fields
                         $txtClientId->isFilled(BL::getError('ClientIdIsRequired'));
                         $txtClientIdSecret->isFilled(BL::getError('ClientIdSecretIsRequired'));
@@ -166,7 +164,6 @@ class BackendSeaConnect extends BackendBaseActionEdit
 				$this->error = true;
 			}
 		}
-		//todo: msg from db
 		return array(array('value' => '', 'label' => ' '));
 	}
 
@@ -193,7 +190,7 @@ class BackendSeaConnect extends BackendBaseActionEdit
 	}
 
 	/**
-	 * Truncate the tables if the user has selected a different profile
+	 * Truncate the tables if the user has selected a different profile/account
 	 *
 	 */
 	private function truncateTables()

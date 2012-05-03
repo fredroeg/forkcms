@@ -15,6 +15,10 @@ class BackendSeaIndex extends BackendBaseActionIndex
 		$this->display();
 	}
 
+	/**
+	 *  Depending on the state of the tokens & id's there is a different redirect
+	 *
+	 */
 	private function checkStatus()
 	{
 		$redirect = BackendSeaHelper::checkStatus();
