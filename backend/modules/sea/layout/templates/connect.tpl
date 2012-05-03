@@ -10,6 +10,12 @@
 			<h3>{$lblGoogleConsoleSettings|ucfirst}</h3>
 		</div>
 		<div class="options">
+			{option:error}
+			<div class='errorMessage'>
+			    {$error}
+			</div>
+			<br/>
+			{/option:error}
 			<p>{$msgConsoleInfo}</p>
                         <p>
                             <label for="clientid">{$lblClientId|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>

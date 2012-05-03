@@ -77,6 +77,19 @@ class BackendSeaShowdata extends BackendSeaBase
 			//$this->tpl->assign('position', $periodDataArray['position']);
 			$this->tpl->assign('cost', $periodDataArray['costs']);
 		}
+		else
+		{
+			$this->tpl->assign('visits', 0);
+			$this->tpl->assign('conversions', 0);
+			$this->tpl->assign('conversionPercentage', 0 . '&#37;');
+			$this->tpl->assign('costPerConversion', 0);
+			$this->tpl->assign('impressions', 0);
+			$this->tpl->assign('clicks', 0);
+			$this->tpl->assign('ctr', 0);
+			$this->tpl->assign('costPerClick', 0);
+			$this->tpl->assign('position', 0);
+			$this->tpl->assign('cost', 0);
+		}
 	}
 
 	private function getGoals()

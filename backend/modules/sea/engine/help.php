@@ -143,6 +143,11 @@ class BackendSeaHelp
 		return self::getGoogleAnalyticsInstance()->getAnalyticsResults($gaMetrics, $startTimestamp, $endTimestamp, $gaDimensions, $parameters);
 	}
 
+	/**
+	 * Get all the accounts and return them
+	 *
+	 * @return array
+	 */
 	public static function getAccounts()
 	{
 		$apiSettings = BackendSeaModel::getAPISettings();
@@ -152,6 +157,11 @@ class BackendSeaHelp
 		return $returned;
 	}
 
+	/**
+	 * Get all the goals and put the names in an array
+	 *
+	 * @return array
+	 */
 	public static function getGoals()
 	{
 		$apiSettings = BackendSeaModel::getAPISettings();
@@ -160,12 +170,15 @@ class BackendSeaHelp
 		$returnedDecodedString =  self::getGoogleAnalyticsInstance()->getGoals($accessToken);
 
 		$goalarray = array();
-		foreach($returnedDecodedString->items as $goal)
+		if($returnedDecodedString->totalResults > 0)
 		{
-		    if($goal->profileId == $apiSettings['table_id'])
-		    {
-			array_push($goalarray, $goal->name);
-		    }
+			foreach($returnedDecodedString->items as $goal)
+			{
+			    if($goal->profileId == $apiSettings['table_id'])
+			    {
+				array_push($goalarray, $goal->name);
+			    }
+			}
 		}
 		return $goalarray;
 	}

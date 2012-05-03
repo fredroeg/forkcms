@@ -85,6 +85,14 @@ class BackendSeaHelper
 		// a json string is returned.
 		$authObj = json_decode($json_response);
 
+
+		if(isset($authObj->error))
+		{
+		    $url = BackendModel::createURLForAction('connect') . '&error=' . $authObj->error;
+		    $_POST['error'] = $authObj->error;
+		    SpoonHTTP::redirect($url);
+		}
+
 		// the returned object should contain at least an access token
 		$accessToken = $authObj->access_token;
 		$_SESSION['access_token'] = $accessToken;

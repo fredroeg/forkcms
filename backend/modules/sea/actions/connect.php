@@ -22,19 +22,39 @@ class BackendSeaConnect extends BackendBaseActionEdit
 	 */
 	private $clientSecret;
 
+	/**
+	 * Error
+	 *
+	 * @var boolean
+	 */
+	private $error;
+
 
 	public function execute()
 	{
 		parent::execute();
 
-		BackendSeaHelper::checkStatus();
-
+		$this->getError();
 		$this->getData();
 		$this->loadForm();
 		$this->validateForm();
 		$this->parse();
 		$this->display();
 	}
+
+	/**
+	 * If there is an error in the URI -> $error is true
+	 *
+	 */
+	private function getError()
+	{
+	    if(isset ($_GET['error']))
+	    {
+		$this->error = true;
+	    }
+	}
+
+
 	private function getData()
 	{
 		$this->record = BackendSeaModel::getAPISettings();
@@ -50,13 +70,18 @@ class BackendSeaConnect extends BackendBaseActionEdit
                 $this->frm->addText('clientId', $this->clientId);
 		$this->frm->addText('clientIdSecret', $this->clientSecret);
 
+		// radiobutton has 3 possibilities
 		if($this->clientId != '' && $this->clientSecret != '' && $this->tableId != '')
 		{
 			$this->frm->addRadiobutton('profileId', $this->getProfileIds(), $this->record['table_id']);
 		}
-		else
+		else if(!isset($this->error))
 		{
 			$this->frm->addRadiobutton('profileId', $this->getProfileIds());
+		}
+		else
+		{
+			$this->frm->addRadiobutton('profileId', array(array('label' => ' ', 'value' => ' ')));
 		}
 
 
@@ -66,9 +91,14 @@ class BackendSeaConnect extends BackendBaseActionEdit
 		// the user has to update 2 times
 		// 1st time = authentication
 		// 2nd time = table selected
-		if($this->tableId == '' && $this->clientId != '' && $this->clientSecret != '')
+		if($this->tableId == '' && $this->clientId != '' && $this->clientSecret != '' && !isset($this->error))
 		{
-			$this->tpl->assign("profileError", "Good! Now, please select a profile and update again");
+			$this->tpl->assign("profileError", SpoonFilter::ucfirst(BL::err('profileWarning')));
+		}
+
+		if(isset($this->error))
+		{
+			$this->tpl->assign("error", SpoonFilter::ucfirst(BL::err('InvalidClient')));
 		}
 	}
 
@@ -100,7 +130,7 @@ class BackendSeaConnect extends BackendBaseActionEdit
                                 $id = (int) BackendSeaModel::updateIds($values);
 
 				// truncate the tables
-				$this->truncateTables($values['table_id']);
+				$this->truncateTables();
 
 				// check if nees authentication (only when the inputfields have been changed)
 				$this->authNeeded($values['client_id'], $values['client_secret']);
@@ -116,21 +146,26 @@ class BackendSeaConnect extends BackendBaseActionEdit
 	 */
 	private function getProfileIds()
 	{
+		$accounts = BackendSeaHelp::getAccounts();
 		if($this->record['client_id'] != '')
 		{
-			$accounts = BackendSeaHelp::getAccounts()->items;
-			$accountArray = array();
-			foreach ($accounts as $account)
+			if($accounts != null)
 			{
-				$accountArray[] = array('value' => $account->id, 'label' => $account->name);
+				$accounts = $accounts->items;
+				$accountArray = array();
+				foreach ($accounts as $account)
+				{
+					$accountArray[] = array('value' => $account->id, 'label' => $account->name);
+				}
+				return $accountArray;
 			}
-			return $accountArray;
+			else
+			{
+				$this->error = true;
+			}
 		}
-		else
-		{
-			//todo msg from db
-			return array(array('value' => '', 'label' => 'Update with id\'s before selecting a profile'));
-		}
+		//todo: msg from db
+		return array(array('value' => '', 'label' => ' '));
 	}
 
 	/**
@@ -160,12 +195,9 @@ class BackendSeaConnect extends BackendBaseActionEdit
 	 *
 	 * @param string $tableId
 	 */
-	private function truncateTables($tableId)
+	private function truncateTables()
 	{
-		if($this->tableId != $tableId)
-		{
-			BackendSeaModel::truncateTables();
-		}
+		BackendSeaModel::truncateTables();
 	}
 
 	protected function parse()
