@@ -58,6 +58,9 @@ class BackendSeaConnect extends BackendBaseActionEdit
 		}
 	}
 
+	/**
+	 * Execute the action
+	 */
 	public function execute()
 	{
 		parent::execute();
@@ -70,6 +73,9 @@ class BackendSeaConnect extends BackendBaseActionEdit
 		$this->display();
 	}
 
+	/**
+	 * Get the API Settings, and store them in variables
+	 */
 	private function getData()
 	{
 		$this->record = BackendSeaModel::getAPISettings();
@@ -90,7 +96,6 @@ class BackendSeaConnect extends BackendBaseActionEdit
 			$this->error = true;
 		}
 	}
-
 
 	/**
 	 * Get all the id's and names from the different profiles in your account

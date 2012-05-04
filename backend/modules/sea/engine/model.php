@@ -127,6 +127,21 @@ class BackendSeaModel
 	}
 
 	/**
+	 * Function to get the timestamp of the token.
+	 * It's important to check if the access token is still valid
+	 *
+	 * @return string
+	 */
+	public static function getTimeStampAccessToken()
+	{
+		return (string) BackendModel::getDB()->getVar(
+			'SELECT UNIX_TIMESTAMP(date) AS date
+			 FROM sea_settings
+			 WHERE name = ?', 'access_token'
+		 );
+	}
+
+	/**
 	 * Insert the data in the database
 	 *
 	 * @param int $period
@@ -209,21 +224,6 @@ class BackendSeaModel
 
 			BackendModel::getDB()->execute($query, $record);
 		}
-	}
-
-	/**
-	 * Function to get the timestamp of the token.
-	 * It's important to check if the access token is still valid
-	 *
-	 * @return string
-	 */
-	public static function getTimeStampAccessToken()
-	{
-		return (string) BackendModel::getDB()->getVar(
-			'SELECT UNIX_TIMESTAMP(date) AS date
-			 FROM sea_settings
-			 WHERE name = ?', 'access_token'
-			 );
 	}
 
 	/**

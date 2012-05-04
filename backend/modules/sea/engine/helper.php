@@ -16,11 +16,12 @@ class BackendSeaHelper
 		$APISettingsArray = BackendSeaModel::getAPISettings();
 		if(($APISettingsArray['client_id'] != '') && ($APISettingsArray['client_secret'] != '') && ($APISettingsArray['table_id'] != ''))
 		{
-			if(!isset($_SESSION['accessTokenCreated']))
+			$accessTCSession = SpoonSession::get('accessTokenCreated');
+			if(!isset($accessTCSession))
 			{
 				return self::renewAccessToken();
 			}
-			elseif(time() - $_SESSION['accessTokenCreated'] > 3600)
+			elseif(time() - $accessTCSession > 3600)
 			{
 				return self::renewAccessToken();
 			}

@@ -102,11 +102,12 @@ class BackendSeaHelp
 	/**
 	 * Get sea-data for a certain period
 	 *
-	 * @param mixed $metrics	The metrics to get for the keywords.
-	 * @param int $period		The period for the google call.
-	 * @param string[optional]	$sort The metric to sort on.
-	 * @param int[optional]		$limit An optional limit of the number of keywords to get.
-	 * @param int[optional]		$index The index to start getting data from.
+	 * @param mixed $metrics
+	 * @param int $period
+	 * @param string $dimensions
+	 * @param int $sort
+	 * @param int $limit
+	 * @param int $index
 	 * @return array
 	 */
 	private static function getData($metrics, $period, $dimensions = null, $sort = null, $limit = null, $index = 1)
