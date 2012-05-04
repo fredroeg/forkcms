@@ -18,14 +18,14 @@ class BackendSeaBase extends BackendBaseActionIndex
 	/**
 	 * The selected page
 	 *
-	 * @var	string
+	 * @var string
 	 */
 	protected $pagePath = null;
 
 	/**
 	 * The start and end timestamp of the collected data
 	 *
-	 * @var	int
+	 * @var int
 	 */
 	protected $startTimestamp, $endTimestamp;
 

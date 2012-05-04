@@ -36,13 +36,32 @@ class BackendSeaConnect extends BackendBaseActionEdit
 	 */
 	private $error;
 
+	/**
+	 * Function to determine if it's necessary to authenticate with Google
+	 *
+	 * @param string $clientId
+	 * @param string $clientSecret
+	 */
+	private function authNeeded($clientId, $clientSecret)
+	{
+		if($this->clientId != $clientId || $this->clientSecret != $clientSecret)
+		{
+			BackendSeaModel::truncateTables();
+		        BackendSeaModel::deleteProfileId();
+
+			$url = BackendSeaHelper::loginWithOAuth();
+			$this->redirect($url);
+		}
+		else
+		{
+			$this->redirect('connect');
+		}
+	}
 
 	public function execute()
 	{
 		parent::execute();
-
 		BackendSeaHelper::checkStatus();
-
 		$this->getError();
 		$this->getData();
 		$this->loadForm();
@@ -50,19 +69,6 @@ class BackendSeaConnect extends BackendBaseActionEdit
 		$this->parse();
 		$this->display();
 	}
-
-	/**
-	 * If there is an error in the URI -> $error is true
-	 *
-	 */
-	private function getError()
-	{
-	    if(isset ($_GET['error']))
-	    {
-		$this->error = true;
-	    }
-	}
-
 
 	private function getData()
 	{
@@ -74,81 +80,17 @@ class BackendSeaConnect extends BackendBaseActionEdit
 		$this->tableId = $this->record['table_id'];
 	}
 
-	private function loadForm()
+	/**
+	 * If there is an error in the URI -> $error is true
+	 */
+	private function getError()
 	{
-		$this->frm = new BackendForm('connectform');
-                $this->frm->addText('clientId', $this->clientId);
-		$this->frm->addText('clientIdSecret', $this->clientSecret);
-		$this->frm->addText('redirectUri', $this->redirectURI);
-
-		// radiobutton has 3 possibilities
-		if($this->clientId != '' && $this->clientSecret != '' && $this->tableId != '')
+		if(isset($_GET['error']))
 		{
-			$this->frm->addRadiobutton('profileId', $this->getProfileIds(), $this->record['table_id']);
-		}
-		else if(!isset($this->error))
-		{
-			$this->frm->addRadiobutton('profileId', $this->getProfileIds());
-		}
-		else
-		{
-			$this->frm->addRadiobutton('profileId', array(array('label' => ' ', 'value' => ' ')));
-		}
-
-
-		// submit dialog
-                $this->frm->addButton('change', 'update', 'submit', 'inputButton button mainButton');
-
-		// the user has to update 2 times
-		// 1st time = authentication
-		// 2nd time = table selected
-		if($this->tableId == '' && $this->clientId != '' && $this->clientSecret != '' && !isset($this->error))
-		{
-			$this->tpl->assign("profileError", SpoonFilter::ucfirst(BL::err('profileWarning')));
-		}
-
-		if(isset($this->error))
-		{
-			$this->tpl->assign("error", SpoonFilter::ucfirst(BL::err('InvalidClient')));
+			$this->error = true;
 		}
 	}
 
-	private function validateForm()
-	{
-		if($this->frm->isSubmitted())
-		{
-                        $this->frm->cleanupFields();
-
-                        // shorten the fields;
-                        $txtClientId = $this->frm->getField('clientId');
-                        $txtClientIdSecret = $this->frm->getField('clientIdSecret');
-			$txtRedirectUri = $this->frm->getField('redirectUri');
-			$ddmTableId = $this->frm->getField('profileId');
-
-                        // validate the fields
-                        $txtClientId->isFilled(BL::getError('ClientIdIsRequired'));
-                        $txtClientIdSecret->isFilled(BL::getError('ClientIdSecretIsRequired'));
-			$txtRedirectUri->isFilled(BL::getError('RedirectIsRequired'));
-
-                        if($this->frm->isCorrect())
-                        {
-                                // build array
-                                $values['client_id'] = $txtClientId->getValue();
-                                $values['client_secret'] = $txtClientIdSecret->getValue();
-				$values['redirect_uri'] = $txtRedirectUri->getValue();
-				$values['table_id'] = $ddmTableId->getValue();
-
-                                // insert the item
-                                $id = (int) BackendSeaModel::updateIds($values);
-
-				// truncate the tables
-				$this->truncateTables();
-
-				// check if nees authentication (only when the inputfields have been changed)
-				$this->authNeeded($values['client_id'], $values['client_secret']);
-			}
-		}
-	}
 
 	/**
 	 * Get all the id's and names from the different profiles in your account
@@ -165,7 +107,7 @@ class BackendSeaConnect extends BackendBaseActionEdit
 			{
 				$accounts = $accounts->items;
 				$accountArray = array();
-				foreach ($accounts as $account)
+				foreach($accounts as $account)
 				{
 					$accountArray[] = array('value' => $account->id, 'label' => $account->name);
 				}
@@ -179,39 +121,87 @@ class BackendSeaConnect extends BackendBaseActionEdit
 		return array(array('value' => '', 'label' => ' '));
 	}
 
-	/**
-	 * Function to determine if it's necessary to authenticate with Google
-	 *
-	 * @param string $clientId
-	 * @param string $clientSecret
-	 */
-	private function authNeeded($clientId, $clientSecret)
+	private function loadForm()
 	{
-		if($this->clientId != $clientId || $this->clientSecret != $clientSecret)
-		{
-			BackendSeaModel::truncateTables();
-			BackendSeaModel::deleteProfileId();
+		$this->frm = new BackendForm('connectform');
+		$this->frm->addText('clientId', $this->clientId);
+		$this->frm->addText('clientIdSecret', $this->clientSecret);
+		$this->frm->addText('redirectUri', $this->redirectURI);
 
-			$url = BackendSeaHelper::loginWithOAuth();
-			$this->redirect($url);
+		// radiobutton has 3 possibilities
+		if($this->clientId != '' && $this->clientSecret != '' && $this->tableId != '')
+		{
+			$this->frm->addRadiobutton('profileId', $this->getProfileIds(), $this->record['table_id']);
+		}
+		elseif(!isset($this->error))
+		{
+			$this->frm->addRadiobutton('profileId', $this->getProfileIds());
 		}
 		else
 		{
-			$this->redirect('connect');
+			$this->frm->addRadiobutton('profileId', array(array('label' => ' ', 'value' => ' ')));
+		}
+
+
+		// submit dialog
+		$this->frm->addButton('change', 'update', 'submit', 'inputButton button mainButton');
+
+		// the user has to update 2 times
+		// 1st time = authentication
+		// 2nd time = table selected
+		if($this->tableId == '' && $this->clientId != '' && $this->clientSecret != '' && !isset($this->error))
+		{
+			$this->tpl->assign("profileError", SpoonFilter::ucfirst(BL::err('profileWarning')));
+		}
+
+		if(isset($this->error))
+		{
+			$this->tpl->assign("error", SpoonFilter::ucfirst(BL::err('InvalidClient')));
 		}
 	}
 
 	/**
 	 * Truncate the tables if the user has selected a different profile/account
-	 *
 	 */
 	private function truncateTables()
 	{
 		BackendSeaModel::truncateTables();
 	}
 
-	protected function parse()
+	private function validateForm()
 	{
-		parent::parse();
+		if($this->frm->isSubmitted())
+		{
+			$this->frm->cleanupFields();
+
+			// shorten the fields;
+			$txtClientId = $this->frm->getField('clientId');
+			$txtClientIdSecret = $this->frm->getField('clientIdSecret');
+			$txtRedirectUri = $this->frm->getField('redirectUri');
+			$ddmTableId = $this->frm->getField('profileId');
+
+			// validate the fields
+			$txtClientId->isFilled(BL::getError('ClientIdIsRequired'));
+			$txtClientIdSecret->isFilled(BL::getError('ClientIdSecretIsRequired'));
+			$txtRedirectUri->isFilled(BL::getError('RedirectIsRequired'));
+
+			if($this->frm->isCorrect())
+			{
+				// build array
+				$values['client_id'] = $txtClientId->getValue();
+				$values['client_secret'] = $txtClientIdSecret->getValue();
+				$values['redirect_uri'] = $txtRedirectUri->getValue();
+				$values['table_id'] = $ddmTableId->getValue();
+
+				// insert the item
+				$id = (int) BackendSeaModel::updateIds($values);
+
+				// truncate the tables
+				$this->truncateTables();
+
+				// check if needs authentication (only when the inputfields have been changed)
+				$this->authNeeded($values['client_id'], $values['client_secret']);
+			}
+		}
 	}
 }

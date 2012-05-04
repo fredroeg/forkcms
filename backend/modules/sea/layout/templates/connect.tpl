@@ -5,48 +5,48 @@
 	<h2>{$lblSea|ucfirst}</h2>
 </div>
 {form:connectform}
-        <div class="box vertical">
+	<div class="box vertical">
 		<div class="heading">
 			<h3>{$lblGoogleConsoleSettings|ucfirst}</h3>
 		</div>
 		<div class="options">
 			{option:error}
-			<div class='errorMessage'>
-			    {$error}
-			</div>
-			<br/>
+				<div class='errorMessage'>
+					{$error}
+				</div>
+				<br/>
 			{/option:error}
 			<p>{$msgConsoleInfo}</p>
-                        <p>
-                            <label for="clientid">{$lblClientId|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
-                            {$txtClientId} {$txtClientIdError}
-                        </p>
-                        <p>
-                            <label for="clientidsecret">{$lblClientIdSecret|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
-                            {$txtClientIdSecret} {$txtClientIdSecretError}
-                        </p>
 			<p>
-                            <label for="redirectUri">{$lblRedirectUri|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
-                            {$txtRedirectUri} {$txtRedirectUriError}
-                        </p>
+				<label for="clientid">{$lblClientId|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
+				{$txtClientId} {$txtClientIdError}
+			</p>
+			<p>
+				<label for="clientidsecret">{$lblClientIdSecret|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
+				{$txtClientIdSecret} {$txtClientIdSecretError}
+			</p>
+			<p>
+				<label for="redirectUri">{$lblRedirectUri|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
+				{$txtRedirectUri} {$txtRedirectUriError}
+			</p>
 			<p>
 			{option:profileId}
-			<label>{$lblProfile|ucfirst}</label>
-			{iteration:profileId}
-			    <label for="{$profileId.id}">{$profileId.rbtProfileId} {$profileId.label}</label>
-			{/iteration:profileId}
+				<label>{$lblProfile|ucfirst}</label>
+				{iteration:profileId}
+					<label for="{$profileId.id}">{$profileId.rbtProfileId} {$profileId.label}</label>
+				{/iteration:profileId}
 			{/option:profileId}
 			{option:profileError}
-			<div class='errorMessage'>
-			    {$profileError}
-			</div>
+				<div class='errorMessage'>
+					{$profileError}
+				</div>
 			{/option:profileError}
-                </div>
-                <div class="fullwidthOptions">
-                        <div class="buttonHolderRight">
-                            {$btnChange}
-                        </div>
-                </div>
+		</div>
+		<div class="fullwidthOptions">
+			<div class="buttonHolderRight">
+				{$btnChange}
+			</div>
+		</div>
 	</div>
 {/form:connectform}
 

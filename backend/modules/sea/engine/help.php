@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Help class to make our life easier
  * Based on the analytics-class from Annelies
@@ -7,6 +8,21 @@
  */
 class BackendSeaHelp
 {
+	public static function getAccounts()
+	{
+		$apiSettings = BackendSeaModel::getAPISettings();
+		$accessToken = $apiSettings['access_token'];
+
+		$returned =  self::getGoogleAnalyticsInstance()->getAnalyticsAccountList($accessToken);
+		return $returned;
+	}
+
+	/**
+	 * Get all the data, put it in the array and hand it over to the model
+	 *
+	 * @param array $period
+	 * @return true
+	 */
 	public static function getAllData($period)
 	{
 		// first data collection
@@ -14,7 +30,7 @@ class BackendSeaHelp
 		$dimensions = array('medium', 'date');
 		$returnedData = self::getData($metrics, $period, $dimensions);
 		$decoded = json_decode($returnedData, true);
-		
+
 		// second data collection
 		$metrics = array('goalCompletionsAll', 'goalConversionRateAll', 'costPerConversion');
 		$dimensions = array('date');
@@ -24,35 +40,35 @@ class BackendSeaHelp
 		// third data collection
 		$goals = self::getGoals();
 
-		//Create a new array to store all our valuable information
+		// Create a new array to store all our valuable information
 		$seaDataArray = array();
-		//Total Results
+		// Total Results
 		$seaDataArray['visits'] = $decoded['totalsForAllResults']['ga:visits'];
-		//Total Costs
+		// Total Costs
 		$seaDataArray['costs'] = $decoded['totalsForAllResults']['ga:adCost'];
-		//Total Impressions
+		// Total Impressions
 		$seaDataArray['impressions'] = $decoded['totalsForAllResults']['ga:impressions'];
-		//Total Clicks
+		// Total Clicks
 		$seaDataArray['adClicks'] = $decoded['totalsForAllResults']['ga:adClicks'];
-		//Click-Through-Rate
+		// Click-Through-Rate
 		$seaDataArray['CTR'] = $decoded['totalsForAllResults']['ga:CTR'];
-		//Cost-Per-Click
+		// Cost-Per-Click
 		$seaDataArray['CPC'] = $decoded['totalsForAllResults']['ga:CPC'];
-		//Cost per 1000 impressions
+		// Cost per 1000 impressions
 		$seaDataArray['CPM'] = $decoded['totalsForAllResults']['ga:CPM'];
-		//Conversions
+		// Conversions
 		$seaDataArray['conversions'] = $decodedConversions['totalsForAllResults']['ga:goalCompletionsAll'];
-		//Conversion rate (or conv. percentage)
+		// Conversion rate (or conv. percentage)
 		$seaDataArray['conversion_percentage'] = $decodedConversions['totalsForAllResults']['ga:goalConversionRateAll'];
-		//Cost per conversion
+		// Cost per conversion
 		$seaDataArray['cost_per_conversion'] = $decodedConversions['totalsForAllResults']['ga:costPerConversion'];
-		//Goals
+		// Goals
 		$seaDataArray['goals'] = $goals;
 
-		//Data per day
-		if (array_key_exists('rows', $decoded))
+		// Data per day
+		if(array_key_exists('rows', $decoded))
 		{
-			foreach ($decoded['rows'] as $key => $row)
+			foreach($decoded['rows'] as $key => $row)
 			{
 				$seaDataArray['dayStats'][$row[1]] = array(
 					'cost' => $row[2],
@@ -64,9 +80,9 @@ class BackendSeaHelp
 					'CPM' => $row[8]
 				 );
 			}
-			if (array_key_exists('rows', $decodedConversions))
+			if(array_key_exists('rows', $decodedConversions))
 			{
-				foreach ($decodedConversions['rows'] as $key => $row)
+				foreach($decodedConversions['rows'] as $key => $row)
 				{
 					$seaDataArray['dayStats'][$row[0]] += array(
 						'conversions' => $row[1],
@@ -75,33 +91,13 @@ class BackendSeaHelp
 					 );
 				}
 			}
-			//Insert this data in the database
+			// Insert this data in the database
 			if(BackendSeaModel::insertSEAData($period, $seaDataArray))
 			{
 				return true;
 			}
 		}
 	}
-
-	/**
-	 * Get Google Analytics SEA instance
-	 *
-	 * @return GoogleAnalyticsSea
-	 */
-	private static function getGoogleAnalyticsInstance()
-	{
-		$APIsettingArray = BackendSeaModel::getAPISettings();
-
-		$accessToken = $APIsettingArray['access_token'];
-		$tableId = 'ga:' . $APIsettingArray['table_id'];
-
-		// require the GoogleAnalytics class
-		require_once 'external/google_analytics_sea.php';
-
-		// get and return an instance
-		return new GoogleAnalyticsSea($accessToken, $tableId);
-	}
-
 
 	/**
 	 * Get sea-data for a certain period
@@ -115,7 +111,7 @@ class BackendSeaHelp
 	 */
 	private static function getData($metrics, $period, $dimensions = null, $sort = null, $limit = null, $index = 1)
 	{
-		//set the timestamps from the period
+		// set the timestamps from the period
 		$startTimestamp = $period[0];
 		$endTimestamp = $period[1];
 
@@ -135,7 +131,7 @@ class BackendSeaHelp
 		// set parameters
 		$parameters = array();
 
-		//With this filter we only get data from SEA-campaigns
+		// With this filter we only get data from SEA-campaigns
 		$parameters['filters'] = 'ga:adCost!=0.0';
 
 		// fetch and return
@@ -143,21 +139,7 @@ class BackendSeaHelp
 	}
 
 	/**
-	 * Get all the accounts and return them
-	 *
-	 * @return array
-	 */
-	public static function getAccounts()
-	{
-		$apiSettings = BackendSeaModel::getAPISettings();
-		$accessToken = $apiSettings['access_token'];
-
-		$returned =  self::getGoogleAnalyticsInstance()->getAnalyticsAccountList($accessToken);
-		return $returned;
-	}
-
-	/**
-	 * Get all the goals and put the names in an array
+	 * Get all the goals and put their names in an array
 	 *
 	 * @return array
 	 */
@@ -180,6 +162,25 @@ class BackendSeaHelp
 			}
 		}
 		return $goalarray;
+	}
+
+	/**
+	 * Get Google Analytics SEA instance
+	 *
+	 * @return GoogleAnalyticsSea
+	 */
+	private static function getGoogleAnalyticsInstance()
+	{
+		$APIsettingArray = BackendSeaModel::getAPISettings();
+
+		$accessToken = $APIsettingArray['access_token'];
+		$tableId = 'ga:' . $APIsettingArray['table_id'];
+
+		// require the GoogleAnalytics class
+		require_once 'external/google_analytics_sea.php';
+
+		// get and return an instance
+		return new GoogleAnalyticsSea($accessToken, $tableId);
 	}
 
 	/**
@@ -329,7 +330,7 @@ class BackendSeaHelp
 
 			// set sessions
 			SpoonSession::set('sea_start_timestamp', strtotime('-1' . $interval, mktime(0, 0, 0)));
-			SpoonSession::set('sea_end_timestamp', mktime(0, 0, 0, date('m'), date('d')-1, date('Y')));
+			SpoonSession::set('sea_end_timestamp', mktime(0, 0, 0, date('m'), date('d') -1, date('Y')));
 		}
 	}
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * In this file we store all generic functions that we will be using in the sea module
  *
@@ -6,6 +7,31 @@
  */
 class BackendSeaModel
 {
+	/**
+	 * Check in the database if we already stored the data from that period
+	 *
+	 * @param array $period
+	 * @return boolean
+	 */
+	public static function checkPeriod($period)
+	{
+		$numRows = BackendModel::getDB()->getNumRows(
+			'SELECT *
+			 FROM sea_period
+			 WHERE period_start = ? AND period_end = ?', $period
+		);
+		$return = ($numRows > 0) ? (true) : (false);
+		return $return;
+	}
+
+	/**
+	 * Delete the profile id
+	 */
+	public static function deleteProfileId()
+	{
+		BackendModel::getDB()->update('sea_settings', array('value' => ''), 'name = ?', 'table_id');
+	}
+
 	/**
 	 * Get all the authentication settings to access the Google API's
 	 *
@@ -16,22 +42,56 @@ class BackendSeaModel
 		return BackendModel::getDB()->getPairs(
 			'SELECT name, value
 			 FROM sea_settings'
-			 );
+		 );
 	}
 
 	/**
-	 * Function to get the timestamp of the token.
-	 * It's important to check if the access token is still valid
+	 * Get all the goals from the db
 	 *
-	 * @return string
+	 * @return array
 	 */
-	public static function getTimeStampAccessToken()
+	public static function getGoals()
 	{
-		return (string) BackendModel::getDB()->getVar(
-			'SELECT UNIX_TIMESTAMP(date) AS date
-			 FROM sea_settings
-			 WHERE name = ?', 'access_token'
-			 );
+		return (array) BackendModel::getDB()->getRecords(
+			'SELECT *
+			 FROM sea_goals'
+		);
+	}
+
+	/**
+	 * Get 1 metric per day
+	 *
+	 * @param string $metric
+	 * @param string $startTimestamp
+	 * @param string $endTimestamp
+	 * @return array
+	 */
+	public static function getMetricPerDay($metric, $startTimestamp, $endTimestamp)
+	{
+		return (array) BackendModel::getDB()->getPairs(
+			'SELECT day, ' . $metric . '
+			 FROM sea_day_data
+			 WHERE day >= ? AND day <= ?',
+			 array($startTimestamp, $endTimestamp)
+		);
+	}
+
+	/**
+	 * Get multiple metrics per day
+	 *
+	 * @param array $metrics
+	 * @param string $startTimestamp
+	 * @param string $endTimestamp
+	 * @return array
+	 */
+	public static function getMetricsPerDay($metrics, $startTimestamp, $endTimestamp)
+	{
+		return (array) BackendModel::getDB()->getRecords(
+			'SELECT day, ' . implode(",", $metrics) . '
+			 FROM sea_day_data
+			 WHERE day >= ? AND day <= ?',
+			 array($startTimestamp, $endTimestamp)
+		);
 	}
 
 	/**
@@ -47,10 +107,11 @@ class BackendSeaModel
 			 FROM sea_period
 			 WHERE period_start = ? AND period_end = ?',
 			 $period
-			);
+		);
 	}
 
 	/**
+	 * Get the SEA Data within a period
 	 *
 	 * @param int $periodId
 	 * @return array
@@ -62,73 +123,7 @@ class BackendSeaModel
 			 FROM sea_period_data
 			 WHERE period_id = ?',
 			 $periodId
-			);
-	}
-
-	public static function getGoals()
-	{
-		return (array) BackendModel::getDB()->getRecords(
-			'SELECT *
-			 FROM sea_goals');
-	}
-
-	public static function getMetricPerDay($metric, $startTimestamp, $endTimestamp)
-	{
-		return (array) BackendModel::getDB()->getPairs(
-			'SELECT day, ' . $metric . '
-			 FROM sea_day_data
-			 WHERE day >= ? AND day <= ?',
-			 array($startTimestamp, $endTimestamp)
-			);
-	}
-
-	public static function getMetricsPerDay($metrics, $startTimestamp, $endTimestamp)
-	{
-		return (array) BackendModel::getDB()->getRecords(
-			'SELECT day, ' . implode(",", $metrics) . '
-			 FROM sea_day_data
-			 WHERE day >= ? AND day <= ?',
-			 array($startTimestamp, $endTimestamp)
-			);
-	}
-
-	/**
-	 * Update the access token (and the refresh token) we achieved from Google
-	 *
-	 * @param string $accessToken
-	 * @param string $refreshToken
-	 * @return boolean
-	 */
-	public static function updateTokens($accessToken, $refreshToken = null)
-	{
-		$datetime = BackendModel::getUTCDate();
-		BackendModel::getDB()->update('sea_settings', array('value' => $accessToken, 'date' => $datetime), 'name = ?', 'access_token');
-		if(isset($refreshToken))
-		{
-			BackendModel::getDB()->update('sea_settings', array('value' => $refreshToken, 'date' => $datetime), 'name = ?', 'refresh_token');
-		}
-		return true;
-	}
-
-	/**
-	 * Update the client-id en client-id-secret
-	 *
-	 * @param array $values
-	 * @return boolean
-	 */
-	public static function updateIds($values)
-	{
-		$datetime = BackendModel::getUTCDate();
-		foreach($values as $name => $value)
-		{
-			BackendModel::getDB()->update('sea_settings', array('value' => $value, 'date' => $datetime), 'name = ?', $name);
-		}
-		return true;
-	}
-
-	public static function deleteProfileId()
-	{
-		BackendModel::getDB()->update('sea_settings', array('value' => ''), 'name = ?', 'table_id');
+		);
 	}
 
 	/**
@@ -165,26 +160,33 @@ class BackendSeaModel
 		return true;
 	}
 
+	/**
+	 * Insert all the SEA-related data per day
+	 *
+	 * @param array $dayData
+	 * @return boolean
+	 */
 	private static function insertSEADayData($dayData)
 	{
-		foreach ($dayData as $day => $data)
+		foreach($dayData as $day => $data)
 		{
 			$query =
-				'INSERT IGNORE INTO sea_day_data (day, cost, visits, impressions, clicks, click_through_rate, cost_per_click, cost_per_mimpressions, conversions, conversion_percentage, cost_per_conversion)
-				VALUES (:day, :cost, :visits, :impressions, :clicks, :click_through_rate, :cost_per_click, :cost_per_mimpressions, :conversions, :conversion_percentage, :cost_per_conversion)';
+			    'INSERT IGNORE INTO sea_day_data (day, cost, visits, impressions, clicks, click_through_rate, cost_per_click, cost_per_mimpressions, conversions, conversion_percentage, cost_per_conversion)
+			     VALUES (:day, :cost, :visits, :impressions, :clicks, :click_through_rate, :cost_per_click, :cost_per_mimpressions, :conversions, :conversion_percentage, :cost_per_conversion)';
 
-			$record = array();
-			$record['day'] = $day;
-			$record['cost'] = $data['cost'];
-			$record['visits'] = $data['visits'];
-			$record['impressions'] = $data['impressions'];
-			$record['clicks'] = $data['adClicks'];
-			$record['click_through_rate'] = $data['CTR'];
-			$record['cost_per_click'] = $data['CPC'];
-			$record['cost_per_mimpressions'] = $data['CPM'];
-			$record['conversions'] = $data['conversions'];
-			$record['conversion_percentage'] = $data['conversion_percentage'];
-			$record['cost_per_conversion'] = $data['cost_per_conversion'];
+			$record = array(
+			    'day' => $day,
+			    'cost' => $data['cost'],
+			    'visits' => $data['visits'],
+			    'impressions' => $data['impressions'],
+			    'clicks' => $data['adClicks'],
+			    'click_through_rate' => $data['CTR'],
+			    'cost_per_click' => $data['CPC'],
+			    'cost_per_mimpressions' => $data['CPM'],
+			    'conversions' => $data['conversions'],
+			    'conversion_percentage' => $data['conversion_percentage'],
+			    'cost_per_conversion' => $data['cost_per_conversion']
+			);
 
 			BackendModel::getDB()->execute($query, $record);
 		}
@@ -192,9 +194,14 @@ class BackendSeaModel
 		return true;
 	}
 
+	/**
+	 * Insert all the goals (if they aren't inserted yet)
+	 *
+	 * @param array $goals
+	 */
 	private static function insertSEAGoalData($goals)
 	{
-		foreach ($goals as $goal)
+		foreach($goals as $goal)
 		{
 			$query = 'INSERT IGNORE INTO sea_goals (goal_name) VALUES (:goal_name)';
 
@@ -205,24 +212,59 @@ class BackendSeaModel
 	}
 
 	/**
-	 * Check in the database if we already stored the data from that period
+	 * Function to get the timestamp of the token.
+	 * It's important to check if the access token is still valid
 	 *
-	 * @param array $period
-	 * @return boolean
+	 * @return string
 	 */
-	public static function checkPeriod($period)
+	public static function getTimeStampAccessToken()
 	{
-		$numRows = BackendModel::getDB()->getNumRows(
-			'SELECT *
-			 FROM sea_period
-			 WHERE period_start = ? AND period_end = ?', $period
+		return (string) BackendModel::getDB()->getVar(
+			'SELECT UNIX_TIMESTAMP(date) AS date
+			 FROM sea_settings
+			 WHERE name = ?', 'access_token'
 			 );
-		$return = ($numRows > 0) ? (true) : (false);
-		return $return;
 	}
 
+	/**
+	 * Truncate the tables
+	 */
 	public static function truncateTables()
 	{
 		BackendModel::getDB()->truncate(array('sea_period_data', 'sea_period', 'sea_day_data', 'sea_goals'));
+	}
+
+	/**
+	 * Update the client-id en client-id-secret
+	 *
+	 * @param array $values
+	 * @return boolean
+	 */
+	public static function updateIds($values)
+	{
+		$datetime = BackendModel::getUTCDate();
+		foreach($values as $name => $value)
+		{
+			BackendModel::getDB()->update('sea_settings', array('value' => $value, 'date' => $datetime), 'name = ?', $name);
+		}
+		return true;
+	}
+
+	/**
+	 * Update the access token (and the refresh token) we achieved from Google
+	 *
+	 * @param string $accessToken
+	 * @param string $refreshToken
+	 * @return boolean
+	 */
+	public static function updateTokens($accessToken, $refreshToken = null)
+	{
+		$datetime = BackendModel::getUTCDate();
+		BackendModel::getDB()->update('sea_settings', array('value' => $accessToken, 'date' => $datetime), 'name = ?', 'access_token');
+		if(isset($refreshToken))
+		{
+			BackendModel::getDB()->update('sea_settings', array('value' => $refreshToken, 'date' => $datetime), 'name = ?', 'refresh_token');
+		}
+		return true;
 	}
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Helper file to make the connection with Google Analytics API
  *
@@ -7,32 +8,35 @@
 class BackendSeaHelper
 {
 	/**
-	 * This helperfunction returns a URL.
-	 * This URL will redirect us to google (button to grant access)
-	 *
-	 * @return string
+	 * Depending on the current state, we have to renew the access token and redirect to a certain page
+	 * @return boolean
 	 */
-	public static function loginWithOAuth()
+	public static function checkStatus()
 	{
-		// We obtain all the settings from the database
 		$APISettingsArray = BackendSeaModel::getAPISettings();
-
-		$clientId = $APISettingsArray['client_id'];
-		$redirectUri = $APISettingsArray['redirect_uri'];
-		$scope = $APISettingsArray['scope'];
-		$accessType = $APISettingsArray['access_type'];
-		$approvalPrompt = 'force';
-
-		$loginUrl = sprintf(
-			"https://accounts.google.com/o/oauth2/auth?scope=%s&redirect_uri=%s&response_type=code&client_id=%s&access_type=%s&approval_prompt=%s",
-			$scope,
-			$redirectUri,
-			$clientId,
-			$accessType,
-			$approvalPrompt);
-
-		// redirect immediately to google
-		spoonHTTP::redirect($loginUrl);
+		if(($APISettingsArray['client_id'] != '') && ($APISettingsArray['client_secret'] != '') && ($APISettingsArray['table_id'] != ''))
+		{
+			if(!isset($_SESSION['accessTokenCreated']))
+			{
+				return self::renewAccessToken();
+			}
+			elseif(time() - $_SESSION['accessTokenCreated'] > 3600)
+			{
+				return self::renewAccessToken();
+			}
+			elseif(($APISettingsArray['access_token'] == '') || ($APISettingsArray['refresh_token'] == ''))
+			{
+				return self::renewAccessToken();
+			}
+			else
+			{
+				return true;
+			}
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	/**
@@ -40,6 +44,7 @@ class BackendSeaHelper
 	 * This token is stored in the database and in a session
 	 *
 	 * @param string $code
+	 * @param boolean $boolean
 	 * @return string
 	 */
 	public static function getOAuth2Token($code, $boolean)
@@ -48,26 +53,26 @@ class BackendSeaHelper
 		$APISettingsArray = BackendSeaModel::getAPISettings();
 
 		// the base_url for the curl
-		$oauth2tokenUrl = "https://accounts.google.com/o/oauth2/token";
+		$oauth2tokenUrl = 'https://accounts.google.com/o/oauth2/token';
 
-		//Normally the client ID and client Secret never changes
+		// Normally the client ID and client Secret never changes
 		$clienttokenPost = array(
-			"client_id"	    =>	$APISettingsArray['client_id'],
-			"client_secret" =>	$APISettingsArray['client_secret']
+			'client_id' => $APISettingsArray['client_id'],
+			'client_secret' => $APISettingsArray['client_secret']
 		);
 
-		//If boolean == true, it means that we can access google's data with the refresh code
-		//This means we weren't redirected to google anymore
+		// If boolean == true, it means that we can access google's data with the refresh code
+		// This means we weren't redirected to google anymore
 		if($boolean)
 		{
-			$clienttokenPost["refresh_token"] = $code;
-			$clienttokenPost["grant_type"] = "refresh_token";
+			$clienttokenPost['refresh_token'] = $code;
+			$clienttokenPost['grant_type'] = 'refresh_token';
 		}
 		else
 		{
-			$clienttokenPost["code"] = $code;
-			$clienttokenPost["redirect_uri"] = $APISettingsArray['redirect_uri'];
-			$clienttokenPost["grant_type"] = "authorization_code";
+			$clienttokenPost['code'] = $code;
+			$clienttokenPost['redirect_uri'] = $APISettingsArray['redirect_uri'];
+			$clienttokenPost['grant_type'] = 'authorization_code';
 		}
 
 		// we use curl to do the authorization
@@ -88,16 +93,14 @@ class BackendSeaHelper
 
 		if(isset($authObj->error))
 		{
-		    $url = BackendModel::createURLForAction('connect') . '&error=' . $authObj->error;
-		    $_POST['error'] = $authObj->error;
-		    SpoonHTTP::redirect($url);
+			$url = BackendModel::createURLForAction('connect') . '&error=' . $authObj->error;
+			SpoonHTTP::redirect($url);
 		}
 
 		// the returned object should contain at least an access token
 		$accessToken = $authObj->access_token;
-		$_SESSION['access_token'] = $accessToken;
 
-		if (isset($authObj->refresh_token))
+		if(isset($authObj->refresh_token))
 		{
 			$refreshToken = $authObj->refresh_token;
 			BackendSeaModel::updateTokens($accessToken, $refreshToken);
@@ -110,35 +113,32 @@ class BackendSeaHelper
 	}
 
 	/**
-	 * Depending on the current state, we have to renew the access token and redirect to a certain page
-	 * @return boolean
+	 * This helperfunction returns a URL.
+	 * This URL will redirect us to google (button to grant access)
+	 *
+	 * @return string
 	 */
-	public static function checkStatus()
+	public static function loginWithOAuth()
 	{
+		// We obtain all the settings from the database
 		$APISettingsArray = BackendSeaModel::getAPISettings();
-		if(($APISettingsArray['client_id'] != '') && ($APISettingsArray['client_secret'] != '') && ($APISettingsArray['table_id'] != ''))
-		{
-			if (!isset($_SESSION['accessTokenCreated']))
-			{
-				return self::renewAccessToken();
-			}
-			else if (time() - $_SESSION['accessTokenCreated'] > 3600)
-			{
-				return self::renewAccessToken();
-			}
-			else if (($APISettingsArray['access_token'] == '') || ($APISettingsArray['refresh_token'] == ''))
-			{
-				return self::renewAccessToken();
-			}
-			else
-			{
-			    return true;
-			}
-		}
-		else
-		{
-			return false;
-		}
+
+		$clientId = $APISettingsArray['client_id'];
+		$redirectUri = $APISettingsArray['redirect_uri'];
+		$scope = $APISettingsArray['scope'];
+		$accessType = $APISettingsArray['access_type'];
+		$approvalPrompt = 'force';
+
+		$loginUrl = sprintf(
+			'https://accounts.google.com/o/oauth2/auth?scope=%s&redirect_uri=%s&response_type=code&client_id=%s&access_type=%s&approval_prompt=%s',
+			$scope,
+			$redirectUri,
+			$clientId,
+			$accessType,
+			$approvalPrompt);
+
+		// redirect immediately to google
+		spoonHTTP::redirect($loginUrl);
 	}
 
 	/**

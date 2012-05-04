@@ -13,12 +13,12 @@ CREATE TABLE IF NOT EXISTS `sea_day_data` (
   `conversions` int(11) DEFAULT NULL,
   `conversion_percentage` float DEFAULT NULL,
   `cost_per_conversion` float DEFAULT NULL,
-  UNIQUE KEY `unique` (`day`)
+  PRIMARY KEY (`day`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE IF NOT EXISTS `sea_goals` (
   `goal_name` varchar(100) NOT NULL,
-  UNIQUE KEY `unique` (`goal_name`)
+  PRIMARY KEY (`goal_name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE IF NOT EXISTS `sea_period` (
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `sea_period_data` (
   `cost_per_mimpressions` float DEFAULT NULL,
   `position` int(11) DEFAULT NULL,
   `costs` float DEFAULT NULL,
-  UNIQUE KEY `period_id` (`period_id`)
+  PRIMARY KEY (`period_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE IF NOT EXISTS `sea_settings` (

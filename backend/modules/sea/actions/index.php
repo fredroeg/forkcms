@@ -7,22 +7,13 @@
  */
 class BackendSeaIndex extends BackendBaseActionIndex
 {
-	public function execute()
-	{
-		parent::execute();
-		$this->checkStatus();
-		$this->parse();
-		$this->display();
-	}
-
 	/**
-	 *  Depending on the state of the tokens & id's there is a different redirect
-	 *
+	 * Depending on the state of the tokens & id's there is a different redirect
 	 */
 	private function checkStatus()
 	{
 		$redirect = BackendSeaHelper::checkStatus();
-		if (!$redirect)
+		if(!$redirect)
 		{
 			$this->redirect('connect');
 		}
@@ -30,5 +21,13 @@ class BackendSeaIndex extends BackendBaseActionIndex
 		{
 			$this->redirect('showdata');
 		}
+	}
+
+	public function execute()
+	{
+		parent::execute();
+		$this->checkStatus();
+		$this->parse();
+		$this->display();
 	}
 }

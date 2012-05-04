@@ -8,22 +8,6 @@
  */
 class BackendSeaShowdata extends BackendSeaBase
 {
-	public function execute()
-	{
-		parent::execute();
-		$this->checkStatus();
-		$this->seaDataDump();
-		$this->parseLineChartData();
-		$this->parseMultiLineChartData();
-		$this->parse();
-		$this->display();
-	}
-
-	protected function parse()
-	{
-		parent::parse();
-	}
-
 	/**
 	 * Check if our access token is still valid
 	 */
@@ -35,30 +19,21 @@ class BackendSeaShowdata extends BackendSeaBase
 		}
 	}
 
-	/**
-	 * Check if we have the necessary data in the db, otherwise insert the missing data
-	 */
-	private function seaDataDump()
+	public function execute()
 	{
-		//Define the period
-		$startTimestamp = date('Y-m-d', SpoonSession::get('sea_start_timestamp'));
-		$endTimestamp = date('Y-m-d', SpoonSession::get('sea_end_timestamp'));
-		$period = array($startTimestamp, $endTimestamp);
-
-		//Check if we already stored the data for that period in the database. (if not -> insert it!)
-		if(!BackendSeaModel::checkPeriod($period))
-		{
-			BackendSeaHelp::getAllData($period);
-		}
-
-		$this->getDataFromThisPeriod(BackendSeaModel::getPeriodId($period));
-		$this->getGoals();
+		parent::execute();
+		$this->checkStatus();
+		$this->seaDataDump();
+		$this->parseLineChartData();
+		$this->parseMultiLineChartData();
+		$this->parse();
+		$this->display();
 	}
 
 	/**
 	 * Get all the data from that period, and assign it to the template
 	 *
-	 * @param array $periodId
+	 * @param int $periodId
 	 */
 	private function getDataFromThisPeriod($periodId)
 	{
@@ -66,7 +41,7 @@ class BackendSeaShowdata extends BackendSeaBase
 
 		// we check if the array isn't empty
 		// possible if the adwords account isn't coupled with the GA account
-		if(!empty ($periodDataArray))
+		if(!empty($periodDataArray))
 		{
 			$this->tpl->assign('visits', $periodDataArray['visits']);
 			$this->tpl->assign('conversions', $periodDataArray['conversions']);
@@ -76,7 +51,7 @@ class BackendSeaShowdata extends BackendSeaBase
 			$this->tpl->assign('clicks', $periodDataArray['clicks_amount']);
 			$this->tpl->assign('ctr', $periodDataArray['click_through_rate']);
 			$this->tpl->assign('costPerClick', $periodDataArray['cost_per_click']);
-			//$this->tpl->assign('position', $periodDataArray['position']);
+			// $this->tpl->assign('position', $periodDataArray['position']);
 			$this->tpl->assign('cost', $periodDataArray['costs']);
 		}
 		else
@@ -95,9 +70,11 @@ class BackendSeaShowdata extends BackendSeaBase
 		}
 	}
 
+	/**
+	 * Get all the goals and assign them to the template
+	 */
 	private function getGoals()
 	{
-
 		$goals = BackendSeaModel::getGoals();
 		$this->tpl->assign('goals', $goals);
 	}
@@ -120,14 +97,12 @@ class BackendSeaShowdata extends BackendSeaBase
 		$graphData[0]['label'] = SpoonFilter::ucfirst(BL::lbl(SpoonFilter::toCamelCase($metric)));
 		$graphData[0]['data'] = array();
 
-
 		foreach($metricsPerDay as $key => $data)
 		{
 			// build array
 			$graphData[0]['data'][$key]['date'] = $key;
 			$graphData[0]['data'][$key]['value'] = $data;
 		}
-
 
 		$this->tpl->assign('maxYAxis', $maxYAxis);
 		$this->tpl->assign('tickInterval', ($maxYAxis == 2 ? '1' : ''));
@@ -166,5 +141,25 @@ class BackendSeaShowdata extends BackendSeaBase
 		}
 
 		$this->tpl->assign('graphDataMulti', $graphData);
+	}
+
+	/**
+	 * Check if we have the necessary data in the db, otherwise insert the missing data
+	 */
+	private function seaDataDump()
+	{
+		// Define the period
+		$startTimestamp = date('Y-m-d', SpoonSession::get('sea_start_timestamp'));
+		$endTimestamp = date('Y-m-d', SpoonSession::get('sea_end_timestamp'));
+		$period = array($startTimestamp, $endTimestamp);
+
+		// Check if we already stored the data for that period in the database. (if not -> insert it!)
+		if(!BackendSeaModel::checkPeriod($period))
+		{
+			BackendSeaHelp::getAllData($period);
+		}
+
+		$this->getDataFromThisPeriod(BackendSeaModel::getPeriodId($period));
+		$this->getGoals();
 	}
 }
