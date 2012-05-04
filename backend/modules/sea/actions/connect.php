@@ -23,6 +23,13 @@ class BackendSeaConnect extends BackendBaseActionEdit
 	private $clientSecret;
 
 	/**
+	 * Redirect URI
+	 *
+	 * @var string
+	 */
+	private $redirectURI;
+
+	/**
 	 * Error
 	 *
 	 * @var boolean
@@ -63,6 +70,7 @@ class BackendSeaConnect extends BackendBaseActionEdit
 
 		$this->clientId = $this->record['client_id'];
 		$this->clientSecret = $this->record['client_secret'];
+		$this->redirectURI = $this->record['redirect_uri'];
 		$this->tableId = $this->record['table_id'];
 	}
 
@@ -71,6 +79,7 @@ class BackendSeaConnect extends BackendBaseActionEdit
 		$this->frm = new BackendForm('connectform');
                 $this->frm->addText('clientId', $this->clientId);
 		$this->frm->addText('clientIdSecret', $this->clientSecret);
+		$this->frm->addText('redirectUri', $this->redirectURI);
 
 		// radiobutton has 3 possibilities
 		if($this->clientId != '' && $this->clientSecret != '' && $this->tableId != '')
@@ -113,17 +122,20 @@ class BackendSeaConnect extends BackendBaseActionEdit
                         // shorten the fields;
                         $txtClientId = $this->frm->getField('clientId');
                         $txtClientIdSecret = $this->frm->getField('clientIdSecret');
+			$txtRedirectUri = $this->frm->getField('redirectUri');
 			$ddmTableId = $this->frm->getField('profileId');
 
                         // validate the fields
                         $txtClientId->isFilled(BL::getError('ClientIdIsRequired'));
                         $txtClientIdSecret->isFilled(BL::getError('ClientIdSecretIsRequired'));
+			$txtRedirectUri->isFilled(BL::getError('RedirectIsRequired'));
 
                         if($this->frm->isCorrect())
                         {
                                 // build array
                                 $values['client_id'] = $txtClientId->getValue();
                                 $values['client_secret'] = $txtClientIdSecret->getValue();
+				$values['redirect_uri'] = $txtRedirectUri->getValue();
 				$values['table_id'] = $ddmTableId->getValue();
 
                                 // insert the item

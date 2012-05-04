@@ -26,6 +26,10 @@
                             {$txtClientIdSecret} {$txtClientIdSecretError}
                         </p>
 			<p>
+                            <label for="redirectUri">{$lblRedirectUri|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
+                            {$txtRedirectUri} {$txtRedirectUriError}
+                        </p>
+			<p>
 			{option:profileId}
 			<label>{$lblProfile|ucfirst}</label>
 			{iteration:profileId}
