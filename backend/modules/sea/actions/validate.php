@@ -23,7 +23,7 @@ class BackendSeaValidate extends BackendBaseActionIndex
 		// Oauth 2.0: exchange token for access-token in the db so multiple calls can be made to api
 		if(isset($_GET['code']))
 		{
-			if(BackendSeaHelper::getOAuth2Token($_GET['code'], false))
+			if(BackendSeaHelper::getOAuth2Token($_GET['code'],false))
 			{
 				$this->redirect('connect');
 			}
