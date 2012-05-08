@@ -134,10 +134,12 @@ class BackendAnalyticsHelper
 	    }
 
 	    $aggregatesData = self::getAggregates($startTimestamp, $endTimestamp);
+	    $keywordsData = self::getKeywords('pageviews', $startTimestamp, $endTimestamp, 'pageviews');
+
 	    // BackendAnalyticsModel::insertAggregatesData($periodId, $aggregatesData);
+	    // BackendAnalyticsModel::insertKeywordsData($periodId, $keywordsData);
 
 	    // self::getDashboardData($startTimestamp, $endTimestamp);
-	    // self::getKeywords('pageviews', $startTimestamp, $endTimestamp, 'pageviews');
 	    // self::getMetricsPerDay($startTimestamp, $endTimestamp);
 	}
 
@@ -395,8 +397,10 @@ class BackendAnalyticsHelper
 		// sort if needed
 		if($sort !== null) $parameters['sort'] = '-ga:' . $sort;
 
+		$results = self::getGoogleAnalyticsInstance()->getAnalyticsResults($gaMetrics, $startTimestamp, $endTimestamp, 'ga:keyword', $parameters);
+
 		// fetch and return
-		return self::getGoogleAnalyticsInstance()->getAnalyticsResults($gaMetrics, $startTimestamp, $endTimestamp, 'ga:keyword', $parameters);
+		return $results['aggregates'];
 	}
 
 	/**

@@ -939,6 +939,12 @@ class BackendAnalyticsModel
 		return $items;
 	}
 
+	/**
+	 * Insert the aggregates in the array with the period id
+	 *
+	 * @param int $periodId
+	 * @param array $data
+	 */
 	public static function insertAggregatesData($periodId, $data)
 	{
 		$aggregatesDataArray = array(
@@ -963,6 +969,22 @@ class BackendAnalyticsModel
 		);
 
 		BackendModel::getDB(true)->insert('analytics_aggregates', $aggregatesDataArray);
+	}
+
+	/**
+	 * Inserts the keywords into the database
+	 *
+	 * @param int $periodId
+	 * @param array $data
+	 */
+	public static function insertKeywordsData($periodId, $data)
+	{
+		$period = array('period_id' => $periodId);
+		foreach($data as $datarow)
+		{
+			$insertData = array_merge($period, $datarow);
+			BackendModel::getDB(true)->insert('analytics_top_keywords', $insertData);
+		}
 	}
 
 	/**
