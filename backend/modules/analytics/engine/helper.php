@@ -40,6 +40,7 @@ class BackendAnalyticsHelper
 		// put in array
 		$results = $visitorResults['aggregates'][0];
 		$results += $contentResults['aggregates'][0];
+
 		/*
 		 * CUSTOM AGGREGATES
 		 */
@@ -91,7 +92,7 @@ class BackendAnalyticsHelper
 		// get results for the landing pages
 		$landingPagesResults = self::getGoogleAnalyticsInstance()->getAnalyticsResults(array('ga:entrances', 'ga:bounces'), $startTimestamp, $endTimestamp, 'ga:pagePath', $parameters);
 
-		$landingPaResults['landingPagesentrances'] = $landingPagesResults['totalResults']['ga:entrances'];
+		$landingPaResults['landingPagesEntrances'] = $landingPagesResults['totalResults']['ga:entrances'];
 		$landingPaResults['landingPagesBounces'] = $landingPagesResults['totalResults']['ga:bounces'];
 
 		// add to the results
@@ -109,8 +110,6 @@ class BackendAnalyticsHelper
 			// save
 			$aggregates[$key] = $value;
 		}
-
-		spoon::dump($aggregates);
 
 		return $aggregates;
 	}
@@ -135,7 +134,7 @@ class BackendAnalyticsHelper
 	    }
 
 	    $aggregatesData = self::getAggregates($startTimestamp, $endTimestamp);
-	    BackendAnalyticsModel::insertAggregates($periodId, $aggregatesData);
+	    // BackendAnalyticsModel::insertAggregatesData($periodId, $aggregatesData);
 
 	    // self::getDashboardData($startTimestamp, $endTimestamp);
 	    // self::getKeywords('pageviews', $startTimestamp, $endTimestamp, 'pageviews');

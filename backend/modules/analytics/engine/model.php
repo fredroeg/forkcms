@@ -939,6 +939,32 @@ class BackendAnalyticsModel
 		return $items;
 	}
 
+	public static function insertAggregatesData($periodId, $data)
+	{
+		$aggregatesDataArray = array(
+			'period_id' => $periodId,
+			'bounces' => $data['bounces'],
+			'entrances' => $data['entrances'],
+			'exits' => $data['exits'],
+			'new_visits' => $data['newVisits'],
+			'pageviews' => $data['pageviews'],
+			'time_on_page' => $data['timeOnPage'],
+			'time_on_site' => $data['timeOnSite'],
+			'visitors' => $data['visitors'],
+			'visits' => $data['visits'],
+			'unique_pageviews' => $data['uniquePageviews'],
+			'keyword_pageviews' => $data['keywordPageviews'],
+			'all_pages_pageviews' => $data['allPagesPageviews'],
+			'all_pages_unique_pageviews' => $data['allPagesUniquePageviews'],
+			'exit_pages_exits' => $data['exitPagesExit'],
+			'exit_pages_pageviews' => $data['exitPagesPageviews'],
+			'landing_pages_entrances' => $data['landingPagesEntrances'],
+			'landing_pages_bounces' => $data['landingPagesBounces']
+		);
+
+		BackendModel::getDB(true)->insert('analytics_aggregates', $aggregatesDataArray);
+	}
+
 	/**
 	 * Inserts a landingpage into the database
 	 *
