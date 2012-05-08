@@ -45,6 +45,7 @@ class BackendAnalyticsLoading extends BackendAnalyticsBase
 	 */
 	private function getData()
 	{
+	    /*
 		$this->redirectAction = SpoonFilter::getGetValue('redirect_action', null, 'index');
 		$this->identifier = time() . rand(0, 999);
 		$this->pageId = SpoonFilter::getGetValue('page_id', null, '');
@@ -81,6 +82,8 @@ class BackendAnalyticsLoading extends BackendAnalyticsBase
 		curl_setopt_array($curl, $options);
 		curl_exec($curl);
 		curl_close($curl);
+	     *
+	     */
 	}
 
 	/**

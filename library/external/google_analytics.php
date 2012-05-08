@@ -173,13 +173,13 @@ class GoogleAnalytics
 
 		// redefine parameters
 		$metrics = (array) $metrics;
-		$startDate = date('Y-m-d', (int) $startTimestamp);
-		$endDate = date('Y-m-d', (int) $endTimestamp);
+		$startDate = $startTimestamp;
+		$endDate = $endTimestamp;
 		$dimensions = (array) $dimensions;
 		$parameters = (array) $parameters;
 
 		// build url
-		$URL = self::API_URL . '/data?ids=' . $this->tableId;
+		$URL = self::API_URL . '/data/ga?ids=ga:' . $this->tableId;
 		$URL .= '&metrics=' . implode(',', $metrics);
 		$URL .= '&start-date=' . $startDate;
 		$URL .= '&end-date=' . $endDate;
@@ -201,49 +201,31 @@ class GoogleAnalytics
 		// unauthorized
 		if($result == 'UNAUTHORIZED') return $result;
 
-		// interpret the result xml
-		$simpleXML = simplexml_load_string(str_replace(array('dxp:', 'openSearch:', 'ga:'), '', $result));
+		$decodedResult = json_decode($result);
 
 		// init vars
-		$results = array('aggregates' => array(), 'entries' => array());
+		$results = array();
 
 		// results total, start index and items per page
-		$results['totalResults'] = (int) $simpleXML->totalResults;
-		$results['startIndex'] = (int) $simpleXML->startIndex;
-		$results['itemsPerPage'] = (int) $simpleXML->itemsPerPage;
+		$results['totalResults'] = (array) $decodedResult->totalsForAllResults;
+		$startIndex = 'start-index';
+		$results['startIndex'] = (int) $decodedResult->query->$startIndex;
+		$results['itemsPerPage'] = (int) $decodedResult->itemsPerPage;
 
 		// start and end date
-		$results['startDate'] = (string) $simpleXML->startDate;
-		$results['endDate'] = (string) $simpleXML->endDate;
+		$results['startDate'] = $startDate;
+		$results['endDate'] = $endDate;
 
-		// there are some aggregates
-		if(count($simpleXML->aggregates->metric) > 0)
+		$value = array();
+		foreach($decodedResult->columnHeaders as $index => $header)
 		{
-			// loop them
-			foreach($simpleXML->aggregates->metric as $aggregate)
-			{
-				// build the array
-				$results['aggregates'][(string) $aggregate['name']] = (string) $aggregate['value'];
-			}
+			$value[$index] = str_replace('ga:', '', $header->name);
 		}
-
-		// there are some entries
-		if(count($simpleXML->entry) > 0)
+		foreach($decodedResult->rows as $index => $row)
 		{
-			// init vars
-			$i = 0;
-
-			// loop them
-			foreach($simpleXML->entry as $entry)
+			foreach($row as $key => $rowVal)
 			{
-				// loop the dimensions
-				foreach($entry->dimension as $dimension) $results['entries'][$i][(string) $dimension['name']] = (string) $dimension['value'];
-
-				// loop the metrics
-				foreach($entry->metric as $metric) $results['entries'][$i][(string) $metric['name']] = (string) $metric['value'];
-
-				// increase counter
-				$i++;
+			    $results['aggregates'][$index][$value[$key]] = $rowVal;
 			}
 		}
 

@@ -21,6 +21,7 @@ class BackendAnalyticsIndex extends BackendAnalyticsBase
 	public function execute()
 	{
 		parent::execute();
+		$this->seaDataDump();
 		$this->parse();
 		$this->display();
 	}
@@ -38,7 +39,7 @@ class BackendAnalyticsIndex extends BackendAnalyticsBase
 		if(empty($warnings))
 		{
 			$this->parseOverviewData();
-			$this->parseLineChartData();
+			/*$this->parseLineChartData();
 			$this->parsePieChartData();
 			$this->parseImportantReferrals();
 			$this->parseImportantKeywords();
@@ -57,6 +58,8 @@ class BackendAnalyticsIndex extends BackendAnalyticsBase
 			$this->tpl->assign('googleVisitorTypesURL', sprintf($googleURL, 'visitor_types', $googleTableId, $googleDate));
 			$this->tpl->assign('googleBouncesURL', sprintf($googleURL, 'bounce_rate', $googleTableId, $googleDate));
 			$this->tpl->assign('googleAveragePageviewsURL', sprintf($googleURL, 'average_pageviews', $googleTableId, $googleDate));
+			 *
+			 */
 		}
 	}
 
@@ -161,6 +164,7 @@ class BackendAnalyticsIndex extends BackendAnalyticsBase
 	{
 		// get aggregates
 		$results = BackendAnalyticsModel::getAggregates($this->startTimestamp, $this->endTimestamp);
+		/*
 		$resultsTotal = BackendAnalyticsModel::getAggregatesTotal($this->startTimestamp, $this->endTimestamp);
 
 		// are there some values?
@@ -212,7 +216,7 @@ class BackendAnalyticsIndex extends BackendAnalyticsBase
 			$this->tpl->assign('bounces', $bounces);
 			$this->tpl->assign('bouncesTotal', $bouncesTotal);
 			$this->tpl->assign('bouncesDifference', $bouncesDifference);
-		}
+		}*/
 	}
 
 	/**
@@ -236,5 +240,22 @@ class BackendAnalyticsIndex extends BackendAnalyticsBase
 		}
 
 		$this->tpl->assign('pieGraphData', $graphData);
+	}
+
+	/**
+	 * Check if we have the necessary data in the db, otherwise insert the missing data
+	 */
+	private function seaDataDump()
+	{
+		// Define the period
+		$startTimestamp = date('Y-m-d', $this->startTimestamp);
+		$endTimestamp = date('Y-m-d', $this->endTimestamp);
+		$period = array($startTimestamp, $endTimestamp);
+
+		// Check if we already stored the data for that period in the database. (if not -> insert it!)
+		if(!BackendAnalyticsModel::checkPeriod($period))
+		{
+			BackendAnalyticsHelper::getAllData($startTimestamp, $endTimestamp);
+		}
 	}
 }

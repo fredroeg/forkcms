@@ -69,7 +69,7 @@ class BackendAnalyticsSettings extends BackendBaseActionEdit
 	{
 		$this->record = BackendAnalyticsModel::getAPISettings();
 
-		// BackendAnalyticsHelper::getOAuth2Token($this->record['refresh_token'], true);
+		BackendAnalyticsHelper::getOAuth2Token($this->record['refresh_token'], true);
 
 		// get session token, account name, the profile's table id, the profile's title
 		$this->accessToken = $this->record['access_token'];
@@ -86,8 +86,8 @@ class BackendAnalyticsSettings extends BackendBaseActionEdit
 			// the session token has te be removed
 			if($remove == 'session_token')
 			{
-			    $values['access_token'] = null;
-			    $values['refresh_token'] = null;
+				$values['access_token'] = null;
+				$values['refresh_token'] = null;
 			}
 
 			$values['account_name'] = null;

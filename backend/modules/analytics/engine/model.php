@@ -38,26 +38,45 @@ class BackendAnalyticsModel
 	private static $data = array(), $dashboardData = array();
 
 	/**
+	 * Check in the database if we already stored the data from that period
+	 *
+	 * @param array $period
+	 * @return boolean
+	 */
+	public static function checkPeriod($period)
+	{
+		$numRows = BackendModel::getDB()->getNumRows(
+			'SELECT *
+			 FROM sea_period
+			 WHERE period_start = ? AND period_end = ?', $period
+		);
+		$return = ($numRows > 0) ? (true) : (false);
+		return $return;
+	}
+
+	/**
 	 * Checks the settings and optionally returns an array with warnings
 	 *
 	 * @return array
 	 */
 	public static function checkSettings()
 	{
+		$APISettingsArray = BackendAnalyticsModel::getAPISettings();
+
 		$warnings = array();
 
 		// check if this action is allowed
 		if(BackendAuthentication::isAllowedAction('settings', 'analytics'))
 		{
 			// analytics session token
-			if(BackendModel::getModuleSetting('analytics', 'session_token', null) == '')
+			if($APISettingsArray['access_token'] == '')
 			{
 				// add warning
 				$warnings[] = array('message' => sprintf(BL::err('AnalyseNoSessionToken', 'analytics'), BackendModel::createURLForAction('settings', 'analytics')));
 			}
 
 			// analytics table id (only show this error if no other exist)
-			if(empty($warnings) && BackendModel::getModuleSetting('analytics', 'table_id', null) == '')
+			if(empty($warnings) && $APISettingsArray['table_id'] == '')
 			{
 				// add warning
 				$warnings[] = array('message' => sprintf(BL::err('AnalyseNoTableId', 'analytics'), BackendModel::createURLForAction('settings', 'analytics')));
@@ -137,19 +156,17 @@ class BackendAnalyticsModel
 	 */
 	public static function getAggregates($startTimestamp, $endTimestamp)
 	{
-		// get data from cache
-		$aggregates = self::getDataFromCacheByType('aggregates', $startTimestamp, $endTimestamp);
+		$periodId = self::getPeriodId(array($startTimestamp, $endTimestamp));
 
 		// get current action
 		$action = Spoon::get('url')->getAction();
 
-		// nothing in cache
-		if($aggregates === false) self::redirectToLoadingPage($action);
+		// not in db
+		if($periodId == 0) self::redirectToLoadingPage($action);
 
-		// reset loop counter for the current action if we got data from cache
-		SpoonSession::set($action . 'Loop', null);
+		$aggregates = self::getDataFromDbByType('analytics_aggregates', $periodId);
 
-		return $aggregates;
+		// return $aggregates;
 	}
 
 	/**
@@ -371,6 +388,22 @@ class BackendAnalyticsModel
 		}
 
 		return (isset(self::$data[$type]['entries']) ? self::$data[$type]['entries'] : self::$data[$type]);
+	}
+
+	/**
+	 *
+	 * @param string $type
+	 * @param int $periodId
+	 * @return array
+	 */
+	public static function getDataFromDbByType($type, $periodId)
+	{
+		return (array) BackendModel::getDB()->getRecord(
+			'SELECT *
+			 FROM analytics_aggregates
+			 WHERE period_id = ?',
+			 $periodId
+		);
 	}
 
 	/**
@@ -621,6 +654,22 @@ class BackendAnalyticsModel
 		}
 
 		return $results;
+	}
+
+	/**
+	 * Get the id from a certain period
+	 *
+	 * @param array $period
+	 * @return int
+	 */
+	public static function getPeriodId($period)
+	{
+		return (int) BackendModel::getDB()->getVar(
+			'SELECT period_id
+			 FROM analytics_period
+			 WHERE period_start = ? AND period_end = ?',
+			 $period
+		);
 	}
 
 	/**
@@ -1035,15 +1084,6 @@ class BackendAnalyticsModel
 	 */
 	public static function redirectToLoadingPage($action, array $extraParameters = array())
 	{
-		// get loop counter
-		$counter = (SpoonSession::exists($action . 'Loop') ? SpoonSession::get($action . 'Loop') : 0);
-
-		// loop has run too long - throw exception
-		if($counter > 2) throw new BackendException('An infinite loop has been detected while getting data from cache for the action "' . $action . '".');
-
-		// set new counter
-		SpoonSession::set($action . 'Loop', ++$counter);
-
 		// put parameters into a string
 		$extraParameters = (empty($extraParameters) ? '' : '&' . http_build_query($extraParameters));
 
