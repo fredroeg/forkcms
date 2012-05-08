@@ -17,10 +17,8 @@ class GoogleAnalytics
 	// internal constant to enable/disable debugging
 	const DEBUG = false;
 
-
 	// api url
-	const API_URL = 'https://www.google.com/analytics/feeds';
-
+	const API_URL = 'https://www.googleapis.com/analytics/v3';
 
 	/**
 	 * cURL instance
@@ -29,14 +27,12 @@ class GoogleAnalytics
 	 */
 	private $curl;
 
-
 	/**
 	 * The session token
 	 *
 	 * @var	string
 	 */
 	private $sessionToken = null;
-
 
 	/**
 	 * The table id
@@ -45,13 +41,12 @@ class GoogleAnalytics
 	 */
 	private $tableId = null;
 
-
 	/**
 	 * Creates an instance of GoogleAnalytics, setting the session token and table id.
 	 *
-	 * @return	void
-	 * @param	string[optional] $sessionToken		The session token to make calls with.
-	 * @param	string[optional] $tableId			The table id to get data from.
+	 * @param string[optional] $sessionToken		The session token to make calls with.
+	 * @param string[optional] $tableId			The table id to get data from.
+	 * @return void
 	 */
 	public function __construct($sessionToken = null, $tableId = null)
 	{
@@ -59,24 +54,22 @@ class GoogleAnalytics
 		$this->setTableId($tableId);
 	}
 
-
 	/**
 	 * Destroy cURL instance.
 	 *
-	 * @return	void
+	 * @return void
 	 */
 	public function __destruct()
 	{
 		if($this->curl != null) curl_close($this->curl);
 	}
 
-
 	/**
 	 * Make a call to the given URL with the given token.
 	 *
-	 * @return	string
-	 * @param	string $URL			The url to call.
-	 * @param	string $token		The token to call with.
+	 * @param string $URL		The url to call.
+	 * @param string $token		The token to call with.
+	 * @return string
 	 */
 	private function doCall($URL, $token)
 	{
@@ -84,18 +77,14 @@ class GoogleAnalytics
 		$URL = (string) $URL;
 		$token = (string) $token;
 
-		// set options
-		$options[CURLOPT_URL] = $URL;
-		$options[CURLOPT_RETURNTRANSFER] = true;
-		$options[CURLOPT_SSL_VERIFYPEER] = false;
-		$this->curlheader[0] = sprintf('Authorization: AuthSub token="%s"/n', $token);
-		$options[CURLOPT_HTTPHEADER] = $this->curlheader;
-
-		// init if needed
-		if($this->curl == null) $this->curl = curl_init();
+		$this->curl = curl_init($URL);
 
 		// set options
-		curl_setopt_array($this->curl, $options);
+		curl_setopt($this->curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
+		curl_setopt($this->curl, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
+		$curlheader[0] = "Authorization: Bearer " . $this->sessionToken;
+		curl_setopt($this->curl, CURLOPT_HTTPHEADER, $curlheader);
 
 		// execute
 		$response = curl_exec($this->curl);
@@ -104,13 +93,6 @@ class GoogleAnalytics
 		// fetch errors
 		$errorNumber = curl_errno($this->curl);
 		$errorMessage = curl_error($this->curl);
-
-		// no analytics account - should be dealt with otherwise but this has the same http code as the 'unauthorized' state
-		if($response == 'No Analytics account was found for the currently logged-in user')
-		{
-			// return this response
-			return $response;
-		}
 
 		// invalid headers
 		if($headers['http_code'] == 401)
@@ -147,24 +129,22 @@ class GoogleAnalytics
 
 		// error?
 		if($errorNumber != '') throw new GoogleAnalyticsException($errorMessage, $errorNumber);
-
-		// return
+		// return response (json-string)
 		return $response;
 	}
-
 
 	/**
 	 * Get all website profiles and their account(s).
 	 *
-	 * @return	mixed
-	 * @param	string $sessionToken	The session token to get accounts from.
+	 * @param string $sessionToken	The session token to get accounts from.
+	 * @return mixed
 	 */
 	public function getAnalyticsAccountList($sessionToken)
 	{
 		// try to make the call
 		try
 		{
-			$response = $this->doCall(self::API_URL .'/accounts/default', $sessionToken);
+			$response = $this->doCall(self::API_URL . '/management/accounts/~all/webproperties/~all/profiles', $sessionToken);
 		}
 
 		// catch possible exception
@@ -173,57 +153,18 @@ class GoogleAnalytics
 			return array();
 		}
 
-		// no accounts - return an empty array
-		if($response == 'No Analytics account was found for the currently logged-in user') return array();
-
-		// unauthorized
-		if($response == 'UNAUTHORIZED') return $response;
-
-		// load with SimpleXML
-		$simpleXML = @simplexml_load_string(str_replace(array('dxp:', 'openSearch:', 'ga:'), '', $response));
-
-		// something went wrong
-		if(!isset($simpleXML->entry)) return 'ERROR';
-
-		// init vars
-		$i = 0;
-		$profiles = array();
-
-		// loop entries
-		foreach($simpleXML->entry as $entry)
-		{
-			// init entry array
-			$profile = array();
-
-			// build array
-			$profile['id'] = (string) $entry->id;
-			$profile['title'] = (string) $entry->title;
-			$profile['tableId'] = 'ga:'. (string) $entry->tableId;
-
-			// loop properties and save them
-			foreach($entry->property as $property) $profile[(string) $property['name']] = (string) $property['value'];
-
-			// save profile in profiles array
-			$profiles[$i] = $profile;
-
-			// increment counter
-			$i++;
-		}
-
-		// return the profiles
-		return (array) $profiles;
+		return json_decode($response);
 	}
-
 
 	/**
 	 * Makes a call to Google.
 	 *
-	 * @return	array
-	 * @param	mixed $metrics					The metrics as string or as array.
-	 * @param	int $startTimestamp				The start date from where data must be collected.
-	 * @param	int $endTimestamp				The end date to where data must be collected.
-	 * @param	mixed[optional] $dimensions		The optional dimensions as string or as array.
-	 * @param	array[optional] $parameters		The extra parameters for google.
+	 * @param mixed $metrics			The metrics as string or as array.
+	 * @param int $startTimestamp			The start date from where data must be collected.
+	 * @param int $endTimestamp			The end date to where data must be collected.
+	 * @param mixed[optional] $dimensions		The optional dimensions as string or as array.
+	 * @param array[optional] $parameters		The extra parameters for google.
+	 * @return array
 	 */
 	public function getAnalyticsResults($metrics, $startTimestamp, $endTimestamp, $dimensions = array(), array $parameters = array())
 	{
@@ -238,20 +179,20 @@ class GoogleAnalytics
 		$parameters = (array) $parameters;
 
 		// build url
-		$URL = self::API_URL .'/data?ids='. $this->tableId;
-		$URL .= '&metrics='. implode(',', $metrics);
-		$URL .= '&start-date='. $startDate;
-		$URL .= '&end-date='. $endDate;
-		$URL .= '&dimensions='. implode(',', $dimensions);
+		$URL = self::API_URL . '/data?ids=' . $this->tableId;
+		$URL .= '&metrics=' . implode(',', $metrics);
+		$URL .= '&start-date=' . $startDate;
+		$URL .= '&end-date=' . $endDate;
+		$URL .= '&dimensions=' . implode(',', $dimensions);
 
 		// add parameters
 		if(count($parameters) > 0)
 		{
 			// loop them and combine key and urlencoded value (but don't encode the colons)
-			foreach($parameters as $key => $value) $parameters[$key] = $key .'='. str_replace(array('%3A', '%3D%3D'), array(':', '=='), urlencode($value));
+			foreach($parameters as $key => $value) $parameters[$key] = $key . '=' . str_replace(array('%3A', '%3D%3D'), array(':', '=='), urlencode($value));
 
 			// append to array
-			$URL .= '&'. implode('&', $parameters);
+			$URL .= '&' . implode('&', $parameters);
 		}
 
 		// do the call
@@ -310,12 +251,11 @@ class GoogleAnalytics
 		return $results;
 	}
 
-
 	/**
 	 * Get a session token based on a one-time token.
 	 *
-	 * @return	string
-	 * @param	string $oneTimeToken	The one-time token to get a session token with.
+	 * @param string $oneTimeToken	The one-time token to get a session token with.
+	 * @return string
 	 */
 	public function getSessionToken($oneTimeToken)
 	{
@@ -332,35 +272,32 @@ class GoogleAnalytics
 		return $sessionToken;
 	}
 
-
 	/**
 	 * Gets the table id
 	 *
-	 * @return	string
+	 * @return string
 	 */
 	public function getTableId()
 	{
 		return $this->tableId;
 	}
 
-
 	/**
 	 * Set the session token to make calls with
 	 *
-	 * @return	void
-	 * @param	string $sessionToken	The session token to make calls with.
+	 * @param string $sessionToken	The session token to make calls with.
+	 * @return void
 	 */
 	public function setSessionToken($sessionToken)
 	{
 		$this->sessionToken = (isset($sessionToken) ? (string) $sessionToken : null);
 	}
 
-
 	/**
 	 * Set the table id to get data from
 	 *
-	 * @return	void
-	 * @param	string $tableId		The table id from which data is received.
+	 * @param string $tableId		The table id from which data is received.
+	 * @return void
 	 */
 	public function setTableId($tableId)
 	{
@@ -368,11 +305,10 @@ class GoogleAnalytics
 	}
 }
 
-
 /**
  * GoogleAnalyticsException class
  *
- * @author		Annelies Van Extergem <annelies@netlash.com>
+ * @author Annelies Van Extergem <annelies@netlash.com>
  */
 class GoogleAnalyticsException extends Exception
 {
@@ -428,9 +364,9 @@ class GoogleAnalyticsException extends Exception
 	/**
 	 * Class constructor.
 	 *
-	 * @return	void
-	 * @param	string[optional] $message	The errormessage.
-	 * @param	int[optional] $code			The errornumber.
+	 * @param string[optional] $message	The errormessage.
+	 * @param int[optional] $code		The errornumber.
+	 * @return void
 	 */
 	public function __construct($message = null, $code = null)
 	{
@@ -441,5 +377,3 @@ class GoogleAnalyticsException extends Exception
 		parent::__construct((string) $message, $code);
 	}
 }
-
-?>

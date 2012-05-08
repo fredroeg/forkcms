@@ -197,6 +197,19 @@ class BackendAnalyticsModel
 	}
 
 	/**
+	 * Get all the authentication settings to access the Google API's
+	 *
+	 * @return array
+	 */
+	public static function getAPISettings()
+	{
+		return BackendModel::getDB()->getPairs(
+			'SELECT name, value
+			 FROM analytics_settings'
+		 );
+	}
+
+	/**
 	 * Get attributes by type from the cache
 	 *
 	 * @param string $type The type of data of which to get the attributes.
@@ -1057,6 +1070,22 @@ class BackendAnalyticsModel
 	}
 
 	/**
+	 * Update the api settings
+	 *
+	 * @param array $values
+	 * @return boolean
+	 */
+	public static function updateIds($values)
+	{
+		$datetime = BackendModel::getUTCDate();
+		foreach($values as $name => $value)
+		{
+			BackendModel::getDB()->update('analytics_settings', array('value' => $value, 'date' => $datetime), 'name = ?', $name);
+		}
+		return true;
+	}
+
+	/**
 	 * Updates the date viewed for a certain page.
 	 *
 	 * @param int $pageId The id of the page to update.
@@ -1069,6 +1098,24 @@ class BackendAnalyticsModel
 			'id = ?',
 			array((int) $pageId)
 		);
+	}
+
+	/**
+	 * Update the access token (and the refresh token) we achieved from Google
+	 *
+	 * @param string $accessToken
+	 * @param string $refreshToken
+	 * @return boolean
+	 */
+	public static function updateTokens($accessToken, $refreshToken = null)
+	{
+		$datetime = BackendModel::getUTCDate();
+		BackendModel::getDB()->update('analytics_settings', array('value' => $accessToken, 'date' => $datetime), 'name = ?', 'access_token');
+		if(isset($refreshToken))
+		{
+			BackendModel::getDB()->update('analytics_settings', array('value' => $refreshToken, 'date' => $datetime), 'name = ?', 'refresh_token');
+		}
+		return true;
 	}
 
 	/**

@@ -10,8 +10,9 @@
 /**
  * This is the settings-action, it will display a form to set general analytics settings
  *
- * @author Annelies Van Extergem <annelies.vanextergem@netlash.com>
- * @author Dieter Vanden Eynde <dieter.vandeneynde@netlash.com>
+ * @author Frederick Roegiers <frederick.roegiers@wijs.be>
+ * @author Annelies Van Extergem <annelies.vanextergem@wijs.be>
+ * @author Dieter Vanden Eynde <dieter.vandeneynde@wijs.be>
  */
 class BackendAnalyticsSettings extends BackendBaseActionEdit
 {
@@ -41,7 +42,7 @@ class BackendAnalyticsSettings extends BackendBaseActionEdit
 	 *
 	 * @var	string
 	 */
-	private $sessionToken;
+	private $accessToken;
 
 	/**
 	 * The table id
@@ -66,6 +67,17 @@ class BackendAnalyticsSettings extends BackendBaseActionEdit
 	 */
 	private function getAnalyticsParameters()
 	{
+		$this->record = BackendAnalyticsModel::getAPISettings();
+
+		// BackendAnalyticsHelper::getOAuth2Token($this->record['refresh_token'], true);
+
+		// get session token, account name, the profile's table id, the profile's title
+		$this->accessToken = $this->record['access_token'];
+		$this->accountName = $this->record['account_name'];
+		$this->profileTitle = $this->record['profile_name'];
+		$this->tableId = $this->record['table_id'];
+
+
 		$remove = SpoonFilter::getGetValue('remove', array('session_token', 'table_id'), null);
 
 		// something has to be removed before proceeding
@@ -74,68 +86,49 @@ class BackendAnalyticsSettings extends BackendBaseActionEdit
 			// the session token has te be removed
 			if($remove == 'session_token')
 			{
-				// remove all parameters from the module settings
-				BackendModel::setModuleSetting($this->getModule(), 'session_token', null);
+			    $values['access_token'] = null;
+			    $values['refresh_token'] = null;
 			}
 
-			// remove all profile parameters from the module settings
-			BackendModel::setModuleSetting($this->getModule(), 'account_name', null);
-			BackendModel::setModuleSetting($this->getModule(), 'table_id', null);
-			BackendModel::setModuleSetting($this->getModule(), 'profile_title', null);
+			$values['account_name'] = null;
+			$values['profile_name'] = null;
+			$values['web_property_id'] = null;
+			$values['table_id'] = null;
 
-			// remove cache files
-			BackendAnalyticsModel::removeCacheFiles();
+			// remove all parameters from the module settings
+			BackendAnalyticsModel::updateIds($values);
 
-			// clear tables
-			BackendAnalyticsModel::clearTables();
+			// redirect to the settings page without parameters
+			$this->redirect(BackendModel::createURLForAction('settings'));
 		}
 
-		// get session token, account name, the profile's table id, the profile's title
-		$this->sessionToken = BackendModel::getModuleSetting($this->getModule(), 'session_token', null);
-		$this->accountName = BackendModel::getModuleSetting($this->getModule(), 'account_name', null);
-		$this->tableId = BackendModel::getModuleSetting($this->getModule(), 'table_id', null);
-		$this->profileTitle = BackendModel::getModuleSetting($this->getModule(), 'profile_title', null);
-
-		// no session token
-		if(!isset($this->sessionToken))
+		// todo: change in spoonfilter
+		if(isset($_GET['code']))
 		{
-			$token = SpoonFilter::getGetValue('token', null, null);
-
-			// a one time token is given in the get parameters
-			if(!empty($token) && $token !== 'true')
+			if(BackendAnalyticsHelper::getOAuth2Token($_GET['code'], false))
 			{
-				// get google analytics instance
-				$ga = BackendAnalyticsHelper::getGoogleAnalyticsInstance();
-
-				// get a session token
-				$this->sessionToken = $ga->getSessionToken($token);
-
-				// store the session token in the settings
-				BackendModel::setModuleSetting($this->getModule(), 'session_token', $this->sessionToken);
+				// redirect to the settings page without parameters
+				$this->redirect(BackendModel::createURLForAction('settings'));
 			}
 		}
 
 		// session id is present but there is no table_id
-		if(isset($this->sessionToken) && !isset($this->tableId))
+		if($this->accessToken != '' && $this->tableId == '')
 		{
 			// get google analytics instance
 			$ga = BackendAnalyticsHelper::getGoogleAnalyticsInstance();
 
 			// get all possible profiles in this account
-			$this->profiles = $ga->getAnalyticsAccountList($this->sessionToken);
+			$this->profiles = $ga->getAnalyticsAccountList($this->accessToken);
 
 			// not authorized
 			if($this->profiles == 'UNAUTHORIZED')
 			{
-				// remove invalid session token
-				BackendModel::setModuleSetting($this->getModule(), 'session_token', null);
-
-				// redirect to the settings page without parameters
-				$this->redirect(BackendModel::createURLForAction('settings'));
+				// the session tokens should be renewed
 			}
 
 			// everything went fine
-			elseif(is_array($this->profiles))
+			elseif(is_object($this->profiles))
 			{
 				$tableId = SpoonFilter::getGetValue('table_id', null, null);
 
@@ -145,22 +138,25 @@ class BackendAnalyticsSettings extends BackendBaseActionEdit
 					$profiles = array();
 
 					// set the table ids as keys
-					foreach($this->profiles as $profile) $profiles[$profile['tableId']] = $profile;
+					foreach($this->profiles->items as $profile)
+					{
+					    $profiles[$profile->id] = $profile;
+					}
 
 					// correct table id
 					if(isset($profiles[$tableId]))
 					{
 						// save table id and account title
-						$this->tableId = $tableId;
-						$this->accountName = $profiles[$this->tableId]['accountName'];
-						$this->profileTitle = $profiles[$this->tableId]['title'];
-						$webPropertyId = $profiles[$this->tableId]['webPropertyId'];
+						$values['table_id'] = $profiles[$tableId]->id;
+						$values['account_name'] = $profiles[$tableId]->name;
+						$values['profile_name'] = $values['account_name'];
+						$values['web_property_id'] = $profiles[$tableId]->webPropertyId;
 
-						// store the table id and account title in the settings
-						BackendModel::setModuleSetting($this->getModule(), 'account_name', $this->accountName);
-						BackendModel::setModuleSetting($this->getModule(), 'table_id', $this->tableId);
-						BackendModel::setModuleSetting($this->getModule(), 'profile_title', $this->profileTitle);
-						BackendModel::setModuleSetting($this->getModule(), 'web_property_id', $webPropertyId);
+						// store the id's and the names in the settings
+						BackendAnalyticsModel::updateIds($values);
+
+						// redirect to the settings page without parameters
+						$this->redirect(BackendModel::createURLForAction('settings'));
 					}
 				}
 			}
@@ -174,22 +170,21 @@ class BackendAnalyticsSettings extends BackendBaseActionEdit
 	{
 		parent::parse();
 
-		if(!isset($this->sessionToken))
+		if($this->accessToken == '')
 		{
 			// show the link to the google account authentication form
 			$this->tpl->assign('NoSessionToken', true);
 			$this->tpl->assign('Wizard', true);
 
 			// build the link to the google account authentication form
-			$redirectUrl = SITE_URL . '/' . (strpos($this->URL->getQueryString(), '?') === false ? $this->URL->getQueryString() : substr($this->URL->getQueryString(), 0, strpos($this->URL->getQueryString(), '?')));
-			$googleAccountAuthenticationForm = sprintf(BackendAnalyticsModel::GOOGLE_ACCOUNT_AUTHENTICATION_URL, urlencode($redirectUrl), urlencode(BackendAnalyticsModel::GOOGLE_ACCOUNT_AUTHENTICATION_SCOPE));
+			$googleAccountAuthenticationForm = BackendAnalyticsHelper::loginWithOAuth();
 
 			// parse the link to the google account authentication form
 			$this->tpl->assign('googleAccountAuthenticationForm', $googleAccountAuthenticationForm);
 		}
 
 		// session token is present but no table id
-		if(isset($this->sessionToken) && isset($this->profiles) && !isset($this->tableId))
+		if($this->accessToken != '' && isset($this->profiles) && $this->tableId == '')
 		{
 			// show all possible accounts with their profiles
 			$this->tpl->assign('NoTableId', true);
@@ -203,9 +198,9 @@ class BackendAnalyticsSettings extends BackendBaseActionEdit
 				$accounts[''][0] = BL::msg('ChooseWebsiteProfile');
 
 				// prepare accounts array
-				foreach((array) $this->profiles as $profile)
+				foreach((array) $this->profiles->items as $profile)
 				{
-					$accounts[$profile['accountName']][$profile['tableId']] = $profile['title'];
+					$accounts[$profile->name][$profile->id] = $profile->name;
 				}
 
 				// there are accounts
@@ -231,7 +226,7 @@ class BackendAnalyticsSettings extends BackendBaseActionEdit
 		}
 
 		// everything is fine
-		if(isset($this->sessionToken) && isset($this->tableId) && isset($this->accountName))
+		if($this->accessToken != '' && $this->tableId != '' && $this->accountName != '')
 		{
 			// show the linked account
 			$this->tpl->assign('EverythingIsPresent', true);

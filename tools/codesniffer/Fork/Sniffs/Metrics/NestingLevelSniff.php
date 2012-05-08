@@ -20,7 +20,7 @@ class Fork_Sniffs_Metrics_NestingLevelSniff implements PHP_CodeSniffer_Sniff
 	 *
 	 * @var int
 	 */
-	protected $nestingLevel = 5;
+	protected $nestingLevel = 8;
 
 	/**
 	 * Processes this test, when one of its tokens is encountered.
@@ -62,7 +62,7 @@ class Fork_Sniffs_Metrics_NestingLevelSniff implements PHP_CodeSniffer_Sniff
 
 		elseif($nestingLevel > $this->nestingLevel)
 		{
-			$warning = "Function's nesting level ($nestingLevel) exceeds " . $this->nestingLevel.'; consider refactoring the function';
+			$warning = "Function's nesting level ($nestingLevel) exceeds " . $this->nestingLevel . '; consider refactoring the function';
 			$phpcsFile->addWarning($warning, $stackPtr);
 		}
 	}

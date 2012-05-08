@@ -6,3 +6,4 @@ ldpath
 backend/cache/
 nbproject/
 .dbuildpath
+tools/
