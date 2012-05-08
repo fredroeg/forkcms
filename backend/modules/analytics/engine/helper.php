@@ -133,13 +133,15 @@ class BackendAnalyticsHelper
 		$periodId = BackendAnalyticsModel::getPeriodId(array($startTimestamp, $endTimestamp));
 	    }
 
-	    $aggregatesData = self::getAggregates($startTimestamp, $endTimestamp);
-	    $keywordsData = self::getKeywords('pageviews', $startTimestamp, $endTimestamp, 'pageviews');
+	    // $aggregatesData = self::getAggregates($startTimestamp, $endTimestamp);
+	    // $keywordsData = self::getKeywords('pageviews', $startTimestamp, $endTimestamp, 'pageviews');
+	    // $dashBoardData = self::getDashboardData($startTimestamp, $endTimestamp);
+	    $metricsPerDay = self::getMetricsPerDay($startTimestamp, $endTimestamp);
 
 	    // BackendAnalyticsModel::insertAggregatesData($periodId, $aggregatesData);
 	    // BackendAnalyticsModel::insertKeywordsData($periodId, $keywordsData);
+	    // BackendAnalyticsModel::insertMetricsPerDay($metricsPerDay);
 
-	    // self::getDashboardData($startTimestamp, $endTimestamp);
 	    // self::getMetricsPerDay($startTimestamp, $endTimestamp);
 	}
 
@@ -162,7 +164,7 @@ class BackendAnalyticsHelper
 		$entries = array();
 
 		// loop visitor results
-		foreach($results['entries'] as $result)
+		foreach($results['aggregates'] as $result)
 		{
 			$timestamp = gmmktime(12, 0, 0, substr($result['date'], 4, 2), substr($result['date'], 6, 2), substr($result['date'], 0, 4));
 
@@ -450,7 +452,7 @@ class BackendAnalyticsHelper
 		// get results
 		$results = self::getGoogleAnalyticsInstance()->getAnalyticsResults($gaMetrics, $startTimestamp, $endTimestamp, $dimensions);
 
-		return $results;
+		return $results['aggregates'];
 	}
 
 	/**
