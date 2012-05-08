@@ -22,7 +22,7 @@ class BackendAnalyticsIndex extends BackendAnalyticsBase
 	{
 		parent::execute();
 		$this->seaDataDump();
-		$this->parse();
+		// $this->parse();
 		$this->display();
 	}
 
@@ -253,7 +253,8 @@ class BackendAnalyticsIndex extends BackendAnalyticsBase
 		$period = array($startTimestamp, $endTimestamp);
 
 		// Check if we already stored the data for that period in the database. (if not -> insert it!)
-		if(!BackendAnalyticsModel::checkPeriod($period))
+		// todo: insert the ! again
+		if(BackendAnalyticsModel::checkPeriod($period))
 		{
 			BackendAnalyticsHelper::getAllData($startTimestamp, $endTimestamp);
 		}

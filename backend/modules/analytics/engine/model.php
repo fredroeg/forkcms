@@ -47,7 +47,7 @@ class BackendAnalyticsModel
 	{
 		$numRows = BackendModel::getDB()->getNumRows(
 			'SELECT *
-			 FROM sea_period
+			 FROM analytics_period
 			 WHERE period_start = ? AND period_end = ?', $period
 		);
 		$return = ($numRows > 0) ? (true) : (false);
@@ -948,6 +948,17 @@ class BackendAnalyticsModel
 	public static function insertLandingPage(array $item)
 	{
 		return (int) BackendModel::getDB(true)->insert('analytics_landing_pages', $item);
+	}
+
+	/**
+	 * Insert the period in the database, and return the id
+	 *
+	 * @param array $period
+	 * @return period
+	 */
+	public static function insertPeriod($period)
+	{
+		return (int) BackendModel::getDB(true)->insert('analytics_period', array('period_start' => $period[0], 'period_end' => $period[1]));
 	}
 
 	/**

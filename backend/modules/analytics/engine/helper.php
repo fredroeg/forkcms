@@ -124,7 +124,19 @@ class BackendAnalyticsHelper
 	 */
 	public static function getAllData($startTimestamp, $endTimestamp)
 	{
-	    self::getAggregates($startTimestamp, $endTimestamp);
+	    $periodBoolean = BackendAnalyticsModel::checkPeriod(array($startTimestamp, $endTimestamp));
+	    if(!$periodBoolean)
+	    {
+		$periodId = BackendAnalyticsModel::insertPeriod(array($startTimestamp, $endTimestamp));
+	    }
+	    else
+	    {
+		$periodId = BackendAnalyticsModel::getPeriodId(array($startTimestamp, $endTimestamp));
+	    }
+
+	    $aggregatesData = self::getAggregates($startTimestamp, $endTimestamp);
+	    BackendAnalyticsModel::insertAggregates($periodId, $aggregatesData);
+
 	    // self::getDashboardData($startTimestamp, $endTimestamp);
 	    // self::getKeywords('pageviews', $startTimestamp, $endTimestamp, 'pageviews');
 	    // self::getMetricsPerDay($startTimestamp, $endTimestamp);
