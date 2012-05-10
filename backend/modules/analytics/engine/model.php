@@ -1085,6 +1085,25 @@ class BackendAnalyticsModel
 	}
 
 	/**
+	 * Insert the top referrals in the db
+	 *
+	 * @param int $periodId
+	 * @param array $referrals
+	 */
+	public static function insertTopReferrals($periodId, $referrals)
+	{
+		foreach($referrals as $datarow)
+		{
+			$record = array(
+				'period_id' => $periodId,
+				'referrer' => $datarow['referrer'],
+				'pageviews' => $datarow['pageviews']
+			);
+			BackendModel::getDB(true)->insert('analytics_top_referrals', $record);
+		}
+	}
+
+	/**
 	 * Parse a XML object to an array and cast all fields to their corresponding types
 	 *
 	 * @param SimpleXMLElement $xml The simpleXML to convert to an array.

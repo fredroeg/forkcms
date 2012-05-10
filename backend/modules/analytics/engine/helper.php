@@ -138,13 +138,15 @@ class BackendAnalyticsHelper
 	    // $dashBoardData = self::getDashboardData($startTimestamp, $endTimestamp);
 	    // $metricsPerDay = self::getMetricsPerDay($startTimestamp, $endTimestamp);
 	    // $exitPages = self::getExitPages(array('exits', 'pageviews'), $startTimestamp, $endTimestamp, 'exits', 50);
-	    $pages = self::getPages(array('bounces', 'entrances', 'exits', 'newVisits', 'pageviews', 'timeOnSite', 'visits'), $startTimestamp, $endTimestamp, 'pageviews', 50);
+	    // $pages = self::getPages(array('bounces', 'entrances', 'exits', 'newVisits', 'pageviews', 'timeOnSite', 'visits'), $startTimestamp, $endTimestamp, 'pageviews', 50);
+	    $referrals = self::getReferrals('pageviews', $startTimestamp, $endTimestamp, 'pageviews', 50);
 
 	    // BackendAnalyticsModel::insertAggregatesData($periodId, $aggregatesData);
 	    // BackendAnalyticsModel::insertKeywordsData($periodId, $keywordsData);
 	    // BackendAnalyticsModel::insertMetricsPerDay($metricsPerDay);
 	    // BackendAnalyticsModel::insertTopExitPages($periodId, $exitPages);
-	    BackendAnalyticsModel::insertPages($periodId, $pages);
+	    // BackendAnalyticsModel::insertPages($periodId, $pages);
+	    BackendAnalyticsModel::insertTopReferrals($periodId, $referrals);
 
 	    // self::getMetricsPerDay($startTimestamp, $endTimestamp);
 	}
@@ -694,7 +696,21 @@ class BackendAnalyticsHelper
 		// sort if needed
 		if($sort !== null) $parameters['sort'] = '-ga:' . $sort;
 
-		return self::getGoogleAnalyticsInstance()->getAnalyticsResults($gaMetrics, $startTimestamp, $endTimestamp, array('ga:source', 'ga:referralPath'), $parameters);
+		$gaResults =  self::getGoogleAnalyticsInstance()->getAnalyticsResults($gaMetrics, $startTimestamp, $endTimestamp, array('ga:source', 'ga:referralPath'), $parameters);
+
+		// init vars
+		$topReferrals = array();
+
+		// add entries to items
+		foreach($gaResults['aggregates'] as $entry)
+		{
+			$topReferrals[] = array(
+				'referrer' => $entry['source'] . $entry['referralPath'],
+				'pageviews' => $entry['pageviews']
+			);
+		}
+
+		return $topReferrals;
 	}
 
 	/**
