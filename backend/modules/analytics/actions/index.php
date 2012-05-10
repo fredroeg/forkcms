@@ -254,7 +254,7 @@ class BackendAnalyticsIndex extends BackendAnalyticsBase
 
 		// Check if we already stored the data for that period in the database. (if not -> insert it!)
 		// todo: insert the ! again
-		if(BackendAnalyticsModel::checkPeriod($period))
+		if(!BackendAnalyticsModel::checkPeriod($period))
 		{
 			BackendAnalyticsHelper::getAllData($startTimestamp, $endTimestamp);
 		}

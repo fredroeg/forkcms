@@ -124,34 +124,16 @@ class BackendAnalyticsHelper
 	public static function getAllData($startTimestamp, $endTimestamp)
 	{
 	    $periodBoolean = BackendAnalyticsModel::checkPeriod(array($startTimestamp, $endTimestamp));
+
 	    if(!$periodBoolean)
 	    {
-		$periodId = BackendAnalyticsModel::insertPeriod(array($startTimestamp, $endTimestamp));
+		    $periodId = BackendAnalyticsModel::insertPeriod(array($startTimestamp, $endTimestamp));
+		    self::insertAnalyticsData($startTimestamp, $endTimestamp, $periodId);
 	    }
 	    else
 	    {
-		$periodId = BackendAnalyticsModel::getPeriodId(array($startTimestamp, $endTimestamp));
+		    $periodId = BackendAnalyticsModel::getPeriodId(array($startTimestamp, $endTimestamp));
 	    }
-	    // $aggregatesData = self::getAggregates($startTimestamp, $endTimestamp);
-	    // $aggregatesTotalData = self::getAggregates('2005-01-01', date('Y-m-d'));
-	    // $keywordsData = self::getKeywords('pageviews', $startTimestamp, $endTimestamp, 'pageviews');
-	    // $dashBoardData = self::getDashboardData($startTimestamp, $endTimestamp);
-	    // $metricsPerDay = self::getMetricsPerDay($startTimestamp, $endTimestamp);
-	    // $exitPages = self::getExitPages(array('exits', 'pageviews'), $startTimestamp, $endTimestamp, 'exits', 50);
-	    // $pages = self::getPages(array('bounces', 'entrances', 'exits', 'newVisits', 'pageviews', 'timeOnSite', 'visits'), $startTimestamp, $endTimestamp, 'pageviews', 50);
-	    // $referrals = self::getReferrals('pageviews', $startTimestamp, $endTimestamp, 'pageviews', 50);
-	    // $trafficSources = self::getTrafficSourcesGrouped(array('pageviews'), $startTimestamp, $endTimestamp, 'pageviews');
-
-	    // BackendAnalyticsModel::insertAggregatesData($periodId, $aggregatesData);
-	    // BackendAnalyticsModel::insertAggregatesData($periodId, $aggregatesTotalData, true);
-	    // BackendAnalyticsModel::insertKeywordsData($periodId, $keywordsData);
-	    // BackendAnalyticsModel::insertMetricsPerDay($metricsPerDay);
-	    // BackendAnalyticsModel::insertTopExitPages($periodId, $exitPages);
-	    // BackendAnalyticsModel::insertPages($periodId, $pages);
-	    // BackendAnalyticsModel::insertTopReferrals($periodId, $referrals);
-	    // BackendAnalyticsModel::insertTrafficSources($periodId, $trafficSources);
-
-	    // self::getMetricsPerDay($startTimestamp, $endTimestamp);
 	}
 
 	/**
@@ -814,6 +796,36 @@ class BackendAnalyticsHelper
 		}
 
 		return $items;
+	}
+
+	/**
+	 *
+	 * @param string $startTimestamp
+	 * @param string $endTimestamp
+	 * @param string $periodId
+	 */
+	private static function insertAnalyticsData($startTimestamp, $endTimestamp, $periodId)
+	{
+		// first we get all the data from Google API
+		$aggregatesData = self::getAggregates($startTimestamp, $endTimestamp);
+		$aggregatesTotalData = self::getAggregates('2005-01-01', date('Y-m-d'));
+		$keywordsData = self::getKeywords('pageviews', $startTimestamp, $endTimestamp, 'pageviews');
+		$dashBoardData = self::getDashboardData($startTimestamp, $endTimestamp);
+		$metricsPerDay = self::getMetricsPerDay($startTimestamp, $endTimestamp);
+		$exitPages = self::getExitPages(array('exits', 'pageviews'), $startTimestamp, $endTimestamp, 'exits');
+		$pages = self::getPages(array('bounces', 'entrances', 'exits', 'newVisits', 'pageviews', 'timeOnSite', 'visits'), $startTimestamp, $endTimestamp, 'pageviews');
+		$referrals = self::getReferrals('pageviews', $startTimestamp, $endTimestamp, 'pageviews');
+		$trafficSources = self::getTrafficSourcesGrouped(array('pageviews'), $startTimestamp, $endTimestamp, 'pageviews');
+
+		// then we insert all the data in th db
+		BackendAnalyticsModel::insertAggregatesData($periodId, $aggregatesData);
+		BackendAnalyticsModel::insertAggregatesData($periodId, $aggregatesTotalData, true);
+		BackendAnalyticsModel::insertKeywordsData($periodId, $keywordsData);
+		BackendAnalyticsModel::insertMetricsPerDay($metricsPerDay);
+		BackendAnalyticsModel::insertExitPages($periodId, $exitPages);
+		BackendAnalyticsModel::insertPages($periodId, $pages);
+		BackendAnalyticsModel::insertReferrals($periodId, $referrals);
+		BackendAnalyticsModel::insertTrafficSources($periodId, $trafficSources);
 	}
 
 	/**

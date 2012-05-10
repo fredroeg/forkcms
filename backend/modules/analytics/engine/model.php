@@ -974,7 +974,31 @@ class BackendAnalyticsModel
 			$aggregatesDataArray = array_merge($periodArray, $aggregatesDataArray);
 			BackendModel::getDB(true)->insert('analytics_aggregates', $aggregatesDataArray);
 		}
-		elseif($total) BackendModel::getDB(true)->insert('analytics_aggregates_total', $aggregatesDataArray);
+		elseif($total)
+		{
+		    BackendModel::getDB(true)->truncate('analytics_aggregates_total');
+		    BackendModel::getDB(true)->insert('analytics_aggregates_total', $aggregatesDataArray);
+		}
+	}
+
+	/**
+	 * Insert the top exit pages in the db
+	 *
+	 * @param int $periodId
+	 * @param array $exitpages
+	 */
+	public static function insertExitpages($periodId, $exitpages)
+	{
+		foreach($exitpages as $datarow)
+		{
+			$record = array(
+				'period_id' => $periodId,
+				'page_path' => $datarow['pagePath'],
+				'exits' => $datarow['exits'],
+				'pageviews' => $datarow['pageviews']
+			);
+			BackendModel::getDB(true)->insert('analytics_exit_pages', $record);
+		}
 	}
 
 	/**
@@ -989,7 +1013,7 @@ class BackendAnalyticsModel
 		foreach($data as $datarow)
 		{
 			$insertData = array_merge($period, $datarow);
-			BackendModel::getDB(true)->insert('analytics_top_keywords', $insertData);
+			BackendModel::getDB(true)->insert('analytics_keywords', $insertData);
 		}
 	}
 
@@ -1055,7 +1079,7 @@ class BackendAnalyticsModel
 				'time_on_site' => $page['timeOnSite'],
 				'visits' => $page['visits']
 			);
-			BackendModel::getDB(true)->insert('analytics_pages_new', $record);
+			BackendModel::getDB(true)->insert('analytics_pages', $record);
 		}
 	}
 
@@ -1071,32 +1095,12 @@ class BackendAnalyticsModel
 	}
 
 	/**
-	 * Insert the top exit pages in the db
-	 *
-	 * @param int $periodId
-	 * @param array $exitpages
-	 */
-	public static function insertTopExitpages($periodId, $exitpages)
-	{
-		foreach($exitpages as $datarow)
-		{
-			$record = array(
-				'period_id' => $periodId,
-				'page_path' => $datarow['pagePath'],
-				'exits' => $datarow['exits'],
-				'pageviews' => $datarow['pageviews']
-			);
-			BackendModel::getDB(true)->insert('analytics_top_exit_pages', $record);
-		}
-	}
-
-	/**
 	 * Insert the top referrals in the db
 	 *
 	 * @param int $periodId
 	 * @param array $referrals
 	 */
-	public static function insertTopReferrals($periodId, $referrals)
+	public static function insertReferrals($periodId, $referrals)
 	{
 		foreach($referrals as $datarow)
 		{
@@ -1105,7 +1109,7 @@ class BackendAnalyticsModel
 				'referrer' => $datarow['referrer'],
 				'pageviews' => $datarow['pageviews']
 			);
-			BackendModel::getDB(true)->insert('analytics_top_referrals', $record);
+			BackendModel::getDB(true)->insert('analytics_referrals', $record);
 		}
 	}
 
