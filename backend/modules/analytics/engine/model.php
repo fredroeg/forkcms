@@ -944,11 +944,11 @@ class BackendAnalyticsModel
 	 *
 	 * @param int $periodId
 	 * @param array $data
+	 * @param boolean $total
 	 */
-	public static function insertAggregatesData($periodId, $data)
+	public static function insertAggregatesData($periodId, $data, $total = false)
 	{
 		$aggregatesDataArray = array(
-			'period_id' => $periodId,
 			'bounces' => $data['bounces'],
 			'entrances' => $data['entrances'],
 			'exits' => $data['exits'],
@@ -968,7 +968,13 @@ class BackendAnalyticsModel
 			'landing_pages_bounces' => $data['landingPagesBounces']
 		);
 
-		BackendModel::getDB(true)->insert('analytics_aggregates', $aggregatesDataArray);
+		if(!$total)
+		{
+			$periodArray = array('period_id' => $periodId);
+			$aggregatesDataArray = array_merge($periodArray, $aggregatesDataArray);
+			BackendModel::getDB(true)->insert('analytics_aggregates', $aggregatesDataArray);
+		}
+		elseif($total) BackendModel::getDB(true)->insert('analytics_aggregates_total', $aggregatesDataArray);
 	}
 
 	/**

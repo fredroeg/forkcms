@@ -132,21 +132,23 @@ class BackendAnalyticsHelper
 	    {
 		$periodId = BackendAnalyticsModel::getPeriodId(array($startTimestamp, $endTimestamp));
 	    }
-
 	    // $aggregatesData = self::getAggregates($startTimestamp, $endTimestamp);
+	    $aggregatesTotalData = self::getAggregates('2005-01-01', date('Y-m-d'));
 	    // $keywordsData = self::getKeywords('pageviews', $startTimestamp, $endTimestamp, 'pageviews');
 	    // $dashBoardData = self::getDashboardData($startTimestamp, $endTimestamp);
 	    // $metricsPerDay = self::getMetricsPerDay($startTimestamp, $endTimestamp);
 	    // $exitPages = self::getExitPages(array('exits', 'pageviews'), $startTimestamp, $endTimestamp, 'exits', 50);
 	    // $pages = self::getPages(array('bounces', 'entrances', 'exits', 'newVisits', 'pageviews', 'timeOnSite', 'visits'), $startTimestamp, $endTimestamp, 'pageviews', 50);
-	    $referrals = self::getReferrals('pageviews', $startTimestamp, $endTimestamp, 'pageviews', 50);
+	    // $referrals = self::getReferrals('pageviews', $startTimestamp, $endTimestamp, 'pageviews', 50);
 
 	    // BackendAnalyticsModel::insertAggregatesData($periodId, $aggregatesData);
+	    BackendAnalyticsModel::insertAggregatesData($periodId, $aggregatesTotalData, true);
 	    // BackendAnalyticsModel::insertKeywordsData($periodId, $keywordsData);
 	    // BackendAnalyticsModel::insertMetricsPerDay($metricsPerDay);
 	    // BackendAnalyticsModel::insertTopExitPages($periodId, $exitPages);
 	    // BackendAnalyticsModel::insertPages($periodId, $pages);
-	    BackendAnalyticsModel::insertTopReferrals($periodId, $referrals);
+	    // BackendAnalyticsModel::insertTopReferrals($periodId, $referrals);
+
 
 	    // self::getMetricsPerDay($startTimestamp, $endTimestamp);
 	}
