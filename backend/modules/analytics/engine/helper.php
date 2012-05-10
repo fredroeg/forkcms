@@ -137,10 +137,14 @@ class BackendAnalyticsHelper
 	    // $keywordsData = self::getKeywords('pageviews', $startTimestamp, $endTimestamp, 'pageviews');
 	    // $dashBoardData = self::getDashboardData($startTimestamp, $endTimestamp);
 	    // $metricsPerDay = self::getMetricsPerDay($startTimestamp, $endTimestamp);
+	    // $exitPages = self::getExitPages(array('exits', 'pageviews'), $startTimestamp, $endTimestamp, 'exits', 50);
+	    $pages = self::getPages(array('bounces', 'entrances', 'exits', 'newVisits', 'pageviews', 'timeOnSite', 'visits'), $startTimestamp, $endTimestamp, 'pageviews', 50);
 
 	    // BackendAnalyticsModel::insertAggregatesData($periodId, $aggregatesData);
 	    // BackendAnalyticsModel::insertKeywordsData($periodId, $keywordsData);
 	    // BackendAnalyticsModel::insertMetricsPerDay($metricsPerDay);
+	    // BackendAnalyticsModel::insertTopExitPages($periodId, $exitPages);
+	    BackendAnalyticsModel::insertPages($periodId, $pages);
 
 	    // self::getMetricsPerDay($startTimestamp, $endTimestamp);
 	}
@@ -347,8 +351,10 @@ class BackendAnalyticsHelper
 		// sort if needed
 		if($sort !== null) $parameters['sort'] = '-ga:' . $sort;
 
-		// return results
-		return self::getGoogleAnalyticsInstance()->getAnalyticsResults($gaMetrics, $startTimestamp, $endTimestamp, 'ga:pagePath', $parameters);
+		$results = self::getGoogleAnalyticsInstance()->getAnalyticsResults($gaMetrics, $startTimestamp, $endTimestamp, 'ga:pagePath', $parameters);
+
+		// return
+		return $results['aggregates'];
 	}
 
 	/**
@@ -555,7 +561,9 @@ class BackendAnalyticsHelper
 		// sort if needed
 		if($sort !== null) $parameters['sort'] = '-ga:' . $sort;
 
-		return self::getGoogleAnalyticsInstance()->getAnalyticsResults($gaMetrics, $startTimestamp, $endTimestamp, 'ga:pagePath', $parameters);
+		$results = self::getGoogleAnalyticsInstance()->getAnalyticsResults($gaMetrics, $startTimestamp, $endTimestamp, 'ga:pagePath', $parameters);
+
+		return $results['aggregates'];
 	}
 
 	/**

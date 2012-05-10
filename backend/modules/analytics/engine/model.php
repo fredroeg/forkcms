@@ -998,6 +998,13 @@ class BackendAnalyticsModel
 		return (int) BackendModel::getDB(true)->insert('analytics_landing_pages', $item);
 	}
 
+	/**
+	 * Insert the metrics per day
+	 * Only those days that aren't inserted yet
+	 *
+	 * @param array $metrics
+	 * @return boolean
+	 */
 	public static function insertMetricsPerDay($metrics)
 	{
 		foreach($metrics as $dayMetric)
@@ -1023,6 +1030,30 @@ class BackendAnalyticsModel
 	}
 
 	/**
+	 *
+	 * @param int $periodId
+	 * @param array $pages
+	 */
+	public static function insertPages($periodId, $pages)
+	{
+		foreach($pages as $page)
+		{
+			$record = array(
+				'period_id' => $periodId,
+				'page_path' => $page['pagePath'],
+				'bounces' => $page['bounces'],
+				'entrances' => $page['entrances'],
+				'exits' => $page['exits'],
+				'new_visits' => $page['newVisits'],
+				'pageviews' => $page['pageviews'],
+				'time_on_site' => $page['timeOnSite'],
+				'visits' => $page['visits']
+			);
+			BackendModel::getDB(true)->insert('analytics_pages_new', $record);
+		}
+	}
+
+	/**
 	 * Insert the period in the database, and return the id
 	 *
 	 * @param array $period
@@ -1031,6 +1062,26 @@ class BackendAnalyticsModel
 	public static function insertPeriod($period)
 	{
 		return (int) BackendModel::getDB(true)->insert('analytics_period', array('period_start' => $period[0], 'period_end' => $period[1]));
+	}
+
+	/**
+	 * Insert the top exit pages in the db
+	 *
+	 * @param int $periodId
+	 * @param array $exitpages
+	 */
+	public static function insertTopExitpages($periodId, $exitpages)
+	{
+		foreach($exitpages as $datarow)
+		{
+			$record = array(
+				'period_id' => $periodId,
+				'page_path' => $datarow['pagePath'],
+				'exits' => $datarow['exits'],
+				'pageviews' => $datarow['pageviews']
+			);
+			BackendModel::getDB(true)->insert('analytics_top_exit_pages', $record);
+		}
 	}
 
 	/**
