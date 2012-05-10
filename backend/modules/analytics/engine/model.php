@@ -1110,6 +1110,25 @@ class BackendAnalyticsModel
 	}
 
 	/**
+	 *
+	 * @param int $periodId
+	 * @param array $trafficsources
+	 */
+	public static function insertTrafficSources($periodId, $trafficSources)
+	{
+		foreach($trafficSources as $source)
+		{
+			$record = array(
+				'period_id' => $periodId,
+				'label' => $source['label'],
+				'value' => $source['value'],
+				'percentage' => $source['percentage']
+			);
+			BackendModel::getDB(true)->insert('analytics_traffic_sources', $record);
+		}
+	}
+
+	/**
 	 * Parse a XML object to an array and cast all fields to their corresponding types
 	 *
 	 * @param SimpleXMLElement $xml The simpleXML to convert to an array.

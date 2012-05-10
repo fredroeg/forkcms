@@ -133,22 +133,23 @@ class BackendAnalyticsHelper
 		$periodId = BackendAnalyticsModel::getPeriodId(array($startTimestamp, $endTimestamp));
 	    }
 	    // $aggregatesData = self::getAggregates($startTimestamp, $endTimestamp);
-	    $aggregatesTotalData = self::getAggregates('2005-01-01', date('Y-m-d'));
+	    // $aggregatesTotalData = self::getAggregates('2005-01-01', date('Y-m-d'));
 	    // $keywordsData = self::getKeywords('pageviews', $startTimestamp, $endTimestamp, 'pageviews');
 	    // $dashBoardData = self::getDashboardData($startTimestamp, $endTimestamp);
 	    // $metricsPerDay = self::getMetricsPerDay($startTimestamp, $endTimestamp);
 	    // $exitPages = self::getExitPages(array('exits', 'pageviews'), $startTimestamp, $endTimestamp, 'exits', 50);
 	    // $pages = self::getPages(array('bounces', 'entrances', 'exits', 'newVisits', 'pageviews', 'timeOnSite', 'visits'), $startTimestamp, $endTimestamp, 'pageviews', 50);
 	    // $referrals = self::getReferrals('pageviews', $startTimestamp, $endTimestamp, 'pageviews', 50);
+	    // $trafficSources = self::getTrafficSourcesGrouped(array('pageviews'), $startTimestamp, $endTimestamp, 'pageviews');
 
 	    // BackendAnalyticsModel::insertAggregatesData($periodId, $aggregatesData);
-	    BackendAnalyticsModel::insertAggregatesData($periodId, $aggregatesTotalData, true);
+	    // BackendAnalyticsModel::insertAggregatesData($periodId, $aggregatesTotalData, true);
 	    // BackendAnalyticsModel::insertKeywordsData($periodId, $keywordsData);
 	    // BackendAnalyticsModel::insertMetricsPerDay($metricsPerDay);
 	    // BackendAnalyticsModel::insertTopExitPages($periodId, $exitPages);
 	    // BackendAnalyticsModel::insertPages($periodId, $pages);
 	    // BackendAnalyticsModel::insertTopReferrals($periodId, $referrals);
-
+	    // BackendAnalyticsModel::insertTrafficSources($periodId, $trafficSources);
 
 	    // self::getMetricsPerDay($startTimestamp, $endTimestamp);
 	}
@@ -794,10 +795,10 @@ class BackendAnalyticsHelper
 		$gaResults = self::getGoogleAnalyticsInstance()->getAnalyticsResults($gaMetrics, $startTimestamp, $endTimestamp, 'ga:medium', $parameters);
 
 		// get total pageviews
-		$totalPageviews = (isset($gaResults['aggregates']['pageviews']) ? (int) $gaResults['aggregates']['pageviews'] : 0);
+		$totalPageviews = (isset($gaResults['totalResults']['ga:pageviews']) ? (int) $gaResults['totalResults']['ga:pageviews'] : 0);
 
 		// add entries to items
-		foreach($gaResults['entries'] as $entry)
+		foreach($gaResults['aggregates'] as $entry)
 		{
 			// get traffic source type
 			$trafficSource = $entry['medium'];
@@ -808,7 +809,7 @@ class BackendAnalyticsHelper
 			$items[] = array(
 				'label' => $trafficSource,
 				'value' => $entry['pageviews'],
-				'percentage' => ($totalPageviews == 0 ? 0 : number_format(((int) $entry['pageviews'] / $totalPageviews) * 100, 2)) . '%'
+				'percentage' => ($totalPageviews == 0 ? 0 : number_format(((int) $entry['pageviews'] / $totalPageviews) * 100, 2))
 			);
 		}
 
