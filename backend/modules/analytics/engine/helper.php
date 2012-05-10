@@ -136,7 +136,7 @@ class BackendAnalyticsHelper
 	    // $aggregatesData = self::getAggregates($startTimestamp, $endTimestamp);
 	    // $keywordsData = self::getKeywords('pageviews', $startTimestamp, $endTimestamp, 'pageviews');
 	    // $dashBoardData = self::getDashboardData($startTimestamp, $endTimestamp);
-	    $metricsPerDay = self::getMetricsPerDay($startTimestamp, $endTimestamp);
+	    // $metricsPerDay = self::getMetricsPerDay($startTimestamp, $endTimestamp);
 
 	    // BackendAnalyticsModel::insertAggregatesData($periodId, $aggregatesData);
 	    // BackendAnalyticsModel::insertKeywordsData($periodId, $keywordsData);
@@ -875,8 +875,8 @@ class BackendAnalyticsHelper
 					// startdate cannot be before 2005 (earliest valid google startdate)
 					if($newStartDate < mktime(0, 0, 0, 1, 1, 2005)) $valid = false;
 
-					// enddate cannot be in the future
-					elseif($newEndDate > time()) $valid = false;
+					// end can not be today or in the future
+					elseif($newEndDate >= mktime(0, 0, 0)) $valid = false;
 
 					// enddate cannot be before the startdate
 					elseif($newStartDate > $newEndDate) $valid = false;
@@ -902,26 +902,6 @@ class BackendAnalyticsHelper
 
 		// parse
 		$frm->parse($tpl);
-
-		// we only allow live data fetching when the end date is today, no point in fetching and older range because it will never change
-		if($endTimestamp == mktime(0, 0, 0, date('n'), date('j'), date('Y')))
-		{
-			// check if this action is allowed
-			if(BackendAuthentication::isAllowedAction('loading', 'analytics'))
-			{
-				// url of current action
-				$liveDataUrl = BackendModel::createURLForAction('loading') . '&amp;redirect_action=' . Spoon::get('url')->getAction();
-
-				// page id set
-				if(isset($_GET['page_id']) && $_GET['page_id'] != '') $liveDataUrl .= '&amp;page_id=' . (int) $_GET['page_id'];
-
-				// page path set
-				if(isset($_GET['page_path']) && $_GET['page_path'] != '') $liveDataUrl .= '&amp;page_path=' . (string) $_GET['page_path'];
-
-				// assign
-				$tpl->assign('liveDataURL', $liveDataUrl);
-			}
-		}
 	}
 
 	/**
@@ -963,8 +943,8 @@ class BackendAnalyticsHelper
 				// startTimestamp cannot be before 2005 (earliest valid google startdate)
 				elseif($startTimestamp < mktime(0, 0, 0, 1, 1, 2005)) $valid = false;
 
-				// end can not be in the future
-				elseif($endTimestamp > time()) $valid = false;
+				// end can not be today or in the future
+				elseif($endTimestamp >= mktime(0, 0, 0)) $valid = false;
 			}
 
 			// valid dates
@@ -980,12 +960,12 @@ class BackendAnalyticsHelper
 		else
 		{
 			// get interval
-			$interval = BackendModel::getModuleSetting('analytics', 'interval', 'week');
-			if($interval == 'week') $interval .= ' -1 days';
+			$interval = BackendModel::getModuleSetting('analytics', 'interval', 'month');
+			if($interval == 'month') $interval .= ' -1 days';
 
 			// set sessions
 			SpoonSession::set('analytics_start_timestamp', strtotime('-1' . $interval, mktime(0, 0, 0)));
-			SpoonSession::set('analytics_end_timestamp', mktime(0, 0, 0));
+			SpoonSession::set('analytics_end_timestamp', mktime(0, 0, 0, date('m'), date('d') -1, date('Y')));
 		}
 	}
 }

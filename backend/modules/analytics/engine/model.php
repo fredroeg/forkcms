@@ -998,6 +998,30 @@ class BackendAnalyticsModel
 		return (int) BackendModel::getDB(true)->insert('analytics_landing_pages', $item);
 	}
 
+	public static function insertMetricsPerDay($metrics)
+	{
+		foreach($metrics as $dayMetric)
+		{
+			$query =
+			    'INSERT IGNORE INTO analytics_metrics_per_day (day, bounces, entrances, exits, pageviews, visits, visitors)
+			     VALUES (:day, :bounces, :entrances, :exits, :pageviews, :visits, :visitors)';
+
+			$record = array(
+			    'day' => $dayMetric['date'],
+			    'bounces' => $dayMetric['bounces'],
+			    'entrances' => $dayMetric['entrances'],
+			    'exits' => $dayMetric['exits'],
+			    'pageviews' => $dayMetric['pageviews'],
+			    'visits' => $dayMetric['visits'],
+			    'visitors' => $dayMetric['visitors']
+			);
+
+			BackendModel::getDB()->execute($query, $record);
+		}
+
+		return true;
+	}
+
 	/**
 	 * Insert the period in the database, and return the id
 	 *

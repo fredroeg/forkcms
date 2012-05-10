@@ -22,7 +22,7 @@ class BackendAnalyticsIndex extends BackendAnalyticsBase
 	{
 		parent::execute();
 		$this->seaDataDump();
-		// $this->parse();
+		$this->parse();
 		$this->display();
 	}
 
@@ -32,14 +32,14 @@ class BackendAnalyticsIndex extends BackendAnalyticsBase
 	protected function parse()
 	{
 		parent::parse();
-
+/*
 		$warnings = BackendAnalyticsModel::checkSettings();
 		$this->tpl->assign('warnings', $warnings);
 
 		if(empty($warnings))
 		{
 			$this->parseOverviewData();
-			/*$this->parseLineChartData();
+			$this->parseLineChartData();
 			$this->parsePieChartData();
 			$this->parseImportantReferrals();
 			$this->parseImportantKeywords();
@@ -58,9 +58,9 @@ class BackendAnalyticsIndex extends BackendAnalyticsBase
 			$this->tpl->assign('googleVisitorTypesURL', sprintf($googleURL, 'visitor_types', $googleTableId, $googleDate));
 			$this->tpl->assign('googleBouncesURL', sprintf($googleURL, 'bounce_rate', $googleTableId, $googleDate));
 			$this->tpl->assign('googleAveragePageviewsURL', sprintf($googleURL, 'average_pageviews', $googleTableId, $googleDate));
-			 *
-			 */
-		}
+
+
+		}*/
 	}
 
 	/**
@@ -254,7 +254,7 @@ class BackendAnalyticsIndex extends BackendAnalyticsBase
 
 		// Check if we already stored the data for that period in the database. (if not -> insert it!)
 		// todo: insert the ! again
-		if(BackendAnalyticsModel::checkPeriod($period))
+		if(!BackendAnalyticsModel::checkPeriod($period))
 		{
 			BackendAnalyticsHelper::getAllData($startTimestamp, $endTimestamp);
 		}
