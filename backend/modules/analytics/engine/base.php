@@ -38,7 +38,7 @@ class BackendAnalyticsBase extends BackendBaseActionIndex
 	/**
 	 * Check if we have the necessary data in the db, otherwise insert the missing data
 	 */
-	private function checkPeriod()
+	protected function checkPeriod()
 	{
 		// Define the period
 		$startTimestamp = date('Y-m-d', $this->startTimestamp);
@@ -64,6 +64,7 @@ class BackendAnalyticsBase extends BackendBaseActionIndex
 	{
 		parent::execute();
 		$this->header->addJS('highcharts.js', 'core', false);
+		BackendAnalyticsHelper::checkStatus();
 		$this->setDates();
 		$this->checkPeriod();
 	}

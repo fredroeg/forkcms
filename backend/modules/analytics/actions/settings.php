@@ -57,6 +57,7 @@ class BackendAnalyticsSettings extends BackendBaseActionEdit
 	public function execute()
 	{
 		parent::execute();
+		BackendAnalyticsHelper::checkStatus();
 		$this->getAnalyticsParameters();
 		$this->parse();
 		$this->display();
@@ -68,8 +69,6 @@ class BackendAnalyticsSettings extends BackendBaseActionEdit
 	private function getAnalyticsParameters()
 	{
 		$this->record = BackendAnalyticsModel::getAPISettings();
-
-		BackendAnalyticsHelper::getOAuth2Token($this->record['refresh_token'], true);
 
 		// get session token, account name, the profile's table id, the profile's title
 		$this->accessToken = $this->record['access_token'];

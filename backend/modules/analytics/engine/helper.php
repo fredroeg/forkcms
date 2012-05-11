@@ -16,6 +16,39 @@
  */
 class BackendAnalyticsHelper
 {
+    	/**
+	 * Depending on the current state, we have to renew the access token and redirect to a certain page
+	 * @return boolean
+	 */
+	public static function checkStatus()
+	{
+		$APISettingsArray = BackendAnalyticsModel::getAPISettings();
+		if(($APISettingsArray['client_id'] != '') && ($APISettingsArray['client_secret'] != '') && ($APISettingsArray['table_id'] != ''))
+		{
+			$accessTCSession = SpoonSession::get('accessTokenCreated');
+			if(!isset($accessTCSession))
+			{
+				return self::renewAccessToken();
+			}
+			elseif(time() - $accessTCSession > 3600)
+			{
+				return self::renewAccessToken();
+			}
+			elseif(($APISettingsArray['access_token'] == '') || ($APISettingsArray['refresh_token'] == ''))
+			{
+				return self::renewAccessToken();
+			}
+			else
+			{
+				return true;
+			}
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 	/**
 	 * Get aggregates
 	 *
@@ -942,6 +975,31 @@ class BackendAnalyticsHelper
 
 		// parse
 		$frm->parse($tpl);
+	}
+
+	/**
+	 * function to check whether there is a refresh token
+	 * then renew the access token or authenticate with Google
+	 *
+	 * @return boolean
+	 */
+	private static function renewAccessToken()
+	{
+		$APISettingsArray = BackendSeaModel::getAPISettings();
+		if($APISettingsArray['refresh_token'] != '')
+		{
+			if(self::getOAuth2Token($APISettingsArray['refresh_token'], true))
+			{
+				SpoonSession::set('accessTokenCreated', time());
+				// it's up to date again, return true
+				return true;
+			}
+		}
+		else
+		{
+			// first time, so no refresh or access token --> (need auth with google)
+			self::loginWithOAuth();
+		}
 	}
 
 	/**
