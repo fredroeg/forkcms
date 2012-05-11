@@ -94,10 +94,16 @@ class BackendAnalyticsModel
 	{
 		BackendModel::getDB(true)->truncate(
 			array(
+				'analytics_aggregates',
+				'analytics_aggregates_total',
+				'analytics_exit_pages',
 				'analytics_keywords',
 				'analytics_landing_pages',
+				'analytics_metrics_per_day',
 				'analytics_pages',
-				'analytics_referrers'
+				'analytics_period',
+				'analytics_referrals',
+				'analytics_traffic_sources'
 			)
 		);
 	}

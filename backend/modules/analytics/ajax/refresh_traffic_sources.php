@@ -31,7 +31,7 @@ class BackendAnalyticsAjaxRefreshTrafficSources extends BackendBaseAJAXAction
 			BackendModel::setModuleSetting($this->getModule(), 'profile_title', null);
 
 			BackendAnalyticsModel::removeCacheFiles();
-			BackendAnalyticsModel::clearTables();
+			// BackendAnalyticsModel::clearTables();
 
 			$this->output(self::OK, array('status' => 'unauthorized', 'message' => BL::msg('Redirecting')), 'No longer authorized.');
 		}

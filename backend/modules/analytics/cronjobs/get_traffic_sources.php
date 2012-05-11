@@ -31,7 +31,7 @@ class BackendAnalyticsCronjobGetTrafficSources extends BackendBaseCronjob
 			BackendModel::setModuleSetting('analytics', 'profile_title', null);
 
 			BackendAnalyticsModel::removeCacheFiles();
-			BackendAnalyticsModel::clearTables();
+			// BackendAnalyticsModel::clearTables();
 			return;
 		}
 

@@ -78,7 +78,7 @@ class BackendAnalyticsAjaxCheckStatus extends BackendBaseAJAXAction
 			BackendModel::setModuleSetting($this->getModule(), 'profile_title', null);
 
 			BackendAnalyticsModel::removeCacheFiles();
-			BackendAnalyticsModel::clearTables();
+			// BackendAnalyticsModel::clearTables();
 
 			$this->output(self::OK, array('status' => 'unauthorized'), 'No longer authorized.');
 		}

@@ -97,6 +97,9 @@ class BackendAnalyticsSettings extends BackendBaseActionEdit
 			// remove all parameters from the module settings
 			BackendAnalyticsModel::updateIds($values);
 
+			// truncate the tables
+			BackendAnalyticsModel::clearTables();
+
 			// redirect to the settings page without parameters
 			$this->redirect(BackendModel::createURLForAction('settings'));
 		}
