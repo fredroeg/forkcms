@@ -471,12 +471,11 @@ class BackendAnalyticsModel
 	/**
 	 * Fetch landing pages
 	 *
-	 * @param int $startTimestamp The start timestamp for the cache file.
-	 * @param int $endTimestamp The end timestamp for the cache file.
+	 * @param int $periodId
 	 * @param int[optional] $limit An optional limit of the number of landing pages to get.
 	 * @return array
 	 */
-	public static function getLandingPages($startTimestamp, $endTimestamp, $limit = null)
+	public static function getLandingPages($periodId, $limit = null)
 	{
 		$results = array();
 		$db = BackendModel::getDB();
@@ -762,15 +761,14 @@ class BackendAnalyticsModel
 	/**
 	 * Get the top exit pages
 	 *
-	 * @param int $startTimestamp The start timestamp for the cache file.
-	 * @param int $endTimestamp The end timestamp for the cache file.
+	 * @param int $periodId
 	 * @param int[optional] $limit An optional limit of the number of exit pages to get.
 	 * @return array
 	 */
-	public static function getTopExitPages($startTimestamp, $endTimestamp, $limit = 5)
+	public static function getTopExitPages($periodId, $limit = 5)
 	{
 		// get data from cache
-		$items = self::getDataFromCacheByType('top_exit_pages', $startTimestamp, $endTimestamp);
+		$items = self::getDataFromDbByType('analytics_exit_pages', $periodId);
 
 		// limit data
 		if(!empty($items)) $items = array_slice($items, 0, $limit, true);
@@ -792,8 +790,8 @@ class BackendAnalyticsModel
 		{
 			// build array
 			$results[$i] = array();
-			$results[$i]['page'] = $pageData['pagePath'];
-			$results[$i]['page_encoded'] = urlencode($pageData['pagePath']);
+			$results[$i]['page'] = $pageData['page_path'];
+			$results[$i]['page_encoded'] = urlencode($pageData['page_path']);
 			$results[$i]['exits'] = (int) $pageData['exits'];
 			$results[$i]['pageviews'] = (int) $pageData['pageviews'];
 		}
@@ -846,15 +844,14 @@ class BackendAnalyticsModel
 	/**
 	 * Get the top pages
 	 *
-	 * @param int $startTimestamp The start timestamp for the cache file.
-	 * @param int $endTimestamp The end timestamp for the cache file.
+	 * @param int $periodId
 	 * @param int[optional] $limit An optional limit of the number of pages to get.
 	 * @return array
 	 */
-	public static function getTopPages($startTimestamp, $endTimestamp, $limit = 5)
+	public static function getTopPages($periodId, $limit = 5)
 	{
 		// get data from cache
-		$items = self::getDataFromCacheByType('top_pages', $startTimestamp, $endTimestamp);
+		$items = self::getDataFromDbByType('analytics_pages', $periodId);
 
 		// limit data
 		if(!empty($items)) $items = array_slice($items, 0, $limit, true);
@@ -872,15 +869,15 @@ class BackendAnalyticsModel
 		$results = array();
 
 		// get total pageviews
-		$totalPageviews = (int) self::getAggregate('pageviews', $startTimestamp, $endTimestamp);
+		$totalPageviews = (int) self::getAggregate('pageviews',$periodId);
 
 		// build top pages
 		foreach($items as $i => $pageData)
 		{
 			// build array
 			$results[$i] = array();
-			$results[$i]['page'] = $pageData['pagePath'];
-			$results[$i]['page_encoded'] = urlencode($pageData['pagePath']);
+			$results[$i]['page'] = $pageData['page_path'];
+			$results[$i]['page_encoded'] = urlencode($pageData['page_path']);
 			$results[$i]['pageviews'] = (int) $pageData['pageviews'];
 			$results[$i]['pageviews_percentage'] = ($totalPageviews == 0 ? '0' : number_format(($pageData['pageviews'] / $totalPageviews) * 100, 2)) . '%';
 		}
@@ -1195,21 +1192,6 @@ class BackendAnalyticsModel
 			BackendModel::getDB()->update('analytics_settings', array('value' => $value, 'date' => $datetime), 'name = ?', $name);
 		}
 		return true;
-	}
-
-	/**
-	 * Updates the date viewed for a certain page.
-	 *
-	 * @param int $pageId The id of the page to update.
-	 */
-	public static function updatePageDateViewed($pageId)
-	{
-		BackendModel::getDB(true)->update(
-			'analytics_pages',
-			array('date_viewed' => SpoonDate::getDate('Y-m-d H:i:s')),
-			'id = ?',
-			array((int) $pageId)
-		);
 	}
 
 	/**
