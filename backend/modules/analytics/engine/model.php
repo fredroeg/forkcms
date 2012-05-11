@@ -132,16 +132,15 @@ class BackendAnalyticsModel
 	 * Get an aggregate
 	 *
 	 * @param string $name The name of the aggregate to look for.
-	 * @param int $startTimestamp The start timestamp for the cache file.
-	 * @param int $endTimestamp The end timestamp for the cache file.
+	 * @param int $periodId
 	 * @return string
 	 */
-	public static function getAggregate($name, $startTimestamp, $endTimestamp)
+	public static function getAggregate($name, $periodId)
 	{
-		$aggregates = self::getAggregates($startTimestamp, $endTimestamp);
+		$aggregates = self::getAggregates($periodId);
 
 		// aggregate exists
-		if(isset($aggregates[$name])) return $aggregates[$name];
+		if(isset($aggregates[0][$name])) return $aggregates[0][$name];
 
 		// doesn't exist
 		return '';
@@ -150,14 +149,11 @@ class BackendAnalyticsModel
 	/**
 	 * Get the aggregates between 2 dates
 	 *
-	 * @param int $startTimestamp The start timestamp for the cache file.
-	 * @param int $endTimestamp The end timestamp for the cache file.
+	 * @param int $periodId
 	 * @return array
 	 */
-	public static function getAggregates($startTimestamp, $endTimestamp)
+	public static function getAggregates($periodId)
 	{
-		$periodId = self::getPeriodId(array($startTimestamp, $endTimestamp));
-
 		// get current action
 		$action = Spoon::get('url')->getAction();
 
@@ -166,7 +162,7 @@ class BackendAnalyticsModel
 
 		$aggregates = self::getDataFromDbByType('analytics_aggregates', $periodId);
 
-		// return $aggregates;
+		return $aggregates;
 	}
 
 	/**
@@ -192,14 +188,13 @@ class BackendAnalyticsModel
 	 * startTimestamp and endTimestamp are needed so we can fetch the correct cache file
 	 * They are not used when fetching the data from google.
 	 *
-	 * @param int $startTimestamp The start timestamp for the cache file.
-	 * @param int $endTimestamp The end timestamp for the cache file.
+	 * @param int $periodId
 	 * @return array
 	 */
-	public static function getAggregatesTotal($startTimestamp, $endTimestamp)
+	public static function getAggregatesTotal($periodId)
 	{
 		// get data from cache
-		$aggregates = self::getDataFromCacheByType('aggregates_total', $startTimestamp, $endTimestamp);
+		$aggregates = self::getDataFromDbByType('analytics_aggregates_total');
 
 		// get current action
 		$action = Spoon::get('url')->getAction();
@@ -396,13 +391,40 @@ class BackendAnalyticsModel
 	 * @param int $periodId
 	 * @return array
 	 */
-	public static function getDataFromDbByType($type, $periodId)
+	public static function getDataFromDbByType($type, $periodId = 0)
 	{
+	    if($periodId != 0)
+	    {
+		return (array) BackendModel::getDB()->getRecords(
+			'SELECT *
+			 FROM ' . $type . ' WHERE period_id = ?',
+			 $periodId
+		);
+	    }
+	    else
+	    {
 		return (array) BackendModel::getDB()->getRecord(
 			'SELECT *
-			 FROM analytics_aggregates
-			 WHERE period_id = ?',
-			 $periodId
+			 FROM ' . $type);
+	    }
+
+	}
+
+	/**
+	 *
+	 * @param string $type
+	 * @param int $startTimestamp
+	 * @param int $endTimestamp
+	 * @return array
+	 */
+	public static function getDayDataFromDbByType($type, $startTimestamp, $endTimestamp)
+	{
+		$startTimestamp = date('Y-m-d', $startTimestamp);
+		$endTimestamp = date('Y-m-d', $endTimestamp);
+		return (array) BackendModel::getDB()->getRecords(
+			'SELECT *
+			 FROM ' . $type . ' WHERE day >= ? AND day <= ?',
+			 array($startTimestamp, $endTimestamp)
 		);
 	}
 
@@ -556,20 +578,16 @@ class BackendAnalyticsModel
 	 * Fetch metrics grouped by day
 	 *
 	 * @param array $metrics The metrics to collect.
-	 * @param int $startTimestamp The start timestamp for the cache file.
-	 * @param int $endTimestamp The end timestamp for the cache file.
+	 * @param int $periodId
 	 * @param string[optional] $forceCache Should the data be forced from cache.
 	 * @return array
 	 */
-	public static function getMetricsPerDay(array $metrics, $startTimestamp, $endTimestamp, $forceCache = false)
+	public static function getMetricsPerDay(array $metrics, $startTimestamp, $endTimestamp)
 	{
 		$metrics = (array) $metrics;
 
 		// get data from cache
-		$items = self::getDataFromCacheByType('metrics_per_day', $startTimestamp, $endTimestamp);
-
-		// force retrieval from cache
-		if($forceCache) return $items;
+		$items = self::getDayDataFromDbByType('analytics_metrics_per_day', $startTimestamp, $endTimestamp);
 
 		// get current action
 		$action = Spoon::get('url')->getAction();
@@ -785,15 +803,14 @@ class BackendAnalyticsModel
 	/**
 	 * Get the top keywords
 	 *
-	 * @param int $startTimestamp The start timestamp for the cache file.
-	 * @param int $endTimestamp The end timestamp for the cache file.
+	 * @param int $periodId
 	 * @param int[optional] $limit An optional limit of the number of keywords to get.
 	 * @return array
 	 */
-	public static function getTopKeywords($startTimestamp, $endTimestamp, $limit = 5)
+	public static function getTopKeywords($periodId, $limit = 5)
 	{
-		// get data from cache
-		$items = self::getDataFromCacheByType('top_keywords', $startTimestamp, $endTimestamp);
+		// get data from db
+		$items = self::getDataFromDbByType('analytics_keywords', $periodId);
 
 		// limit data
 		if(!empty($items)) $items = array_slice($items, 0, $limit, true);
@@ -810,7 +827,7 @@ class BackendAnalyticsModel
 		$results = array();
 
 		// get total pageviews
-		$totalPageviews = (int) self::getAggregate('keywordPageviews', $startTimestamp, $endTimestamp);
+		$totalPageviews = (int) self::getAggregate('keyword_pageviews', $periodId);
 
 		// build top keywords
 		foreach($items as $i => $keywordData)
@@ -873,15 +890,14 @@ class BackendAnalyticsModel
 	/**
 	 * Get the top referrals
 	 *
-	 * @param int $startTimestamp The start timestamp for the cache file.
-	 * @param int $endTimestamp The end timestamp for the cache file.
+	 * @param int $periodId
 	 * @param int[optional] $limit An optional limit of the number of referrals to get.
 	 * @return array
 	 */
-	public static function getTopReferrals($startTimestamp, $endTimestamp, $limit = 5)
+	public static function getTopReferrals($periodId, $limit = 5)
 	{
 		// get data from cache
-		$items = self::getDataFromCacheByType('top_referrals', $startTimestamp, $endTimestamp);
+		$items = self::getDataFromDbByType('analytics_referrals', $periodId);
 
 		// limit data
 		if(!empty($items)) $items = array_slice($items, 0, $limit, true);
@@ -899,7 +915,7 @@ class BackendAnalyticsModel
 		$results = array();
 
 		// get total pageviews
-		$totalPageviews = (int) self::getAggregate('pageviews', $startTimestamp, $endTimestamp);
+		$totalPageviews = (int) self::getAggregate('pageviews', $periodId);
 
 		// build top keywords
 		foreach($items as $i => $referrerData)
@@ -918,14 +934,13 @@ class BackendAnalyticsModel
 	/**
 	 * Get the traffic sources grouped by medium
 	 *
-	 * @param int $startTimestamp The start timestamp for the cache file.
-	 * @param int $endTimestamp The end timestamp for the cache file.
+	 * @param int $periodId
 	 * @return array
 	 */
-	public static function getTrafficSourcesGrouped($startTimestamp, $endTimestamp)
+	public static function getTrafficSourcesGrouped($periodId)
 	{
 		// get data from cache
-		$items = self::getDataFromCacheByType('traffic_sources', $startTimestamp, $endTimestamp);
+		$items = self::getDataFromDbByType('analytics_traffic_sources', $periodId);
 
 		// get current action
 		$action = Spoon::get('url')->getAction();

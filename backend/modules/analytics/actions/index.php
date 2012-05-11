@@ -16,6 +16,12 @@
 class BackendAnalyticsIndex extends BackendAnalyticsBase
 {
 	/**
+	 *
+	 * @var int
+	 */
+	private $periodId;
+
+	/**
 	 * Execute the action
 	 */
 	public function execute()
@@ -32,7 +38,7 @@ class BackendAnalyticsIndex extends BackendAnalyticsBase
 	protected function parse()
 	{
 		parent::parse();
-/*
+
 		$warnings = BackendAnalyticsModel::checkSettings();
 		$this->tpl->assign('warnings', $warnings);
 
@@ -43,6 +49,7 @@ class BackendAnalyticsIndex extends BackendAnalyticsBase
 			$this->parsePieChartData();
 			$this->parseImportantReferrals();
 			$this->parseImportantKeywords();
+		     /*
 
 			$googleURL = BackendAnalyticsModel::GOOGLE_ANALYTICS_URL . '/%1$s?id=%2$s&amp;pdr=%3$s';
 			$googleTableId = str_replace('ga:', '', BackendAnalyticsModel::getTableId());
@@ -59,8 +66,8 @@ class BackendAnalyticsIndex extends BackendAnalyticsBase
 			$this->tpl->assign('googleBouncesURL', sprintf($googleURL, 'bounce_rate', $googleTableId, $googleDate));
 			$this->tpl->assign('googleAveragePageviewsURL', sprintf($googleURL, 'average_pageviews', $googleTableId, $googleDate));
 
-
-		}*/
+			*/
+		}
 	}
 
 	/**
@@ -68,7 +75,7 @@ class BackendAnalyticsIndex extends BackendAnalyticsBase
 	 */
 	private function parseImportantKeywords()
 	{
-		$results = BackendAnalyticsModel::getTopKeywords($this->startTimestamp, $this->endTimestamp, 25);
+		$results = BackendAnalyticsModel::getTopKeywords($this->periodId, 25);
 		if(!empty($results))
 		{
 			$dataGrid = new BackendDataGridArray($results);
@@ -91,7 +98,7 @@ class BackendAnalyticsIndex extends BackendAnalyticsBase
 	 */
 	private function parseImportantReferrals()
 	{
-		$results = BackendAnalyticsModel::getTopReferrals($this->startTimestamp, $this->endTimestamp, 25);
+		$results = BackendAnalyticsModel::getTopReferrals($this->periodId, $this->endTimestamp, 25);
 		if(!empty($results))
 		{
 			$dataGrid = new BackendDataGridArray($results);
@@ -137,7 +144,7 @@ class BackendAnalyticsIndex extends BackendAnalyticsBase
 				$data = (array) $data;
 
 				// build array
-				$graphData[$i]['data'][$j]['date'] = (int) $data['timestamp'];
+				$graphData[$i]['data'][$j]['date'] = (int) $data['day'];
 				$graphData[$i]['data'][$j]['value'] = (string) $data[$metric];
 			}
 		}
@@ -163,9 +170,9 @@ class BackendAnalyticsIndex extends BackendAnalyticsBase
 	private function parseOverviewData()
 	{
 		// get aggregates
-		$results = BackendAnalyticsModel::getAggregates($this->startTimestamp, $this->endTimestamp);
-		/*
-		$resultsTotal = BackendAnalyticsModel::getAggregatesTotal($this->startTimestamp, $this->endTimestamp);
+		$results = BackendAnalyticsModel::getAggregates($this->periodId);
+
+		$resultsTotal = BackendAnalyticsModel::getAggregatesTotal($this->periodId);
 
 		// are there some values?
 		$dataAvailable = false;
@@ -177,32 +184,32 @@ class BackendAnalyticsIndex extends BackendAnalyticsBase
 		if(!empty($results))
 		{
 			// time on site values
-			$timeOnSite = ($results['entrances'] == 0) ? 0 : ($results['timeOnSite'] / $results['entrances']);
-			$timeOnSiteTotal = ($resultsTotal['entrances'] == 0) ? 0 : ($resultsTotal['timeOnSite'] / $resultsTotal['entrances']);
+			$timeOnSite = ($results[0]['entrances'] == 0) ? 0 : ($results[0]['time_on_site'] / $results[0]['entrances']);
+			$timeOnSiteTotal = ($resultsTotal['entrances'] == 0) ? 0 : ($resultsTotal['time_on_site'] / $resultsTotal['entrances']);
 			$timeOnSiteDifference = ($timeOnSiteTotal == 0) ? 0 : number_format((($timeOnSite - $timeOnSiteTotal) / $timeOnSiteTotal) * 100, 0);
 			if($timeOnSiteDifference > 0) $timeOnSiteDifference = '+' . $timeOnSiteDifference;
 
 			// pages / visit
-			$pagesPerVisit = ($results['visits'] == 0) ? 0 : number_format(($results['pageviews'] / $results['visits']), 2);
+			$pagesPerVisit = ($results[0]['visits'] == 0) ? 0 : number_format(($results[0]['pageviews'] / $results[0]['visits']), 2);
 			$pagesPerVisitTotal = ($resultsTotal['visits'] == 0) ? 0 : number_format(($resultsTotal['pageviews'] / $resultsTotal['visits']), 2);
 			$pagesPerVisitDifference = ($pagesPerVisitTotal == 0) ? 0 : number_format((($pagesPerVisit - $pagesPerVisitTotal) / $pagesPerVisitTotal) * 100, 0);
 			if($pagesPerVisitDifference > 0) $pagesPerVisitDifference = '+' . $pagesPerVisitDifference;
 
 			// new visits
-			$newVisits = ($results['entrances'] == 0) ? 0 : number_format(($results['newVisits'] / $results['entrances']) * 100, 0);
-			$newVisitsTotal = ($resultsTotal['entrances'] == 0) ? 0 : number_format(($resultsTotal['newVisits'] / $resultsTotal['entrances']) * 100, 0);
+			$newVisits = ($results[0]['entrances'] == 0) ? 0 : number_format(($results[0]['new_visits'] / $results[0]['entrances']) * 100, 0);
+			$newVisitsTotal = ($resultsTotal['entrances'] == 0) ? 0 : number_format(($resultsTotal['new_visits'] / $resultsTotal['entrances']) * 100, 0);
 			$newVisitsDifference = ($newVisitsTotal == 0) ? 0 : number_format((($newVisits - $newVisitsTotal) / $newVisitsTotal) * 100, 0);
 			if($newVisitsDifference > 0) $newVisitsDifference = '+' . $newVisitsDifference;
 
 			// bounces
-			$bounces = ($results['entrances'] == 0) ? 0 : number_format(($results['bounces'] / $results['entrances']) * 100, 0);
+			$bounces = ($results[0]['entrances'] == 0) ? 0 : number_format(($results[0]['bounces'] / $results[0]['entrances']) * 100, 0);
 			$bouncesTotal = ($resultsTotal['entrances'] == 0) ? 0 : number_format(($resultsTotal['bounces'] / $resultsTotal['entrances']) * 100, 0);
 			$bouncesDifference = ($bouncesTotal == 0) ? 0 : number_format((($bounces - $bouncesTotal) / $bouncesTotal) * 100, 0);
 			if($bouncesDifference > 0) $bouncesDifference = '+' . $bouncesDifference;
 
-			$this->tpl->assign('pageviews', $results['pageviews']);
-			$this->tpl->assign('visitors', $results['visitors']);
-			$this->tpl->assign('pageviews', $results['pageviews']);
+			$this->tpl->assign('pageviews', $results[0]['pageviews']);
+			$this->tpl->assign('visitors', $results[0]['visitors']);
+			$this->tpl->assign('pageviews', $results[0]['pageviews']);
 			$this->tpl->assign('pageviewsTotal', $resultsTotal['pageviews']);
 			$this->tpl->assign('pagesPerVisit', $pagesPerVisit);
 			$this->tpl->assign('pagesPerVisitTotal', $pagesPerVisitTotal);
@@ -216,7 +223,7 @@ class BackendAnalyticsIndex extends BackendAnalyticsBase
 			$this->tpl->assign('bounces', $bounces);
 			$this->tpl->assign('bouncesTotal', $bouncesTotal);
 			$this->tpl->assign('bouncesDifference', $bouncesDifference);
-		}*/
+		}
 	}
 
 	/**
@@ -225,7 +232,7 @@ class BackendAnalyticsIndex extends BackendAnalyticsBase
 	private function parsePieChartData()
 	{
 		$graphData = array();
-		$sources = BackendAnalyticsModel::getTrafficSourcesGrouped($this->startTimestamp, $this->endTimestamp);
+		$sources = BackendAnalyticsModel::getTrafficSourcesGrouped($this->periodId);
 
 		foreach($sources as $i => $source)
 		{
@@ -257,6 +264,11 @@ class BackendAnalyticsIndex extends BackendAnalyticsBase
 		if(!BackendAnalyticsModel::checkPeriod($period))
 		{
 			BackendAnalyticsHelper::getAllData($startTimestamp, $endTimestamp);
+		}
+
+		else
+		{
+			$this->periodId = BackendAnalyticsModel::getPeriodId(array($startTimestamp, $endTimestamp));
 		}
 	}
 }
