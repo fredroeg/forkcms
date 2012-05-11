@@ -16,11 +16,17 @@
 class BackendAnalyticsExitPages extends BackendAnalyticsBase
 {
 	/**
+	 *
+	 * @var int
+	 */
+	private $periodId;
+	/**
 	 * Execute the action
 	 */
 	public function execute()
 	{
 		parent::execute();
+		$this->seaDataDump();
 		$this->parse();
 		$this->display();
 	}
@@ -35,12 +41,14 @@ class BackendAnalyticsExitPages extends BackendAnalyticsBase
 		$this->parseChartData();
 		$this->parseExitPages();
 
-		$googleURL = BackendAnalyticsModel::GOOGLE_ANALYTICS_URL . '/%1$s?id=%2$s&amp;pdr=%3$s';
+		/*$googleURL = BackendAnalyticsModel::GOOGLE_ANALYTICS_URL . '/%1$s?id=%2$s&amp;pdr=%3$s';
 		$googleTableId = str_replace('ga:', '', BackendAnalyticsModel::getTableId());
 		$googleDate = date('Ymd', $this->startTimestamp) . '-' . date('Ymd', $this->endTimestamp);
 
 		// parse links to google
 		$this->tpl->assign('googleTopExitPagesURL', sprintf($googleURL, 'exits', $googleTableId, $googleDate));
+		 *
+		 */
 	}
 
 	/**
@@ -69,7 +77,7 @@ class BackendAnalyticsExitPages extends BackendAnalyticsBase
 				$data = (array) $data;
 
 				// build array
-				$graphData[$i]['data'][$j]['date'] = (int) $data['timestamp'];
+				$graphData[$i]['data'][$j]['date'] = $data['day'];
 				$graphData[$i]['data'][$j]['value'] = (string) $data[$metric];
 			}
 		}
@@ -95,7 +103,7 @@ class BackendAnalyticsExitPages extends BackendAnalyticsBase
 	 */
 	private function parseExitPages()
 	{
-		$results = BackendAnalyticsModel::getExitPages($this->startTimestamp, $this->endTimestamp);
+		$results = BackendAnalyticsModel::getExitPages($this->periodId);
 		if(!empty($results))
 		{
 			$dataGrid = new BackendDataGridArray($results);
@@ -119,8 +127,8 @@ class BackendAnalyticsExitPages extends BackendAnalyticsBase
 	private function parseOverviewData()
 	{
 		// get aggregates
-		$results = BackendAnalyticsModel::getAggregates($this->startTimestamp, $this->endTimestamp);
-		$resultsTotal = BackendAnalyticsModel::getAggregatesTotal($this->startTimestamp, $this->endTimestamp);
+		$results = BackendAnalyticsModel::getAggregates($this->periodId);
+		$resultsTotal = BackendAnalyticsModel::getAggregatesTotal($this->periodId);
 
 		// are there some values?
 		$dataAvailable = false;
@@ -132,24 +140,47 @@ class BackendAnalyticsExitPages extends BackendAnalyticsBase
 		if(!empty($results))
 		{
 			// exits percentage of total
-			$exitsPercentageOfTotal = ($results['exits'] == 0) ? 0 : number_format(($results['exitPagesExits'] / $results['exits']) * 100, 0);
+			$exitsPercentageOfTotal = ($results[0]['exits'] == 0) ? 0 : number_format(($results[0]['exit_pages_exits'] / $results[0]['exits']) * 100, 0);
 
 			// pageviews percentage of total
-			$pageviewsPercentageOfTotal = ($results['pageviews'] == 0) ? 0 : number_format(($results['exitPagesPageviews'] / $results['pageviews']) * 100, 0);
+			$pageviewsPercentageOfTotal = ($results[0]['pageviews'] == 0) ? 0 : number_format(($results[0]['exit_pages_pageviews'] / $results[0]['pageviews']) * 100, 0);
 
 			// exits percentage
-			$exitsPercentage = ($results['exitPagesPageviews'] == 0) ? 0 : number_format(($results['exits'] / $results['exitPagesPageviews']) * 100, 0);
+			$exitsPercentage = ($results[0]['exit_pages_pageviews'] == 0) ? 0 : number_format(($results[0]['exits'] / $results[0]['exit_pages_pageviews']) * 100, 0);
 			$exitsPercentageTotal = ($resultsTotal['pageviews'] == 0) ? 0 : number_format(($resultsTotal['exits'] / $resultsTotal['pageviews']) * 100, 0);
 			$exitsPercentageDifference = ($exitsPercentageTotal == 0) ? 0 : number_format((($exitsPercentage - $exitsPercentageTotal) / $exitsPercentageTotal) * 100, 0);
 			if($exitsPercentageDifference > 0) $exitsPercentageDifference = '+' . $exitsPercentageDifference;
 
-			$this->tpl->assign('exits', $results['exits']);
+			$this->tpl->assign('exits', $results[0]['exits']);
 			$this->tpl->assign('exitsPercentageOfTotal', $exitsPercentageOfTotal);
-			$this->tpl->assign('pageviews', $results['exitPagesPageviews']);
+			$this->tpl->assign('pageviews', $results[0]['exit_pages_pageviews']);
 			$this->tpl->assign('pageviewsPercentageOfTotal', $pageviewsPercentageOfTotal);
 			$this->tpl->assign('exitsPercentage', $exitsPercentage);
 			$this->tpl->assign('exitsPercentageTotal', $exitsPercentageTotal);
 			$this->tpl->assign('exitsPercentageDifference', $exitsPercentageDifference);
+		}
+	}
+
+	/**
+	 * Check if we have the necessary data in the db, otherwise insert the missing data
+	 */
+	private function seaDataDump()
+	{
+		// Define the period
+		$startTimestamp = date('Y-m-d', $this->startTimestamp);
+		$endTimestamp = date('Y-m-d', $this->endTimestamp);
+		$period = array($startTimestamp, $endTimestamp);
+
+		// Check if we already stored the data for that period in the database. (if not -> insert it!)
+		// todo: insert the ! again
+		if(!BackendAnalyticsModel::checkPeriod($period))
+		{
+			BackendAnalyticsHelper::getAllData($startTimestamp, $endTimestamp);
+		}
+
+		else
+		{
+			$this->periodId = BackendAnalyticsModel::getPeriodId(array($startTimestamp, $endTimestamp));
 		}
 	}
 }

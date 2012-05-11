@@ -432,14 +432,13 @@ class BackendAnalyticsModel
 	/**
 	 * Get the exit pages
 	 *
-	 * @param int $startTimestamp The start timestamp for the cache file.
-	 * @param int $endTimestamp The end Timestamp for the cache file.
+	 * @param int $periodId
 	 * @return array
 	 */
-	public static function getExitPages($startTimestamp, $endTimestamp)
+	public static function getExitPages($periodId)
 	{
 		// get data from cache
-		$items = self::getDataFromCacheByType('exit_pages', $startTimestamp, $endTimestamp);
+		$items = self::getDataFromDbByType('analytics_exit_pages', $periodId);
 
 		// get current action
 		$action = Spoon::get('url')->getAction();
@@ -458,8 +457,8 @@ class BackendAnalyticsModel
 		{
 			// build array
 			$results[$i] = array();
-			$results[$i]['page'] = $pageData['pagePath'];
-			$results[$i]['page_encoded'] = urlencode($pageData['pagePath']);
+			$results[$i]['page'] = $pageData['page_path'];
+			$results[$i]['page_encoded'] = urlencode($pageData['page_path']);
 			$results[$i]['exits'] = (int) $pageData['exits'];
 			$results[$i]['pageviews'] = (int) $pageData['pageviews'];
 			$results[$i]['exit_rate'] = ($pageData['pageviews'] == 0 ? 0 : number_format(((int) $pageData['exits'] / $pageData['pageviews']) * 100, 2)) . '%';
