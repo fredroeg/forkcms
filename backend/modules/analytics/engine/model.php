@@ -158,9 +158,6 @@ class BackendAnalyticsModel
 		// get current action
 		$action = Spoon::get('url')->getAction();
 
-		// not in db
-		if($periodId == 0) self::redirectToLoadingPage($action);
-
 		$aggregates = self::getDataFromDbByType('analytics_aggregates', $periodId);
 
 		return $aggregates;

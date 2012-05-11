@@ -30,6 +30,34 @@ class BackendAnalyticsBase extends BackendBaseActionIndex
 	protected $startTimestamp, $endTimestamp;
 
 	/**
+	 *
+	 * @var int
+	 */
+	protected $periodId;
+
+	/**
+	 * Check if we have the necessary data in the db, otherwise insert the missing data
+	 */
+	private function checkPeriod()
+	{
+		// Define the period
+		$startTimestamp = date('Y-m-d', $this->startTimestamp);
+		$endTimestamp = date('Y-m-d', $this->endTimestamp);
+		$period = array($startTimestamp, $endTimestamp);
+
+		// Check if we already stored the data for that period in the database. (if not -> insert it!)
+		// todo: insert the ! again
+		if(!BackendAnalyticsModel::checkPeriod($period))
+		{
+			BackendAnalyticsHelper::getAllData($startTimestamp, $endTimestamp);
+		}
+		else
+		{
+			$this->periodId = BackendAnalyticsModel::getPeriodId(array($startTimestamp, $endTimestamp));
+		}
+	}
+
+	/**
 	 * Execute the action
 	 */
 	public function execute()
@@ -37,6 +65,7 @@ class BackendAnalyticsBase extends BackendBaseActionIndex
 		parent::execute();
 		$this->header->addJS('highcharts.js', 'core', false);
 		$this->setDates();
+		$this->checkPeriod();
 	}
 
 	/**

@@ -17,17 +17,11 @@
 class BackendAnalyticsAllPages extends BackendAnalyticsBase
 {
 	/**
-	 *
-	 * @var int
-	 */
-	private $periodId;
-	/**
 	 * Execute the action
 	 */
 	public function execute()
 	{
 		parent::execute();
-		$this->seaDataDump();
 		$this->parse();
 		$this->display();
 	}
@@ -176,29 +170,6 @@ class BackendAnalyticsAllPages extends BackendAnalyticsBase
 
 			// parse the datagrid
 			$this->tpl->assign('dgPages', $dataGrid->getContent());
-		}
-	}
-
-	/**
-	 * Check if we have the necessary data in the db, otherwise insert the missing data
-	 */
-	private function seaDataDump()
-	{
-		// Define the period
-		$startTimestamp = date('Y-m-d', $this->startTimestamp);
-		$endTimestamp = date('Y-m-d', $this->endTimestamp);
-		$period = array($startTimestamp, $endTimestamp);
-
-		// Check if we already stored the data for that period in the database. (if not -> insert it!)
-		// todo: insert the ! again
-		if(!BackendAnalyticsModel::checkPeriod($period))
-		{
-			BackendAnalyticsHelper::getAllData($startTimestamp, $endTimestamp);
-		}
-
-		else
-		{
-			$this->periodId = BackendAnalyticsModel::getPeriodId(array($startTimestamp, $endTimestamp));
 		}
 	}
 }
