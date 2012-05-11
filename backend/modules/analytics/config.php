@@ -37,14 +37,19 @@ class BackendAnalyticsConfig extends BackendBaseConfig
 	{
 		parent::__construct($module);
 
+		$record = BackendAnalyticsModel::getAPISettings();
+		$accessToken = $record['access_token'];
+		$tableId = $record['table_id'];
+
 		$error = false;
 		$action = Spoon::exists('url') ? Spoon::get('url')->getAction() : null;
 
 		// analytics session token
-		if(BackendModel::getModuleSetting('analytics', 'session_token') === null) $error = true;
+
+		if($record === null) $error = true;
 
 		// analytics table id
-		if(BackendModel::getModuleSetting('analytics', 'table_id') === null) $error = true;
+		if($tableId === null) $error = true;
 
 		// missing settings, so redirect to the index-page to show a message (except on the index- and settings-page)
 		if($error && $action != 'settings' && $action != 'index')
