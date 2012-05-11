@@ -21,7 +21,6 @@ class BackendAnalyticsContent extends BackendAnalyticsBase
 	public function execute()
 	{
 		parent::execute();
-		$this->seaDataDump();
 		$this->parse();
 		$this->display();
 	}

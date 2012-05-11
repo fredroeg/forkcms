@@ -159,10 +159,13 @@ class BackendAnalyticsHelper
 	{
 	    $periodBoolean = BackendAnalyticsModel::checkPeriod(array($startTimestamp, $endTimestamp));
 
-	    if(!$periodBoolean)
+	    $loadingSession = SpoonSession::get('loading');
+	    if(!$periodBoolean && $loadingSession != 'true')
 	    {
-		    $periodId = BackendAnalyticsModel::insertPeriod(array($startTimestamp, $endTimestamp));
-		    self::insertAnalyticsData($startTimestamp, $endTimestamp, $periodId);
+		    SpoonSession::set('loading', 'true');
+
+		    $url = BackendModel::createURLForAction('loading' . '?redirect_action=index');
+		    SpoonHTTP::redirect($url);
 	    }
 	    else
 	    {
@@ -838,7 +841,7 @@ class BackendAnalyticsHelper
 	 * @param string $endTimestamp
 	 * @param string $periodId
 	 */
-	private static function insertAnalyticsData($startTimestamp, $endTimestamp, $periodId)
+	public static function insertAnalyticsData($startTimestamp, $endTimestamp, $periodId)
 	{
 		// first we get all the data from Google API
 		$aggregatesData = self::getAggregates($startTimestamp, $endTimestamp);
@@ -860,6 +863,11 @@ class BackendAnalyticsHelper
 		BackendAnalyticsModel::insertPages($periodId, $pages);
 		BackendAnalyticsModel::insertReferrals($periodId, $referrals);
 		BackendAnalyticsModel::insertTrafficSources($periodId, $trafficSources);
+
+		SpoonSession::set('loading', 'false');
+
+		$url = BackendModel::createURLForAction('index');
+		SpoonHTTP::redirect($url);
 	}
 
 	/**

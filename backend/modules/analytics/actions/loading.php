@@ -45,10 +45,15 @@ class BackendAnalyticsLoading extends BackendAnalyticsBase
 	 */
 	private function getData()
 	{
-	    /*
 		$this->redirectAction = SpoonFilter::getGetValue('redirect_action', null, 'index');
 		$this->identifier = time() . rand(0, 999);
-		$this->pageId = SpoonFilter::getGetValue('page_id', null, '');
+
+		$startTimestamp = date('Y-m-d', $this->startTimestamp);
+		$endTimestamp = date('Y-m-d', $this->endTimestamp);
+
+		$periodId = BackendAnalyticsModel::insertPeriod(array($startTimestamp, $endTimestamp));
+		BackendAnalyticsHelper::insertAnalyticsData($startTimestamp, $endTimestamp, $periodId);
+		/*$this->pageId = SpoonFilter::getGetValue('page_id', null, '');
 		$this->pagePath = SpoonFilter::getGetValue('page_path', null, '');
 		$force = SpoonFilter::getGetValue('force', null, '');
 
@@ -93,13 +98,13 @@ class BackendAnalyticsLoading extends BackendAnalyticsBase
 	{
 		parent::parse();
 
-		$page = ($this->pageId != '' ? BackendAnalyticsModel::getPageForId($this->pageId) : null);
+		// $page = ($this->pageId != '' ? BackendAnalyticsModel::getPageForId($this->pageId) : null);
 
 		// update date_viewed for this page
-		BackendAnalyticsModel::updatePageDateViewed($this->pageId);
+		// BackendAnalyticsModel::updatePageDateViewed($this->pageId);
 
 		// parse redirect link
-		$this->tpl->assign('redirectGet', (isset($page) ? 'page=' . $page : ''));
+		// $this->tpl->assign('redirectGet', (isset($page) ? 'page=' . $page : ''));
 		$this->tpl->assign('page', $this->redirectAction);
 		$this->tpl->assign('identifier', ($this->pageId != '' ? $this->pageId . '_' : '') . $this->identifier);
 
@@ -114,5 +119,6 @@ class BackendAnalyticsLoading extends BackendAnalyticsBase
 		{
 			$this->tpl->assign('settingsUrl', BackendModel::createURLForAction('settings'));
 		}
+
 	}
 }
