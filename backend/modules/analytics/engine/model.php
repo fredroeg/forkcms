@@ -10,6 +10,7 @@
 /**
  * In this file we store all generic data communication functions
  *
+ * @author Frederick Roegiers <frederick.roegiers@wijs.be>
  * @author Annelies Van Extergem <annelies.vanextergem@netlash.com>
  * @author Dieter Van den Eynde <dieter.vandeneynde@netlash.com>
  */
@@ -1145,132 +1146,6 @@ class BackendAnalyticsModel
 			);
 			BackendModel::getDB(true)->insert('analytics_traffic_sources', $record);
 		}
-	}
-
-	/**
-	 * Parse a XML object to an array and cast all fields to their corresponding types
-	 *
-	 * @param SimpleXMLElement $xml The simpleXML to convert to an array.
-	 * @return array
-	 */
-	private static function parseXMLToArray(SimpleXMLElement $xml)
-	{
-		$data = array();
-		$xml = (array) $xml;
-
-		// loop children
-		foreach($xml as $name => $children)
-		{
-			$children = (array) $children;
-
-			// skip attributes
-			if($name == '@attributes') continue;
-
-			// empty item
-			if(trim((string) $children) == '')
-			{
-				// save empty array
-				$data[$name] = array();
-				continue;
-			}
-
-			// save attributes
-			if(isset($children['@attributes']) && is_array($children['@attributes'])) $data[$name]['attributes'] = $children['@attributes'];
-
-			// page details
-			if(strpos($name, 'page_') !== false)
-			{
-				// loop entries
-				foreach($children as $pageKey => $pageChildren)
-				{
-					// this is the hostname - add to data
-					if($pageKey == 'hostname') $data[$name][$pageKey] = trim($pageChildren);
-
-					// cast children to array
-					$pageChildren = (array) $pageChildren;
-
-					// dig deeper
-					if(isset($pageChildren['entry']) && is_array($pageChildren['entry']))
-					{
-						// loop entries
-						foreach($pageChildren['entry'] as $entry)
-						{
-							// cast to array
-							$entry = (array) $entry;
-
-							// entry with casted elements
-							$entryCasted = array();
-
-							// cast and add each element
-							foreach($entry as $entryName => $entryValue) $entryCasted[$entryName] = (string) $entryValue;
-
-							// add to data
-							$data[$name][$pageKey][] = $entryCasted;
-						}
-					}
-
-					// normal item
-					else
-					{
-						// loop children
-						foreach($pageChildren as $childName => $childValue)
-						{
-							// empty item - skip
-							if($childName == '@attributes' || trim((string) $childValue) == '') continue;
-
-							// cast and add item
-							$data[$name][$pageKey][$childName] = (string) $childValue;
-						}
-					}
-				}
-			}
-
-			// dig deeper
-			elseif(isset($children['entry']) && is_array($children['entry']))
-			{
-				// loop entries
-				foreach($children['entry'] as $entry)
-				{
-					// cast to array
-					$entry = (array) $entry;
-
-					// entry with casted elements
-					$entryCasted = array();
-
-					// cast and add each element
-					foreach($entry as $entryName => $entryValue) $entryCasted[$entryName] = (string) $entryValue;
-
-					// add to data
-					$data[$name]['entries'][] = $entryCasted;
-				}
-			}
-
-			// normal item
-			else
-			{
-				// loop children
-				foreach($children as $childName => $childValue)
-				{
-					// attributes - skip
-					if($childName === '@attributes') continue;
-
-					// empty item
-					if(trim((string) $childValue) == '')
-					{
-						// save empty array
-						$data[$name] = array();
-
-						// continue
-						continue 2;
-					}
-
-					// cast and add item
-					$data[$name][$childName] = (string) $childValue;
-				}
-			}
-		}
-
-		return $data;
 	}
 
 	/**

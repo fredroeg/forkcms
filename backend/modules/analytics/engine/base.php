@@ -11,6 +11,7 @@
  * This class implements a lot of functionality that can be extended by a specific action
  *
  * @author Annelies Van Extergem <annelies.vanextergem@netlash.com>
+ * @author Frederick Roegiers <frederick.roegiers@wijs.be>
  */
 class BackendAnalyticsBase extends BackendBaseActionIndex
 {

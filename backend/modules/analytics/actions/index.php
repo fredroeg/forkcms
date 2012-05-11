@@ -10,6 +10,7 @@
 /**
  * This is the index-action (default), it will display the overview of analytics posts
  *
+ * @author Frederick Roegiers <frederick.roegiers@wijs.be>
  * @author Annelies Van Extergem <annelies.vanextergem@netlash.com>
  * @author Dieter Vanden Eynde <dieter.vandeneynde@netlash.com>
  */
@@ -140,11 +141,10 @@ class BackendAnalyticsIndex extends BackendAnalyticsBase
 
 			foreach($metricsPerDay as $j => $data)
 			{
-				// cast SimpleXMLElement to array
 				$data = (array) $data;
 
 				// build array
-				$graphData[$i]['data'][$j]['date'] = (int) $data['day'];
+				$graphData[$i]['data'][$j]['date'] = $data['day'];
 				$graphData[$i]['data'][$j]['value'] = (string) $data[$metric];
 			}
 		}

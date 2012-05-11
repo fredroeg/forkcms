@@ -10,6 +10,7 @@
 /**
  * Helper class to make our life easier
  *
+ * @author Frederick Roegiers <frederick.roegiers@wijs.be>
  * @author Dieter Van den Eynde <dieter.vandeneynde@netlash.com>
  * @author Annelies Van Extergem <annelies.vanextergem@netlash.com>
  */
