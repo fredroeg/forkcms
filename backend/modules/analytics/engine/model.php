@@ -636,14 +636,13 @@ class BackendAnalyticsModel
 	/**
 	 * Get pages
 	 *
-	 * @param int $startTimestamp The start timestamp for the cache file.
-	 * @param int $endTimestamp The end timestamp for the cache file.
+	 * @param int $periodId
 	 * @return array
 	 */
-	public static function getPages($startTimestamp, $endTimestamp)
+	public static function getPages($periodId)
 	{
 		// get data from cache
-		$items = self::getDataFromCacheByType('pages', $startTimestamp, $endTimestamp);
+		$items = self::getDataFromDbByType('analytics_pages', $periodId);
 
 		// get current action
 		$action = Spoon::get('url')->getAction();
@@ -662,12 +661,12 @@ class BackendAnalyticsModel
 		{
 			// build array
 			$results[$i] = array();
-			$results[$i]['page'] = $item['pagePath'];
-			$results[$i]['page_encoded'] = urlencode($item['pagePath']);
+			$results[$i]['page'] = $item['page_path'];
+			$results[$i]['page_encoded'] = urlencode($item['page_path']);
 			$results[$i]['pageviews'] = (int) $item['pageviews'];
 			$results[$i]['pages_per_visit'] = ($item['visits'] == 0 ? 0 : number_format(((int) $item['pageviews'] / $item['visits']), 2));
-			$results[$i]['time_on_site'] = BackendAnalyticsModel::getTimeFromSeconds(($item['entrances'] == 0 ? 0 : number_format(((int) $item['timeOnSite'] / $item['entrances']), 2)));
-			$results[$i]['new_visits_percentage'] = ($item['visits'] == 0 ? 0 : number_format(((int) $item['newVisits'] / $item['visits']) * 100, 2)) . '%';
+			$results[$i]['time_on_site'] = BackendAnalyticsModel::getTimeFromSeconds(($item['entrances'] == 0 ? 0 : number_format(((int) $item['time_on_site'] / $item['entrances']), 2)));
+			$results[$i]['new_visits_percentage'] = ($item['visits'] == 0 ? 0 : number_format(((int) $item['new_visits'] / $item['visits']) * 100, 2)) . '%';
 			$results[$i]['bounce_rate'] = ($item['entrances'] == 0 ? 0 : number_format(((int) $item['bounces'] / $item['entrances']) * 100, 2)) . '%';
 		}
 
