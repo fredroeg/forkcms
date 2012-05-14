@@ -19,9 +19,10 @@ class BackendAnalyticsWidgetVisitors extends BackendBaseWidget
 	 */
 	public function execute()
 	{
-		// analytics session token and analytics table id
-		if(BackendModel::getModuleSetting('analytics', 'session_token', null) == '') return;
-		if(BackendModel::getModuleSetting('analytics', 'table_id', null) == '') return;
+		// check analytics session token and analytics table id
+		$APISettingsArray = BackendAnalyticsModel::getAPISettings();
+		if($APISettingsArray['access_token'] == '') return;
+		if($APISettingsArray['table_id'] == '') return;
 
 		// settings are ok, set option
 		$this->tpl->assign('analyticsValidSettings', true);
@@ -45,17 +46,21 @@ class BackendAnalyticsWidgetVisitors extends BackendBaseWidget
 	 */
 	private function parse()
 	{
+		// get dashboard data
+		$periodId = BackendAnalyticsModel::getLatestPeriod();
+
 		$maxYAxis = 2;
 		$metrics = array('visitors', 'pageviews');
 		$graphData = array();
-		$startTimestamp = strtotime('-1 week -1 days', mktime(0, 0, 0));
-		$endTimestamp = mktime(0, 0, 0);
+		$startTimestamp = $periodId['period_start'];
+		$endTimestamp = $periodId['period_end'];
 
-		// get dashboard data
-		$dashboardData = BackendAnalyticsModel::getDashboardData($metrics, $startTimestamp, $endTimestamp, true);
+
+
+		$metricsPerDay = BackendAnalyticsModel::getMetricsPerDay($metrics, $periodId['period_start'], $periodId['period_end']);
 
 		// there are some metrics
-		if($dashboardData !== false)
+		if($metricsPerDay !== false)
 		{
 			// loop metrics
 			foreach($metrics as $i => $metric)
@@ -68,13 +73,10 @@ class BackendAnalyticsWidgetVisitors extends BackendBaseWidget
 				$graphData[$i]['data'] = array();
 
 				// loop metrics per day
-				foreach($dashboardData as $j => $data)
+				foreach($metricsPerDay as $j => $data)
 				{
-					// cast SimpleXMLElement to array
-					$data = (array) $data;
-
 					// build array
-					$graphData[$i]['data'][$j]['date'] = (int) $data['timestamp'];
+					$graphData[$i]['data'][$j]['date'] = $data['day'];
 					$graphData[$i]['data'][$j]['value'] = (string) $data[$metric];
 				}
 			}

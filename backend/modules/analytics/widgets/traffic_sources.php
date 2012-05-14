@@ -60,6 +60,12 @@ class BackendAnalyticsWidgetTrafficSources extends BackendBaseWidget
 	 */
 	private function parse()
 	{
+		// get dashboard data
+		$periodId = BackendAnalyticsModel::getLatestPeriod();
+
+		$startTimestamp = $periodId['period_start'];
+		$endTimestamp = $periodId['period_end'];
+
 		// check if this action is allowed
 		if(BackendAuthentication::isAllowedAction('settings', 'analytics'))
 		{
@@ -69,6 +75,9 @@ class BackendAnalyticsWidgetTrafficSources extends BackendBaseWidget
 
 		$this->parseKeywords();
 		$this->parseReferrers();
+
+		$this->tpl->assign('analyticsRecentVisitsStartDate', $startTimestamp);
+		$this->tpl->assign('analyticsRecentVisitsEndDate', $endTimestamp);
 	}
 
 	/**
@@ -77,7 +86,7 @@ class BackendAnalyticsWidgetTrafficSources extends BackendBaseWidget
 	private function parseKeywords()
 	{
 		$periodId = BackendAnalyticsModel::getLatestPeriod();
-		$results = BackendAnalyticsModel::getRecentKeywords($periodId);
+		$results = BackendAnalyticsModel::getRecentKeywords($periodId['period_id']);
 
 		if(!empty($results))
 		{
@@ -92,9 +101,6 @@ class BackendAnalyticsWidgetTrafficSources extends BackendBaseWidget
 		// get date
 		// $date = (isset($results[0]['date']) ? substr($results[0]['date'], 0, 10) : date('Y-m-d'));
 		// $timestamp = mktime(0, 0, 0, substr($date, 5, 2), substr($date, 8, 2), substr($date, 0, 4));
-
-		// assign date label
-		$this->tpl->assign('analyticsTrafficSourcesDate', ($date = BL::lbl('Today')));
 	}
 
 	/**
@@ -103,7 +109,7 @@ class BackendAnalyticsWidgetTrafficSources extends BackendBaseWidget
 	private function parseReferrers()
 	{
 		$periodId = BackendAnalyticsModel::getLatestPeriod();
-		$results = BackendAnalyticsModel::getRecentReferrers($periodId);
+		$results = BackendAnalyticsModel::getRecentReferrers($periodId['period_id']);
 		if(!empty($results))
 		{
 			$dataGrid = new BackendDataGridArray($results);

@@ -277,17 +277,14 @@ class BackendAnalyticsModel
 	 * Fetch dashboard data grouped by day
 	 *
 	 * @param array $metrics The metrics to collect.
-	 * @param int $startTimestamp The start timestamp for the cache file.
-	 * @param int $endTimestamp The end timestamp for the cache file.
-	 * @param bool[optional] $forceCache Should the data be forced from cache.
+	 * @param int $periodId
 	 * @return array
 	 */
-	public static function getDashboardData(array $metrics, $startTimestamp, $endTimestamp, $forceCache = false)
+	public static function getDashboardData(array $metrics, $periodId)
 	{
 		$metrics = (array) $metrics;
-		$forceCache = (bool) $forceCache;
 
-		return self::getDataFromCacheByType('dashboard_data', $startTimestamp, $endTimestamp);
+		return self::getDataFromDbByType('analytics_aggregates', $periodId);
 	}
 
 	/**
@@ -423,8 +420,11 @@ class BackendAnalyticsModel
 	 */
 	public static function getDayDataFromDbByType($type, $startTimestamp, $endTimestamp)
 	{
-		$startTimestamp = date('Y-m-d', $startTimestamp);
-		$endTimestamp = date('Y-m-d', $endTimestamp);
+		if(is_int($startTimestamp))
+		{
+			$startTimestamp = date('Y-m-d', $startTimestamp);
+			$endTimestamp = date('Y-m-d', $endTimestamp);
+		}
 		return (array) BackendModel::getDB()->getRecords(
 			'SELECT *
 			 FROM ' . $type . ' WHERE day >= ? AND day <= ?',
@@ -537,12 +537,12 @@ class BackendAnalyticsModel
 
 	/**
 	 *
-	 * @return string
+	 * @return arrat
 	 */
 	public static function getLatestPeriod()
 	{
-		return (string) BackendModel::getDB()->getVar(
-			'SELECT period_id
+		return BackendModel::getDB()->getRecord(
+			'SELECT *
 			 FROM analytics_period
 			 ORDER BY period_id
 			 DESC LIMIT 1');

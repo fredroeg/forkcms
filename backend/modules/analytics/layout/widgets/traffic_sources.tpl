@@ -3,9 +3,9 @@
 	<div class="heading">
 		<h3>
 			<a href="{$var|geturl:'index':'analytics'}">
-				{$lblTrafficSources|ucfirst}
-				{$lblFrom}
-				<span id="trafficSourcesDate">{$analyticsTrafficSourcesDate}</span>
+				{$lblTrafficSources|ucfirst} {$lblFrom}
+				{$analyticsRecentVisitsStartDate|date:'j-m':{$INTERFACE_LANGUAGE}} {$lblTill}
+				{$analyticsRecentVisitsEndDate|date:'j-m':{$INTERFACE_LANGUAGE}}
 			</a>
 		</h3>
 	</div>
@@ -55,7 +55,6 @@
 	<div class="footer">
 		<div class="buttonHolderRight">
 			<a href="{$var|geturl:'index':'analytics'}" class="button"><span>{$lblAllStatistics|ucfirst}</span></a>
-			<a href="#refresh" id="refreshTrafficSources" class="submitButton button inputButton mainButton iconLink icon iconRefresh"><span></span></a>
 			{option:settingsUrl}<div id="settingsUrl" class="hidden">{$settingsUrl}</div>{/option:settingsUrl}
 		</div>
 	</div>
