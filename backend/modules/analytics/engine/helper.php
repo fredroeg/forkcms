@@ -45,6 +45,8 @@ class BackendAnalyticsHelper
 		}
 		else
 		{
+			$url = BackendModel::createURLForAction('settings');
+			SpoonHTTP::redirect($url);
 			return false;
 		}
 	}
@@ -157,20 +159,20 @@ class BackendAnalyticsHelper
 	 */
 	public static function getAllData($startTimestamp, $endTimestamp)
 	{
-	    $periodBoolean = BackendAnalyticsModel::checkPeriod(array($startTimestamp, $endTimestamp));
+		$periodBoolean = BackendAnalyticsModel::checkPeriod(array($startTimestamp, $endTimestamp));
 
-	    $loadingSession = SpoonSession::get('loading');
-	    if(!$periodBoolean && $loadingSession != 'true')
-	    {
-		    SpoonSession::set('loading', 'true');
+		$loadingSession = SpoonSession::get('loading');
+		if(!$periodBoolean && $loadingSession != 'true')
+		{
+			SpoonSession::set('loading', 'true');
 
-		    $url = BackendModel::createURLForAction('loading' . '?redirect_action=index');
-		    SpoonHTTP::redirect($url);
-	    }
-	    else
-	    {
-		    $periodId = BackendAnalyticsModel::getPeriodId(array($startTimestamp, $endTimestamp));
-	    }
+			$url = BackendModel::createURLForAction('loading' . '?redirect_action=index');
+			SpoonHTTP::redirect($url);
+		}
+		else
+		{
+			$periodId = BackendAnalyticsModel::getPeriodId(array($startTimestamp, $endTimestamp));
+		}
 	}
 
 	/**

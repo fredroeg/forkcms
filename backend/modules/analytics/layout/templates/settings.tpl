@@ -19,14 +19,36 @@
 	<div class="heading">
 		<h3>{$lblGoogleAnalyticsLink|ucfirst}</h3>
 	</div>
-
 	<div class="options">
 		{option:Wizard}
-			{option:NoSessionToken}
-				<p>{$msgLinkGoogleAccount}</p>
+			{option:NoClient}
+				{form:connectform}
+					{option:error}
+						<div class='errorMessage'>
+							{$error}
+						</div>
+						<br/>
+					{/option:error}
+					<p>
+						<label for="clientid">{$lblClientId|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
+						{$txtClientId} {$txtClientIdError}
+					</p>
+					<p>
+						<label for="clientidsecret">{$lblClientIdSecret|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
+						{$txtClientIdSecret} {$txtClientIdSecretError}
+					</p>
+					<p>
+						<label for="redirectUri">{$lblRedirectUri|ucfirst}<abbr title="{$lblRequiredField}">*</abbr></label>
+						{$txtRedirectUri} {$txtRedirectUriError}
+					</p>
+					<p>{$msgLinkGoogleAccount}</p>
 				<div class="buttonHolder">
-					<a href="{$googleAccountAuthenticationForm}" class="submitButton button inputButton"><span>{$msgAuthenticateAtGoogle}</span></a>
+					{$btnChange}
 				</div>
+				{/form:connectform}
+			{/option:NoClient}
+			{option:NoSessionToken}
+
 			{/option:NoSessionToken}
 
 			{option:NoTableId}

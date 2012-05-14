@@ -51,14 +51,21 @@ class BackendAnalyticsSettings extends BackendBaseActionEdit
 	 */
 	private $tableId;
 
+	private $clientId;
+
+	private $clientIdSecret;
+
+	private $redirectURI;
+
 	/**
 	 * Execute the action
 	 */
 	public function execute()
 	{
 		parent::execute();
-		BackendAnalyticsHelper::checkStatus();
+
 		$this->getAnalyticsParameters();
+		$this->loadWizard();
 		$this->parse();
 		$this->display();
 	}
@@ -72,9 +79,20 @@ class BackendAnalyticsSettings extends BackendBaseActionEdit
 
 		// get session token, account name, the profile's table id, the profile's title
 		$this->accessToken = $this->record['access_token'];
+		if($this->accessToken == '')
+		{
+			$this->clientId = '';
+			$this->clientIdSecret = '';
+		}
+		else
+		{
+			$this->clientId = $this->record['client_id'];
+			$this->clientIdSecret = $this->record['client_secret'];
+		}
 		$this->accountName = $this->record['account_name'];
 		$this->profileTitle = $this->record['profile_name'];
 		$this->tableId = $this->record['table_id'];
+		$this->redirectURI = $this->record['redirect_uri'];
 
 
 		$remove = SpoonFilter::getGetValue('remove', array('session_token', 'table_id'), null);
@@ -85,8 +103,7 @@ class BackendAnalyticsSettings extends BackendBaseActionEdit
 			// the session token has te be removed
 			if($remove == 'session_token')
 			{
-				$values['access_token'] = null;
-				$values['refresh_token'] = null;
+				$this->removeIds();
 			}
 
 			$values['account_name'] = null;
@@ -165,24 +182,25 @@ class BackendAnalyticsSettings extends BackendBaseActionEdit
 		}
 	}
 
-	/**
-	 * Parse
-	 */
-	protected function parse()
+	private function loadWizard()
 	{
-		parent::parse();
-
-		if($this->accessToken == '')
+		if($this->clientId == '' || $this->clientIdSecret == '' || $this->accessToken == '')
 		{
 			// show the link to the google account authentication form
+			$this->tpl->assign('NoClient', true);
 			$this->tpl->assign('NoSessionToken', true);
 			$this->tpl->assign('Wizard', true);
 
-			// build the link to the google account authentication form
-			$googleAccountAuthenticationForm = BackendAnalyticsHelper::loginWithOAuth();
+			$this->frm = new BackendForm('connectform');
+			$this->frm->addText('clientId', $this->clientId);
+			$this->frm->addText('clientIdSecret', $this->clientIdSecret);
+			$this->frm->addText('redirectUri', $this->redirectURI);
 
-			// parse the link to the google account authentication form
-			$this->tpl->assign('googleAccountAuthenticationForm', $googleAccountAuthenticationForm);
+			// submit dialog
+			$this->frm->addButton('change', 'update', 'submit', 'inputButton button mainButton');
+
+			// validate the form
+			$this->validateForm();
 		}
 
 		// session token is present but no table id
@@ -240,6 +258,24 @@ class BackendAnalyticsSettings extends BackendBaseActionEdit
 	}
 
 	/**
+	 * Parse
+	 */
+	protected function parse()
+	{
+		parent::parse();
+	}
+
+	private function removeIds()
+	{
+	    $values['access_token'] = null;
+	    $values['refresh_token'] = null;
+	    $values['client_id'] = null;
+	    $values['client_secret'] = null;
+
+	    BackendAnalyticsModel::updateIds($values);
+	}
+
+	/**
 	 * Helper function to sort accounts
 	 *
 	 * @param array $account1 First account for comparison.
@@ -251,5 +287,40 @@ class BackendAnalyticsSettings extends BackendBaseActionEdit
 		if(strtolower($account1) > strtolower($account2)) return 1;
 		if(strtolower($account1) < strtolower($account2)) return -1;
 		return 0;
+	}
+
+	/**
+	 * Function to validate the form
+	 */
+	private function validateForm()
+	{
+		if($this->frm->isSubmitted())
+		{
+			$this->frm->cleanupFields();
+
+			// shorten the fields;
+			$txtClientId = $this->frm->getField('clientId');
+			$txtClientIdSecret = $this->frm->getField('clientIdSecret');
+			$txtRedirectUri = $this->frm->getField('redirectUri');
+
+			// validate the fields
+			$txtClientId->isFilled(BL::getError('ClientIdIsRequired'));
+			$txtClientIdSecret->isFilled(BL::getError('ClientIdSecretIsRequired'));
+			$txtRedirectUri->isFilled(BL::getError('RedirectIsRequired'));
+
+			if($this->frm->isCorrect())
+			{
+				// build array
+				$values['client_id'] = $txtClientId->getValue();
+				$values['client_secret'] = $txtClientIdSecret->getValue();
+				$values['redirect_uri'] = $txtRedirectUri->getValue();
+
+				// insert the item
+				$id = (int) BackendAnalyticsModel::updateIds($values);
+
+				$url = BackendAnalyticsHelper::loginWithOAuth();
+				$this->redirect($url);
+			}
+		}
 	}
 }

@@ -54,6 +54,7 @@ class BackendAnalyticsBase extends BackendBaseActionIndex
 		else
 		{
 			$this->periodId = BackendAnalyticsModel::getPeriodId(array($startTimestamp, $endTimestamp));
+			SpoonSession::set('loading', 'false');
 		}
 	}
 
