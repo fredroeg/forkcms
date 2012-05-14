@@ -20,8 +20,9 @@ class BackendAnalyticsWidgetTrafficSources extends BackendBaseWidget
 	public function execute()
 	{
 		// check analytics session token and analytics table id
-		if(BackendModel::getModuleSetting('analytics', 'session_token', null) == '') return;
-		if(BackendModel::getModuleSetting('analytics', 'table_id', null) == '') return;
+		$APISettingsArray = BackendAnalyticsModel::getAPISettings();
+		if($APISettingsArray['access_token'] == '') return;
+		if($APISettingsArray['table_id'] == '') return;
 
 		// settings are ok, set option
 		$this->tpl->assign('analyticsValidSettings', true);
@@ -75,23 +76,25 @@ class BackendAnalyticsWidgetTrafficSources extends BackendBaseWidget
 	 */
 	private function parseKeywords()
 	{
-		$results = BackendAnalyticsModel::getRecentKeywords();
+		$periodId = BackendAnalyticsModel::getLatestPeriod();
+		$results = BackendAnalyticsModel::getRecentKeywords($periodId);
+
 		if(!empty($results))
 		{
 			$dataGrid = new BackendDataGridArray($results);
 			$dataGrid->setPaging(false);
-			$dataGrid->setColumnsHidden('id', 'date');
+			// $dataGrid->setColumnsHidden('id', 'date');
 
 			// parse the datagrid
 			$this->tpl->assign('dgAnalyticsKeywords', $dataGrid->getContent());
 		}
 
 		// get date
-		$date = (isset($results[0]['date']) ? substr($results[0]['date'], 0, 10) : date('Y-m-d'));
-		$timestamp = mktime(0, 0, 0, substr($date, 5, 2), substr($date, 8, 2), substr($date, 0, 4));
+		// $date = (isset($results[0]['date']) ? substr($results[0]['date'], 0, 10) : date('Y-m-d'));
+		// $timestamp = mktime(0, 0, 0, substr($date, 5, 2), substr($date, 8, 2), substr($date, 0, 4));
 
 		// assign date label
-		$this->tpl->assign('analyticsTrafficSourcesDate', ($date != date('Y-m-d') ? BackendModel::getUTCDate('d-m', $timestamp) : BL::lbl('Today')));
+		$this->tpl->assign('analyticsTrafficSourcesDate', ($date = BL::lbl('Today')));
 	}
 
 	/**
@@ -99,13 +102,14 @@ class BackendAnalyticsWidgetTrafficSources extends BackendBaseWidget
 	 */
 	private function parseReferrers()
 	{
-		$results = BackendAnalyticsModel::getRecentReferrers();
+		$periodId = BackendAnalyticsModel::getLatestPeriod();
+		$results = BackendAnalyticsModel::getRecentReferrers($periodId);
 		if(!empty($results))
 		{
 			$dataGrid = new BackendDataGridArray($results);
 			$dataGrid->setPaging(false);
-			$dataGrid->setColumnsHidden('id', 'date', 'url');
-			$dataGrid->setColumnURL('referrer', '[url]');
+			// $dataGrid->setColumnsHidden('id', 'date', 'url');
+			// $dataGrid->setColumnURL('referrer', '[url]');
 
 			// parse the datagrid
 			$this->tpl->assign('dgAnalyticsReferrers', $dataGrid->getContent());

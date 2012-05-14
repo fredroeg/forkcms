@@ -868,8 +868,6 @@ class BackendAnalyticsHelper
 
 		SpoonSession::set('loading', 'false');
 
-		$url = BackendModel::createURLForAction('index');
-		SpoonHTTP::redirect($url);
 	}
 
 	/**

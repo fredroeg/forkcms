@@ -51,9 +51,8 @@ class BackendAnalyticsLoading extends BackendAnalyticsBase
 		$startTimestamp = date('Y-m-d', $this->startTimestamp);
 		$endTimestamp = date('Y-m-d', $this->endTimestamp);
 
-		$periodId = BackendAnalyticsModel::insertPeriod(array($startTimestamp, $endTimestamp));
-		BackendAnalyticsHelper::insertAnalyticsData($startTimestamp, $endTimestamp, $periodId);
-		/*$this->pageId = SpoonFilter::getGetValue('page_id', null, '');
+
+		$this->pageId = SpoonFilter::getGetValue('page_id', null, '');
 		$this->pagePath = SpoonFilter::getGetValue('page_path', null, '');
 		$force = SpoonFilter::getGetValue('force', null, '');
 
@@ -68,13 +67,9 @@ class BackendAnalyticsLoading extends BackendAnalyticsBase
 		}
 
 		// build url
-		$URL = SITE_URL . '/backend/cronjob.php?module=analytics&action=get_data&id=1';
-		$URL .= '&page=' . $this->redirectAction;
-		if($this->pageId != '') $URL .= '&page_id=' . $this->pageId;
-		$URL .= '&identifier=' . $this->identifier;
-		$URL .= '&start_date=' . $this->startTimestamp;
-		$URL .= '&end_date=' . $this->endTimestamp;
-		$URL .= '&force=' . $force;
+		$URL = SITE_URL . '/backend/cronjob.php?module=analytics&action=get_insert_data&id=1';
+		$URL .= '&start_date=' . $startTimestamp;
+		$URL .= '&end_date=' . $endTimestamp;
 
 		// set options
 		$options = array();
@@ -87,8 +82,6 @@ class BackendAnalyticsLoading extends BackendAnalyticsBase
 		curl_setopt_array($curl, $options);
 		curl_exec($curl);
 		curl_close($curl);
-	     *
-	     */
 	}
 
 	/**

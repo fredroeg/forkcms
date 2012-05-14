@@ -536,6 +536,19 @@ class BackendAnalyticsModel
 	}
 
 	/**
+	 *
+	 * @return string
+	 */
+	public static function getLatestPeriod()
+	{
+		return (string) BackendModel::getDB()->getVar(
+			'SELECT period_id
+			 FROM analytics_period
+			 ORDER BY period_id
+			 DESC LIMIT 1');
+	}
+
+	/**
 	 * Get all data for a given revision.
 	 *
 	 * @param string[optional] $language The language to use.
@@ -694,37 +707,43 @@ class BackendAnalyticsModel
 	/**
 	 * Get the most recent keywords
 	 *
+	 * @param int $periodId
 	 * @return string
 	 */
-	public static function getRecentKeywords()
+	public static function getRecentKeywords($periodId)
 	{
-		return (array) BackendModel::getDB()->getRecords(
-			'SELECT *
+		return  (array) BackendModel::getDB()->getRecords(
+			'SELECT keyword, pageviews
 			 FROM analytics_keywords
-			 ORDER BY entrances DESC, id'
-		);
+			 WHERE period_id = ?
+			 ORDER BY pageviews
+			 DESC
+			 LIMIT 10', $periodId);
 	}
 
 	/**
 	 * Get the most recent referrers
 	 *
+	 * @param int $periodId
 	 * @return string
 	 */
-	public static function getRecentReferrers()
+	public static function getRecentReferrers($periodId)
 	{
 		$items = (array) BackendModel::getDB()->getRecords(
-			'SELECT *
-			 FROM analytics_referrers
-			 ORDER BY entrances DESC, id'
-		);
+			'SELECT referrer, pageviews
+			 FROM analytics_referrals
+			 WHERE period_id = ?
+			 ORDER BY pageviews
+			 DESC
+			 LIMIT 10', $periodId);
 
 		foreach($items as $key => $item)
 		{
 			// assign URL
-			$items[$key]['url'] = 'http://' . $item['referrer'];
+			// $items[$key]['url'] = 'http://' . $item['referrer'];
 
 			// wordwrap referrer
-			$items[$key]['referrer'] = wordwrap($item['referrer'], 50, ' ', true);
+			$items[$key]['referrer'] = wordwrap($item['referrer'], 40, ' ', true);
 		}
 
 		return $items;

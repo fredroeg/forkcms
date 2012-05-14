@@ -15,7 +15,6 @@
 		</ul>
 	</div>
 {/option:warnings}
-
 {option:!warnings}
 	{option:!dataAvailable}
 		<div class="generalMessage infoMessage content singleMessage">
