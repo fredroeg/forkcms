@@ -234,6 +234,29 @@ class GoogleAnalytics
 	}
 
 	/**
+	 * Get all the goals
+	 *
+	 * @param string $sessionToken
+	 * @return object
+	 */
+	public function getGoals($sessionToken)
+	{
+		// try to make the call
+		try
+		{
+			$response = $this->doCall(self::API_URL . '/management/accounts/~all/webproperties/~all/profiles/~all/goals', $sessionToken);
+		}
+
+		// catch possible exception
+		catch(Exception $e)
+		{
+			return array();
+		}
+
+		return json_decode($response);
+	}
+
+	/**
 	 * Get a session token based on a one-time token.
 	 *
 	 * @param string $oneTimeToken	The one-time token to get a session token with.

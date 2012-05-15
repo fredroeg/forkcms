@@ -384,6 +384,32 @@ class BackendAnalyticsHelper
 	}
 
 	/**
+	 * Get all the goals and put their names in an array
+	 *
+	 * @return array
+	 */
+	public static function getGoals()
+	{
+		$apiSettings = BackendSeaModel::getAPISettings();
+		$accessToken = $apiSettings['access_token'];
+
+		$returnedDecodedString =  self::getGoogleAnalyticsInstance()->getGoals($accessToken);
+
+		$goalarray = array();
+		if($returnedDecodedString->totalResults > 0)
+		{
+			foreach($returnedDecodedString->items as $goal)
+			{
+			    if($goal->profileId == $apiSettings['table_id'])
+			    {
+				array_push($goalarray, $goal->name);
+			    }
+			}
+		}
+		return $goalarray;
+	}
+
+	/**
 	 * Get Google Analytics instance
 	 *
 	 * @return GoogleAnalytics
@@ -738,6 +764,123 @@ class BackendAnalyticsHelper
 	}
 
 	/**
+	 * Get all the sea data and put it nicely in an array
+	 *
+	 * @param array $period
+	 * @return array
+	 */
+	public static function getSeaData($period)
+	{
+		// first data collection
+		$metrics = array('adCost', 'visits', 'impressions', 'adClicks', 'CTR', 'CPC', 'CPM');
+		$dimensions = array('medium', 'date');
+		$returnedSeaData = self::getSeaRelatedData($metrics, $period, $dimensions);
+
+		// second data collection
+		$metrics = array('goalCompletionsAll', 'goalConversionRateAll', 'costPerConversion');
+		$dimensions = array('date');
+		$returnedConversionsData = self::getSeaRelatedData($metrics, $period, $dimensions);
+
+		// third data collection
+		$goals = self::getGoals();
+
+		// Create a new array to store all our valuable information
+		$seaDataArray = array();
+		// Total Results
+		$seaDataArray['visits'] = $returnedSeaData['totalResults']['ga:visits'];
+		// Total Costs
+		$seaDataArray['costs'] = $returnedSeaData['totalResults']['ga:adCost'];
+		// Total Impressions
+		$seaDataArray['impressions'] = $returnedSeaData['totalResults']['ga:impressions'];
+		// Total Clicks
+		$seaDataArray['adClicks'] = $returnedSeaData['totalResults']['ga:adClicks'];
+		// Click-Through-Rate
+		$seaDataArray['CTR'] = $returnedSeaData['totalResults']['ga:CTR'];
+		// Cost-Per-Click
+		$seaDataArray['CPC'] = $returnedSeaData['totalResults']['ga:CPC'];
+		// Cost per 1000 impressions
+		$seaDataArray['CPM'] = $returnedSeaData['totalResults']['ga:CPM'];
+		// Conversions
+		$seaDataArray['conversions'] = $returnedConversionsData['totalResults']['ga:goalCompletionsAll'];
+		// Conversion rate (or conv. percentage)
+		$seaDataArray['conversion_percentage'] = $returnedConversionsData['totalResults']['ga:goalConversionRateAll'];
+		// Cost per conversion
+		$seaDataArray['cost_per_conversion'] = $returnedConversionsData['totalResults']['ga:costPerConversion'];
+		// Goals
+		$seaDataArray['goals'] = $goals;
+
+		// Data per day
+		if(array_key_exists('aggregates', $returnedSeaData))
+		{
+			foreach($returnedSeaData['aggregates'] as $key => $row)
+			{
+				$seaDataArray['dayStats'][$row['date']] = array(
+					'cost' => $row['adCost'],
+					'visits' => $row['visits'],
+					'impressions' => $row['impressions'],
+					'adClicks' => $row['adClicks'],
+					'CTR' => $row['CTR'],
+					'CPC' => $row['CPC'],
+					'CPM' => $row['CPM']
+				 );
+			}
+			if(array_key_exists('aggregates', $returnedConversionsData))
+			{
+				foreach($returnedConversionsData['aggregates'] as $key => $row)
+				{
+					$seaDataArray['dayStats'][$row['date']] += array(
+						'conversions' => $row['goalCompletionsAll'],
+						'conversion_percentage' => $row['goalConversionRateAll'],
+						'cost_per_conversion' => $row['costPerConversion']
+					 );
+				}
+			}
+
+			return $seaDataArray;
+		}
+	}
+
+	/**
+	 * Get sea-data for a certain period
+	 *
+	 * @param mixed $metrics
+	 * @param int $period
+	 * @param string $dimensions
+	 * @param int $sort
+	 * @param int $limit
+	 * @param int $index
+	 * @return array
+	 */
+	private static function getSeaRelatedData($metrics, $period, $dimensions = null, $sort = null, $limit = null, $index = 1)
+	{
+		// set the timestamps from the period
+		$startTimestamp = $period[0];
+		$endTimestamp = $period[1];
+
+		$metrics = (array) $metrics;
+
+		// set metrics
+		$gaMetrics = array();
+		foreach($metrics as $metric) $gaMetrics[] = 'ga:' . $metric;
+
+		$gaDimensions = array();
+		// set dimensions
+		if(isset($dimensions))
+		{
+			foreach($dimensions as $dimension) $gaDimensions[] = 'ga:' . $dimension;
+		}
+
+		// set parameters
+		$parameters = array();
+
+		// With this filter we only get data from SEA-campaigns
+		$parameters['filters'] = 'ga:adCost!=0.0';
+
+		// fetch and return
+		return self::getGoogleAnalyticsInstance()->getAnalyticsResults($gaMetrics, $startTimestamp, $endTimestamp, $gaDimensions, $parameters);
+	}
+
+	/**
 	 * Get the status by doing a simple call
 	 *
 	 * @return array
@@ -855,6 +998,7 @@ class BackendAnalyticsHelper
 		$pages = self::getPages(array('bounces', 'entrances', 'exits', 'newVisits', 'pageviews', 'timeOnSite', 'visits'), $startTimestamp, $endTimestamp, 'pageviews');
 		$referrals = self::getReferrals('pageviews', $startTimestamp, $endTimestamp, 'pageviews');
 		$trafficSources = self::getTrafficSourcesGrouped(array('pageviews'), $startTimestamp, $endTimestamp, 'pageviews');
+		$seaData = self::getSeaData(array($startTimestamp, $endTimestamp));
 
 		// then we insert all the data in th db
 		BackendAnalyticsModel::insertAggregatesData($periodId, $aggregatesData);
@@ -865,6 +1009,7 @@ class BackendAnalyticsHelper
 		BackendAnalyticsModel::insertPages($periodId, $pages);
 		BackendAnalyticsModel::insertReferrals($periodId, $referrals);
 		BackendAnalyticsModel::insertTrafficSources($periodId, $trafficSources);
+		BackendAnalyticsModel::insertSEAData($periodId, $seaData);
 
 		SpoonSession::set('loading', 'false');
 

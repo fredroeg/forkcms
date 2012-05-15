@@ -31,12 +31,6 @@ class BackendAnalyticsModel
 	 */
 	const GOOGLE_ANALYTICS_URL = 'https://www.google.com/analytics/reporting';
 
-	/**
-	 * Cached data
-	 *
-	 * @var	array
-	 */
-	private static $data = array(), $dashboardData = array();
 
 	/**
 	 * Check in the database if we already stored the data from that period
@@ -170,23 +164,6 @@ class BackendAnalyticsModel
 	}
 
 	/**
-	 * Get data by type from the cache
-	 *
-	 * @param string $type The type of data to get.
-	 * @param int $startTimestamp The start timestamp for the cache file.
-	 * @param int $endTimestamp The end timestamp for the cache file.
-	 * @return array
-	 */
-	public static function getAggregatesFromCacheByType($type, $startTimestamp, $endTimestamp)
-	{
-		// doesnt exist in cache - load cache xml file
-		if(!isset(self::$data[$type]['aggregates'])) self::$data = self::getCacheFile($startTimestamp, $endTimestamp);
-
-		// return data is exists and false if not to get live data
-		return (isset(self::$data[$type]['aggregates']) ? self::$data[$type]['aggregates'] : false);
-	}
-
-	/**
 	 * Get the sites total aggregates
 	 *
 	 * startTimestamp and endTimestamp are needed so we can fetch the correct cache file
@@ -226,54 +203,6 @@ class BackendAnalyticsModel
 	}
 
 	/**
-	 * Get attributes by type from the cache
-	 *
-	 * @param string $type The type of data of which to get the attributes.
-	 * @param int $startTimestamp The start timestamp for the cache file.
-	 * @param int $endTimestamp The end timestamp for the cache file.
-	 * @return array
-	 */
-	private static function getAttributesFromCache($type, $startTimestamp, $endTimestamp)
-	{
-		// doesn't exist in cache
-		if(!isset(self::$data[$type]['attributes']))
-		{
-			// load cache xml file
-			self::$data = self::getCacheFile($startTimestamp, $endTimestamp);
-
-			// doesnt exist in cache after loading the xml file so set to empty
-			if(!isset(self::$data[$type]['attributes'])) self::$data[$type]['attributes'] = array();
-		}
-
-		return self::$data[$type]['attributes'];
-	}
-
-	/**
-	 * Get cache file
-	 *
-	 * @param int $startTimestamp The start timestamp for the cache file.
-	 * @param int $endTimestamp The end timestamp for the cache file.
-	 * @return array
-	 */
-	private static function getCacheFile($startTimestamp, $endTimestamp)
-	{
-		$filename = (string) $startTimestamp . '_' . (string) $endTimestamp . '.xml';
-
-		// file exists
-		if(SpoonFile::exists(BACKEND_CACHE_PATH . '/analytics/' . $filename))
-		{
-			// get the xml (cast is important otherwise we cant use array_walk_recursive)
-			$xml = simplexml_load_file(BACKEND_CACHE_PATH . '/analytics/' . $filename, 'SimpleXMLElement', LIBXML_NOCDATA);
-
-			// parse xml to array
-			return self::parseXMLToArray($xml);
-		}
-
-		// fallback (cache file doesn't exist)
-		return array();
-	}
-
-	/**
 	 * Fetch dashboard data grouped by day
 	 *
 	 * @param array $metrics The metrics to collect.
@@ -285,24 +214,6 @@ class BackendAnalyticsModel
 		$metrics = (array) $metrics;
 
 		return self::getDataFromDbByType('analytics_aggregates', $periodId);
-	}
-
-	/**
-	 * Get dashboard data from the cache
-	 *
-	 * @param int $startTimestamp The start timestamp for the cache file.
-	 * @param int $endTimestamp The end timestamp for the cache file.
-	 * @return array
-	 */
-	public static function getDashboardDataFromCache($startTimestamp, $endTimestamp)
-	{
-		// doesnt exist in cache - load cache xml file
-		if(!isset(self::$dashboardData) || empty(self::$dashboardData))
-		{
-			self::$dashboardData = self::getCacheFile($startTimestamp, $endTimestamp);
-		}
-
-		return self::$dashboardData;
 	}
 
 	/**
@@ -346,44 +257,6 @@ class BackendAnalyticsModel
 		BackendAnalyticsModel::updatePageDateViewed($id);
 
 		return $items;
-	}
-
-	/**
-	 * Get data from the cache
-	 *
-	 * @param int $startTimestamp The start timestamp for the cache file.
-	 * @param int $endTimestamp The end timestamp for the cache file.
-	 * @return array
-	 */
-	public static function getDataFromCache($startTimestamp, $endTimestamp)
-	{
-		// doesnt exist in cache - load cache xml file
-		if(!isset(self::$data) || empty(self::$data)) self::$data = self::getCacheFile($startTimestamp, $endTimestamp);
-
-		return self::$data;
-	}
-
-	/**
-	 * Get data by type from the cache
-	 *
-	 * @param string $type The type of data to get.
-	 * @param int $startTimestamp The start timestamp for the cache file.
-	 * @param int $endTimestamp The end timestamp for the cache file.
-	 * @return array
-	 */
-	public static function getDataFromCacheByType($type, $startTimestamp, $endTimestamp)
-	{
-		// doesnt exist in cache
-		if(!isset(self::$data[$type]))
-		{
-			// load cache xml file
-			self::$data = self::getCacheFile($startTimestamp, $endTimestamp);
-
-			// doesnt exist in cache after loading the xml file so set to false to get live data
-			if(!isset(self::$data[$type])) return false;
-		}
-
-		return (isset(self::$data[$type]['entries']) ? self::$data[$type]['entries'] : self::$data[$type]);
 	}
 
 	/**
@@ -740,7 +613,7 @@ class BackendAnalyticsModel
 		foreach($items as $key => $item)
 		{
 			// assign URL
-			// $items[$key]['url'] = 'http://' . $item['referrer'];
+			$items[$key]['url'] = 'http://' . $item['referrer'];
 
 			// wordwrap referrer
 			$items[$key]['referrer'] = wordwrap($item['referrer'], 40, ' ', true);
@@ -1147,6 +1020,86 @@ class BackendAnalyticsModel
 	}
 
 	/**
+	 * Insert the data in the database
+	 *
+	 * @param int $period
+	 * @param array $seaData
+	 * @return boolean
+	 */
+	public static function insertSEAData($periodId, $seaData)
+	{
+		// then we insert all the data from that period
+		$data['period_id'] = $periodId;
+		$data['visits'] = $seaData['visits'];
+		$data['impressions'] = $seaData['impressions'];
+		$data['clicks_amount'] = $seaData['adClicks'];
+		$data['click_through_rate'] = $seaData['CTR'];
+		$data['cost_per_click'] = $seaData['CPC'];
+		$data['cost_per_mimpressions'] = $seaData['CPM'];
+		$data['costs'] = $seaData['costs'];
+		$data['conversions'] = $seaData['conversions'];
+		$data['conversion_percentage'] = $seaData['conversion_percentage'];
+		$data['cost_per_conversion'] = $seaData['cost_per_conversion'];
+
+		BackendModel::getDB()->insert('analytics_sea_data', $data);
+
+		// at last we insert day-related data
+		self::insertSEADayData($seaData['dayStats']);
+		self::insertSEAGoalData($seaData['goals']);
+
+		return true;
+	}
+
+	/**
+	 * Insert all the SEA-related data per day
+	 *
+	 * @param array $dayData
+	 * @return boolean
+	 */
+	private static function insertSEADayData($dayData)
+	{
+		foreach($dayData as $day => $data)
+		{
+			$query =
+			    'INSERT IGNORE INTO analytics_sea_day_data (day, cost, visits, impressions, clicks, click_through_rate, cost_per_click, cost_per_mimpressions, conversions, conversion_percentage, cost_per_conversion)
+			     VALUES (:day, :cost, :visits, :impressions, :clicks, :click_through_rate, :cost_per_click, :cost_per_mimpressions, :conversions, :conversion_percentage, :cost_per_conversion)';
+
+			$record = array(
+			    'day' => $day,
+			    'cost' => $data['cost'],
+			    'visits' => $data['visits'],
+			    'impressions' => $data['impressions'],
+			    'clicks' => $data['adClicks'],
+			    'click_through_rate' => $data['CTR'],
+			    'cost_per_click' => $data['CPC'],
+			    'cost_per_mimpressions' => $data['CPM'],
+			    'conversions' => $data['conversions'],
+			    'conversion_percentage' => $data['conversion_percentage'],
+			    'cost_per_conversion' => $data['cost_per_conversion']
+			);
+
+			BackendModel::getDB()->execute($query, $record);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Insert all the goals (if they aren't inserted yet)
+	 *
+	 * @param array $goals
+	 */
+	private static function insertSEAGoalData($goals)
+	{
+		foreach($goals as $goal)
+		{
+			$query = 'INSERT IGNORE INTO analytics_sea_goals (goal_name) VALUES (:goal_name)';
+			$record['goal_name'] = $goal;
+			BackendModel::getDB()->execute($query, $record);
+		}
+	}
+
+	/**
 	 *
 	 * @param int $periodId
 	 * @param array $trafficsources
@@ -1185,20 +1138,6 @@ class BackendAnalyticsModel
 	}
 
 	/**
-	 * Remove all cache files
-	 */
-	public static function removeCacheFiles()
-	{
-		$cachePath = BACKEND_CACHE_PATH . '/analytics';
-
-		// delete all cache files
-		foreach(SpoonFile::getList($cachePath) as $file)
-		{
-			SpoonFile::delete($cachePath . '/' . $file);
-		}
-	}
-
-	/**
 	 * Update the api settings
 	 *
 	 * @param array $values
@@ -1230,140 +1169,5 @@ class BackendAnalyticsModel
 			BackendModel::getDB()->update('analytics_settings', array('value' => $refreshToken, 'date' => $datetime), 'name = ?', 'refresh_token');
 		}
 		return true;
-	}
-
-	/**
-	 * Write data to cache file
-	 *
-	 * @param array $data The data to write to the cache file.
-	 * @param int $startTimestamp The start timestamp for the cache file.
-	 * @param int $endTimestamp The end timestamp for the cache file.
-	 */
-	public static function writeCacheFile(array $data, $startTimestamp, $endTimestamp)
-	{
-		$xml = "<?xml version='1.0' encoding='" . SPOON_CHARSET . "'?>\n";
-		$xml .= "<analytics start_timestamp=\"" . $startTimestamp . "\" end_timestamp=\"" . $endTimestamp . "\">\n";
-
-		// loop data
-		foreach($data as $type => $records)
-		{
-			$attributes = array();
-
-			// there are some attributes
-			if(isset($records['attributes']) && !empty($records['attributes']))
-			{
-				// loop em
-				foreach($records['attributes'] as $key => $value)
-				{
-					// add to the attributes string
-					$attributes[] = $key . '="' . $value . '"';
-				}
-			}
-
-			$xml .= "\t<" . $type . (!empty($attributes) ? ' ' . implode(' ', $attributes) : '') . ">\n";
-
-			// we're not dealing with a page detail
-			if(strpos($type, 'page_') === false)
-			{
-				// get items
-				$items = (isset($records['entries']) ? $records['entries'] : $records);
-
-				// loop data
-				foreach($items as $key => $value)
-				{
-					// skip empty items
-					if((is_array($value) && empty($value)) || trim((string) $value) === '') continue;
-
-					// value contains an array
-					if(is_array($value))
-					{
-						// there are values
-						if(!empty($value))
-						{
-							// build xml
-							$xml .= "\t\t<entry>\n";
-
-							// loop data
-							foreach($value as $entryKey => $entryValue)
-							{
-								// build xml
-								$xml .= "\t\t\t<" . $entryKey . "><![CDATA[" . $entryValue . "]]></" . $entryKey . ">\n";
-							}
-
-							// end xml element
-							$xml .= "\t\t</entry>\n";
-						}
-					}
-
-					// build xml
-					else $xml .= "\t\t<" . $key . ">" . $value . "</" . $key . ">\n";
-				}
-			}
-
-			// we're dealing with a page detail
-			else
-			{
-				// loop data
-				foreach($records as $subkey => $subitems)
-				{
-					// build xml
-					$xml .= "\t\t<" . $subkey . ">\n";
-
-					// subitems is an array
-					if(is_array($subitems))
-					{
-						// loop data
-						foreach($subitems as $key => $value)
-						{
-							// skip empty items
-							if((is_array($value) && empty($value)) || trim((string) $value) === '') continue;
-
-							// value contains an array
-							if(is_array($value))
-							{
-								// there are values
-								if(!empty($value))
-								{
-									// build xml
-									$xml .= "\t\t\t<entry>\n";
-
-									// loop data
-									foreach($value as $entryKey => $entryValue)
-									{
-										// build xml
-										$xml .= "\t\t\t\t<" . $entryKey . "><![CDATA[" . $entryValue . "]]></" . $entryKey . ">\n";
-									}
-
-									// end xml element
-									$xml .= "\t\t\t</entry>\n";
-								}
-							}
-
-							// build xml
-							else $xml .= "\t\t<" . $key . ">" . $value . "</" . $key . ">\n";
-						}
-					}
-
-					// not an array
-					else $xml .= "<![CDATA[" . (string) $subitems . "]]>";
-
-					// end xml element
-					$xml .= "\t\t</" . $subkey . ">\n";
-				}
-			}
-
-			// end xml element
-			$xml .= "\t</" . $type . ">\n";
-		}
-
-		// end xml string
-		$xml .= "</analytics>";
-
-		// perform checks for valid xml and throw exception if needed
-		$simpleXml = @simplexml_load_string($xml);
-		if($simpleXml === false) throw new BackendException('The xml of the cache file is invalid.');
-
-		$filename = $startTimestamp . '_' . $endTimestamp . '.xml';
-		SpoonFile::setContent(BACKEND_CACHE_PATH . '/analytics/' . $filename, $xml);
 	}
 }

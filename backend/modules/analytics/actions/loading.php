@@ -67,7 +67,7 @@ class BackendAnalyticsLoading extends BackendAnalyticsBase
 		}
 
 		// build url
-		$URL = SITE_URL . '/backend/cronjob.php?module=analytics&action=get_insert_data&id=1';
+		/*$URL = SITE_URL . '/backend/cronjob.php?module=analytics&action=get_insert_data&id=1';
 		$URL .= '&start_date=' . $startTimestamp;
 		$URL .= '&end_date=' . $endTimestamp;
 
@@ -81,7 +81,11 @@ class BackendAnalyticsLoading extends BackendAnalyticsBase
 		$curl = curl_init();
 		curl_setopt_array($curl, $options);
 		curl_exec($curl);
-		curl_close($curl);
+		curl_close($curl);*/
+		;
+
+		$periodId = BackendAnalyticsModel::insertPeriod(array($startTimestamp, $endTimestamp));
+		BackendAnalyticsHelper::insertAnalyticsData($startTimestamp, $endTimestamp, $periodId);
 	}
 
 	/**
