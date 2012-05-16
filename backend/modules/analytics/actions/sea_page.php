@@ -11,9 +11,10 @@ class BackendAnalyticsSeaPage extends BackendAnalyticsBase
 	public function execute()
 	{
 		parent::execute();
-		$this->seaDataDump();
 		$this->parseLineChartData();
 		$this->parseMultiLineChartData();
+		$this->getDataFromThisPeriod($this->periodId);
+		$this->getGoals();
 		$this->parse();
 		$this->display();
 	}
@@ -25,22 +26,22 @@ class BackendAnalyticsSeaPage extends BackendAnalyticsBase
 	 */
 	private function getDataFromThisPeriod($periodId)
 	{
-		$periodDataArray = BackendSeaModel::getSEAData($periodId);
+		$periodDataArray = BackendAnalyticsModel::getSEAData($periodId);
 
 		// we check if the array isn't empty
 		// possible if the adwords account isn't coupled with the GA account
 		if(!empty($periodDataArray))
 		{
-			$this->tpl->assign('visits', $periodDataArray['visits']);
-			$this->tpl->assign('conversions', $periodDataArray['conversions']);
-			$this->tpl->assign('conversionPercentage', $periodDataArray['conversion_percentage'] . '&#37;');
-			$this->tpl->assign('costPerConversion', $periodDataArray['cost_per_conversion']);
-			$this->tpl->assign('impressions', $periodDataArray['impressions']);
-			$this->tpl->assign('clicks', $periodDataArray['clicks_amount']);
-			$this->tpl->assign('ctr', $periodDataArray['click_through_rate']);
-			$this->tpl->assign('costPerClick', $periodDataArray['cost_per_click']);
+			$this->tpl->assign('visits', $periodDataArray[0]['visits']);
+			$this->tpl->assign('conversions', $periodDataArray[0]['conversions']);
+			$this->tpl->assign('conversionPercentage', $periodDataArray[0]['conversion_percentage'] . '&#37;');
+			$this->tpl->assign('costPerConversion', $periodDataArray[0]['cost_per_conversion']);
+			$this->tpl->assign('impressions', $periodDataArray[0]['impressions']);
+			$this->tpl->assign('clicks', $periodDataArray[0]['clicks_amount']);
+			$this->tpl->assign('ctr', $periodDataArray[0]['click_through_rate']);
+			$this->tpl->assign('costPerClick', $periodDataArray[0]['cost_per_click']);
 			// $this->tpl->assign('position', $periodDataArray['position']);
-			$this->tpl->assign('cost', $periodDataArray['costs']);
+			$this->tpl->assign('cost', $periodDataArray[0]['costs']);
 		}
 		else
 		{
@@ -63,7 +64,7 @@ class BackendAnalyticsSeaPage extends BackendAnalyticsBase
 	 */
 	private function getGoals()
 	{
-		$goals = BackendSeaModel::getGoals();
+		$goals = BackendAnalyticsModel::getGoals();
 		$this->tpl->assign('goals', $goals);
 	}
 
@@ -72,26 +73,40 @@ class BackendAnalyticsSeaPage extends BackendAnalyticsBase
 	 */
 	private function parseLineChartData()
 	{
-		$startTimestamp = date('Y-m-d', SpoonSession::get('sea_start_timestamp'));
-		$endTimestamp = date('Y-m-d', SpoonSession::get('sea_end_timestamp'));
-
-		$maxYAxis = 2;
-		$metric = 'visits';
+	    	$maxYAxis = 2;
+		$metrics = array('visits');
 		$graphData = array();
+		$table = 'analytics_sea_day_data';
 
-		$metricsPerDay = (array) BackendSeaModel::getMetricPerDay($metric, $startTimestamp, $endTimestamp);
+		$metricsPerDay = (array) BackendAnalyticsModel::getMetricsPerDay($metrics, $this->startTimestamp, $this->endTimestamp, $table);
 
-		$graphData[0]['title'] = $metric;
-		$graphData[0]['label'] = SpoonFilter::ucfirst(BL::lbl(SpoonFilter::toCamelCase($metric)));
-		$graphData[0]['data'] = array();
-
-		foreach($metricsPerDay as $key => $data)
+		foreach($metrics as $i => $metric)
 		{
-			// build array
-			$graphData[0]['data'][$key]['date'] = $key;
-			$graphData[0]['data'][$key]['value'] = $data;
+			// build graph data array
+			$graphData[$i] = array();
+			$graphData[$i]['title'] = $metric;
+			$graphData[$i]['label'] = SpoonFilter::ucfirst(BL::lbl(SpoonFilter::toCamelCase($metric)));
+			$graphData[$i]['data'] = array();
+
+			foreach($metricsPerDay as $j => $data)
+			{
+				// build array
+				$graphData[$i]['data'][$j]['date'] = $data['day'];
+				$graphData[$i]['data'][$j]['value'] = (string) $data[$metric];
+			}
 		}
 
+		// loop the metrics
+		foreach($graphData as $metric)
+		{
+			foreach($metric['data'] as $data)
+			{
+				// get the maximum value
+				if((int) $data['value'] > $maxYAxis) $maxYAxis = (int) $data['value'];
+			}
+		}
+
+		// parse
 		$this->tpl->assign('maxYAxis', $maxYAxis);
 		$this->tpl->assign('tickInterval', ($maxYAxis == 2 ? '1' : ''));
 		$this->tpl->assign('graphData', $graphData);
@@ -102,16 +117,14 @@ class BackendAnalyticsSeaPage extends BackendAnalyticsBase
 	 */
 	private function parseMultiLineChartData()
 	{
-		$startTimestamp = date('Y-m-d', SpoonSession::get('sea_start_timestamp'));
-		$endTimestamp = date('Y-m-d', SpoonSession::get('sea_end_timestamp'));
-
 		$maxYAxis = 2;
-		$metricsArr = array('cost_per_click', 'cost_per_conversion', 'cost_per_mimpressions');
+		$metrics = array('cost_per_click', 'cost_per_conversion', 'cost_per_mimpressions');
 		$graphData = array();
+		$table = 'analytics_sea_day_data';
 
-		$metricsPerDay = (array) BackendSeaModel::getMetricsPerDay($metricsArr, $startTimestamp, $endTimestamp);
+		$metricsPerDay = (array) BackendAnalyticsModel::getMetricsPerDay($metrics, $this->startTimestamp, $this->endTimestamp, $table);
 
-		foreach($metricsArr as $i => $metric)
+		foreach($metrics as $i => $metric)
 		{
 			// build graph data array
 			$graphData[$i] = array();
@@ -128,26 +141,8 @@ class BackendAnalyticsSeaPage extends BackendAnalyticsBase
 			}
 		}
 
+		$this->tpl->assign('maxYAxisTriple', $maxYAxis);
+		$this->tpl->assign('tickIntervalTriple', ($maxYAxis == 2 ? '1' : ''));
 		$this->tpl->assign('graphDataMulti', $graphData);
-	}
-
-	/**
-	 * Check if we have the necessary data in the db, otherwise insert the missing data
-	 */
-	private function seaDataDump()
-	{
-		// Define the period
-		$startTimestamp = date('Y-m-d', SpoonSession::get('sea_start_timestamp'));
-		$endTimestamp = date('Y-m-d', SpoonSession::get('sea_end_timestamp'));
-		$period = array($startTimestamp, $endTimestamp);
-
-		// Check if we already stored the data for that period in the database. (if not -> insert it!)
-		if(!BackendSeaModel::checkPeriod($period))
-		{
-			BackendSeaHelp::getAllData($period);
-		}
-
-		$this->getDataFromThisPeriod(BackendSeaModel::getPeriodId($period));
-		$this->getGoals();
 	}
 }

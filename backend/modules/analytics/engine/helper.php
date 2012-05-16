@@ -1011,6 +1011,9 @@ class BackendAnalyticsHelper
 		BackendAnalyticsModel::insertTrafficSources($periodId, $trafficSources);
 		BackendAnalyticsModel::insertSEAData($periodId, $seaData);
 
+		// at last we insert a true value in the period to d
+		// BackendAnalyticsModel::insertSEAData($periodId, $seaData);
+
 		SpoonSession::set('loading', 'false');
 
 	}

@@ -344,6 +344,19 @@ class BackendAnalyticsModel
 	}
 
 	/**
+	 * Get all the goals from the db
+	 *
+	 * @return array
+	 */
+	public static function getGoals()
+	{
+		return (array) BackendModel::getDB()->getRecords(
+			'SELECT *
+			 FROM analytics_sea_goals'
+		);
+	}
+
+	/**
 	 * Fetch landing pages
 	 *
 	 * @param int $periodId
@@ -466,16 +479,26 @@ class BackendAnalyticsModel
 	 * Fetch metrics grouped by day
 	 *
 	 * @param array $metrics The metrics to collect.
-	 * @param int $periodId
-	 * @param string[optional] $forceCache Should the data be forced from cache.
+	 * @param date $startTimestamp
+	 * @param date $endTimestamp
+	 * @param string $table
 	 * @return array
 	 */
-	public static function getMetricsPerDay(array $metrics, $startTimestamp, $endTimestamp)
+	public static function getMetricsPerDay(array $metrics, $startTimestamp, $endTimestamp, $table = null)
 	{
 		$metrics = (array) $metrics;
 
 		// get data from cache
-		$items = self::getDayDataFromDbByType('analytics_metrics_per_day', $startTimestamp, $endTimestamp);
+		if(!$table)
+		{
+			$items = self::getDayDataFromDbByType('analytics_metrics_per_day', $startTimestamp, $endTimestamp);
+
+		}
+		elseif($table == 'analytics_sea_day_data')
+		{
+			$items = self::getDayDataFromDbByType($table, $startTimestamp, $endTimestamp);
+
+		}
 
 		// get current action
 		$action = Spoon::get('url')->getAction();
@@ -623,6 +646,17 @@ class BackendAnalyticsModel
 	}
 
 	/**
+	 * Get the SEA Data within a period
+	 *
+	 * @param int $periodId
+	 * @return array
+	 */
+	public static function getSEAData($periodId)
+	{
+		return self::getDataFromDbByType('analytics_sea_data', $periodId);
+	}
+
+	/**
 	 * Get the selected table id
 	 *
 	 * @return string
@@ -660,7 +694,7 @@ class BackendAnalyticsModel
 	 */
 	public static function getTopExitPages($periodId, $limit = 5)
 	{
-		// get data from cache
+		// get data from db
 		$items = self::getDataFromDbByType('analytics_exit_pages', $periodId);
 
 		// limit data

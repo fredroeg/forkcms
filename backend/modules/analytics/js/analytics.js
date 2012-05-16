@@ -3,6 +3,7 @@
  *
  * @author	Annelies Vanextergem <annelies@netlash.com>
  * @author	Thomas Deceuninck <thomasdeceuninck@netlash.com>
+ * @author	Frederick Roegiers <frederick.roegiers@wijs.be>
  */
 jsBackend.analytics =
 {
@@ -11,11 +12,13 @@ jsBackend.analytics =
 		// variables
 		$chartPieChart = $('#chartPieChart');
 		$chartWidget = $('#chartWidget');
+		$chartTripleMetricPerDay = $('#chartTripleMetricPerDay');
 		$chartDoubleMetricPerDay = $('#chartDoubleMetricPerDay');
 		$chartSingleMetricPerDay = $('#chartSingleMetricPerDay');
 
 		jsBackend.analytics.charts.init();
 		jsBackend.analytics.chartDoubleMetricPerDay.init();
+		jsBackend.analytics.chartTripleMetricPerDay.init();
 		jsBackend.analytics.chartPieChart.init();
 		jsBackend.analytics.chartSingleMetricPerDay.init();
 		jsBackend.analytics.chartWidget.init();
@@ -165,7 +168,7 @@ jsBackend.analytics.chartDoubleMetricPerDay =
 		{
 			chart: { renderTo: 'chartDoubleMetricPerDay', height: 200, width: containerWidth, margin: [60, 0, 30, 40], defaultSeriesType: 'line' },
 			xAxis: { lineColor: '#CCC', lineWidth: 1, categories: xAxisCategories, color: '#000' },
-			yAxis: { min: 0, max: $('#dataChartDoubleMetricPerDay #maxYAxis').html(), tickInterval: ($('#dataChartDoubleMetricPerDay #tickInterval').html() == '' ? null : $('#dataChartDoubleMetricPerDay #tickInterval').html()), title: { text: '' } },
+			yAxis: { min: 0, max: $('#dataChartDoubleMetricPerDay #maxYAxisTriple').html(), tickInterval: ($('#dataChartDoubleMetricPerDay #tickIntervalTriple').html() == '' ? null : $('#dataChartDoubleMetricPerDay #tickInterval').html()), title: { text: '' } },
 			credits: { enabled: false },
 			tooltip: { formatter: function() { return '<b>'+ this.series.name +'</b><br/>'+ xAxisValues[this.point.x] +': '+ this.y; } },
 			plotOptions:
@@ -183,6 +186,80 @@ jsBackend.analytics.chartDoubleMetricPerDay =
 	destroy: function()
 	{
 		jsBackend.analytics.chartDoubleMetricPerDay.chart.destroy();
+	}
+}
+
+jsBackend.analytics.chartTripleMetricPerDay =
+{
+	chart: '',
+
+	init: function()
+	{
+		if($chartTripleMetricPerDay.length > 0) {jsBackend.analytics.chartTripleMetricPerDay.create();}
+	},
+
+	// add new chart
+	create: function()
+	{
+		var xAxisItems = $('#dataChartTripleMetricPerDay ul.series li.serie:first-child ul.data li');
+		var xAxisValues = [];
+		var xAxisCategories = [];
+		var counter = 0;
+		var interval = Math.ceil(xAxisItems.length / 10);
+
+		xAxisItems.each(function()
+		{
+			xAxisValues.push($(this).children('span.date').html());
+			var text = $(this).children('span.date').html();
+			if(xAxisItems.length > 10 && counter%interval > 0) text = ' ';
+			xAxisCategories.push(text);
+			counter++;
+		});
+
+		var metric1Name = $('#dataChartTripleMetricPerDay ul.series li#metric1serie span.name').html();
+		var metric1Values = $('#dataChartTripleMetricPerDay ul.series li#metric1serie span.value');
+		var metric1Data = [];
+
+		metric1Values.each(function() {metric1Data.push(parseFloat($(this).html()));});
+
+		var metric2Name = $('#dataChartTripleMetricPerDay ul.series li#metric2serie span.name').html();
+		var metric2Values = $('#dataChartTripleMetricPerDay ul.series li#metric2serie span.value');
+		var metric2Data = [];
+
+		metric2Values.each(function() {metric2Data.push(parseFloat($(this).html()));});
+
+		var metric3Name = $('#dataChartTripleMetricPerDay ul.series li#metric3serie span.name').html();
+		var metric3Values = $('#dataChartTripleMetricPerDay ul.series li#metric3serie span.value');
+		var metric3Data = [];
+
+		metric3Values.each(function() {metric3Data.push(parseFloat($(this).html()));});
+
+		var containerWidth = $('#chartTripleMetricPerDay').width();
+
+		jsBackend.analytics.chartTripleMetricPerDay.chart = new Highcharts.Chart(
+		{
+			chart: {renderTo: 'chartTripleMetricPerDay', height: 400, width: containerWidth, margin: [60, 0, 30, 40], defaultSeriesType: 'line'},
+			xAxis: {lineColor: '#CCC', lineWidth: 1, categories: xAxisCategories, color: '#000'},
+			yAxis: {title: {text: ''}},
+			credits: {enabled: false},
+			tooltip: {formatter: function() {return '<b>'+ this.series.name +'</b><br/>'+ xAxisValues[this.point.x] +': '+ this.y;}},
+			plotOptions:
+			{
+				line: {marker: {enabled: false, states: {hover: {enabled: true, symbol: 'circle', radius: 5, lineWidth: 1}}}},
+				area: {marker: {enabled: false, states: {hover: {enabled: true, symbol: 'circle', radius: 5, lineWidth: 1}}}},
+				column: {pointPadding: 0.2, borderWidth: 0},
+				series: {fillOpacity: 0.3}
+			},
+			series: [   {name: metric1Name, data: metric1Data},
+				    {name: metric2Name, data: metric2Data},
+				    {name: metric3Name, data: metric3Data}]
+		});
+	},
+
+	// destroy chart
+	destroy: function()
+	{
+		jsBackend.analytics.chartTripleMetricPerDay.chart.destroy();
 	}
 }
 
