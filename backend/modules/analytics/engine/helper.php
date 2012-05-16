@@ -1012,7 +1012,7 @@ class BackendAnalyticsHelper
 		BackendAnalyticsModel::insertSEAData($periodId, $seaData);
 
 		// at last we insert a true value in the period to d
-		// BackendAnalyticsModel::insertSEAData($periodId, $seaData);
+		BackendAnalyticsModel::insertPeriod(array($periodId, $startTimestamp, $endTimestamp));
 
 		SpoonSession::set('loading', 'false');
 

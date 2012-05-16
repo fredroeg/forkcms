@@ -117,9 +117,9 @@ class BackendAnalyticsSeaPage extends BackendAnalyticsBase
 	 */
 	private function parseMultiLineChartData()
 	{
-		$maxYAxis = 2;
+		$maxYAxisTriple = 2;
 		$metrics = array('cost_per_click', 'cost_per_conversion', 'cost_per_mimpressions');
-		$graphData = array();
+		$graphDataTriple = array();
 		$table = 'analytics_sea_day_data';
 
 		$metricsPerDay = (array) BackendAnalyticsModel::getMetricsPerDay($metrics, $this->startTimestamp, $this->endTimestamp, $table);
@@ -127,22 +127,22 @@ class BackendAnalyticsSeaPage extends BackendAnalyticsBase
 		foreach($metrics as $i => $metric)
 		{
 			// build graph data array
-			$graphData[$i] = array();
-			$graphData[$i]['title'] = $metric;
-			$graphData[$i]['label'] = SpoonFilter::ucfirst(BL::lbl(SpoonFilter::toCamelCase($metric)));
-			$graphData[$i]['i'] = $i + 1;
-			$graphData[$i]['data'] = array();
+			$graphDataTriple[$i] = array();
+			$graphDataTriple[$i]['title'] = $metric;
+			$graphDataTriple[$i]['label'] = SpoonFilter::ucfirst(BL::lbl(SpoonFilter::toCamelCase($metric)));
+			$graphDataTriple[$i]['i'] = $i + 1;
+			$graphDataTriple[$i]['data'] = array();
 
 			foreach($metricsPerDay as $j => $data)
 			{
 				// build array
-				$graphData[$i]['data'][$j]['date'] =  $data['day'];
-				$graphData[$i]['data'][$j]['value'] = (string) $data[$metric];
+				$graphDataTriple[$i]['data'][$j]['date'] =  $data['day'];
+				$graphDataTriple[$i]['data'][$j]['value'] = (string) $data[$metric];
 			}
 		}
 
-		$this->tpl->assign('maxYAxisTriple', $maxYAxis);
-		$this->tpl->assign('tickIntervalTriple', ($maxYAxis == 2 ? '1' : ''));
-		$this->tpl->assign('graphDataMulti', $graphData);
+		// $this->tpl->assign('maxYAxisTriple', $maxYAxisTriple);
+		// $this->tpl->assign('tickIntervalTriple', ($maxYAxisTriple == 2 ? '1' : ''));
+		$this->tpl->assign('graphDataMulti', $graphDataTriple);
 	}
 }

@@ -11,6 +11,7 @@
  * This edit-action will check the status using Ajax
  *
  * @author Annelies Van Extergem <annelies.vanextergem@netlash.com>
+ * @author Frederick Roegiers <frederick.roegiers@wijs.be>
  */
 class BackendAnalyticsAjaxCheckStatus extends BackendBaseAJAXAction
 {
@@ -20,6 +21,18 @@ class BackendAnalyticsAjaxCheckStatus extends BackendBaseAJAXAction
 	public function execute()
 	{
 		parent::execute();
+
+		$startTimestamp = SpoonSession::get('analytics_start_timestamp');
+		$endTimestamp = SpoonSession::get('analytics_end_timestamp');
+		$period = BackendAnalyticsModel::getLatestPeriod();
+
+		if(date('Y-m-d', $startTimestamp) == $period['period_start'] && date('Y-m-d', $endTimestamp) == $period['period_end'])
+		{
+			// return status
+			$this->output(self::OK, array('status' => 'done'), 'Data retrieved.');
+		}
+
+
 		$page = trim(SpoonFilter::getPostValue('page', null, ''));
 		$identifier = trim(SpoonFilter::getPostValue('identifier', null, ''));
 

@@ -1031,7 +1031,7 @@ class BackendAnalyticsModel
 	 */
 	public static function insertPeriod($period)
 	{
-		return (int) BackendModel::getDB(true)->insert('analytics_period', array('period_start' => $period[0], 'period_end' => $period[1]));
+		return (int) BackendModel::getDB(true)->insert('analytics_period', array('period_id' => $period[0], 'period_start' => $period[1], 'period_end' => $period[2]));
 	}
 
 	/**

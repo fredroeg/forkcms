@@ -84,7 +84,8 @@ class BackendAnalyticsLoading extends BackendAnalyticsBase
 		curl_close($curl);*/
 		;
 
-		$periodId = BackendAnalyticsModel::insertPeriod(array($startTimestamp, $endTimestamp));
+		$period = BackendAnalyticsModel::getLatestPeriod();
+		$periodId = $period['period_id'] + 1;
 		BackendAnalyticsHelper::insertAnalyticsData($startTimestamp, $endTimestamp, $periodId);
 	}
 

@@ -168,7 +168,7 @@ jsBackend.analytics.chartDoubleMetricPerDay =
 		{
 			chart: { renderTo: 'chartDoubleMetricPerDay', height: 200, width: containerWidth, margin: [60, 0, 30, 40], defaultSeriesType: 'line' },
 			xAxis: { lineColor: '#CCC', lineWidth: 1, categories: xAxisCategories, color: '#000' },
-			yAxis: { min: 0, max: $('#dataChartDoubleMetricPerDay #maxYAxisTriple').html(), tickInterval: ($('#dataChartDoubleMetricPerDay #tickIntervalTriple').html() == '' ? null : $('#dataChartDoubleMetricPerDay #tickInterval').html()), title: { text: '' } },
+			yAxis: { min: 0, max: $('#dataChartDoubleMetricPerDay #maxYAxis').html(), tickInterval: ($('#dataChartDoubleMetricPerDay #tickInterval').html() == '' ? null : $('#dataChartDoubleMetricPerDay #tickInterval').html()), title: { text: '' } },
 			credits: { enabled: false },
 			tooltip: { formatter: function() { return '<b>'+ this.series.name +'</b><br/>'+ xAxisValues[this.point.x] +': '+ this.y; } },
 			plotOptions:
@@ -240,7 +240,8 @@ jsBackend.analytics.chartTripleMetricPerDay =
 		{
 			chart: {renderTo: 'chartTripleMetricPerDay', height: 400, width: containerWidth, margin: [60, 0, 30, 40], defaultSeriesType: 'line'},
 			xAxis: {lineColor: '#CCC', lineWidth: 1, categories: xAxisCategories, color: '#000'},
-			yAxis: {title: {text: ''}},
+			// yAxis: { min: 0, max: $('#dataChartTripleMetricPerDay #maxYAxisTriple').html(), tickInterval: ($('#dataChartTripleMetricPerDay #tickIntervalTriple').html() == '' ? null : $('#dataChartTripleMetricPerDay #tickIntervalTriple').html()), title: { text: '' } },
+			yAxis: { min: 0,title: { text: '' } },
 			credits: {enabled: false},
 			tooltip: {formatter: function() {return '<b>'+ this.series.name +'</b><br/>'+ xAxisValues[this.point.x] +': '+ this.y;}},
 			plotOptions:
