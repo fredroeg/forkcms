@@ -391,7 +391,7 @@ class BackendAnalyticsHelper
 	 */
 	public static function getGoals()
 	{
-		$apiSettings = BackendSeaModel::getAPISettings();
+		$apiSettings = BackendAnalyticsModel::getAPISettings();
 		$accessToken = $apiSettings['access_token'];
 
 		$returnedDecodedString =  self::getGoogleAnalyticsInstance()->getGoals($accessToken);
@@ -401,10 +401,10 @@ class BackendAnalyticsHelper
 		{
 			foreach($returnedDecodedString->items as $goal)
 			{
-			    if($goal->profileId == $apiSettings['table_id'])
-			    {
-				array_push($goalarray, $goal->name);
-			    }
+				if($goal->profileId == $apiSettings['table_id'])
+				{
+					array_push($goalarray, $goal->name);
+				}
 			}
 		}
 		return $goalarray;
@@ -1012,7 +1012,7 @@ class BackendAnalyticsHelper
 		BackendAnalyticsModel::insertTrafficSources($periodId, $trafficSources);
 		BackendAnalyticsModel::insertSEAData($periodId, $seaData);
 
-		// at last we insert a true value in the period to d
+		// at last we insert a true value in the period to db
 		BackendAnalyticsModel::insertPeriod(array($periodId, $startTimestamp, $endTimestamp));
 
 		SpoonSession::set('loading', 'false');

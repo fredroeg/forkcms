@@ -45,18 +45,23 @@ class BackendAnalyticsBase extends BackendBaseActionIndex
 		$endTimestamp = date('Y-m-d', $this->endTimestamp);
 		$period = array($startTimestamp, $endTimestamp);
 
+		// get current action
+		$action = Spoon::get('url')->getAction();
+
 		// Check if we already stored the data for that period in the database. (if not -> insert it!)
 		// todo: insert the ! again
 		if(!BackendAnalyticsModel::checkPeriod($period))
 		{
-			// get current action
-			$action = Spoon::get('url')->getAction();
-
 			BackendAnalyticsHelper::getAllData($startTimestamp, $endTimestamp, $action);
 		}
 		else
 		{
 			$this->periodId = BackendAnalyticsModel::getPeriodId(array($startTimestamp, $endTimestamp));
+		}
+
+		// delete the session loading when other pages are accessed
+		if($action != "loading")
+		{
 			SpoonSession::set('loading', 'false');
 		}
 	}

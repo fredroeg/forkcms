@@ -97,7 +97,10 @@ class BackendAnalyticsModel
 				'analytics_pages',
 				'analytics_period',
 				'analytics_referrals',
-				'analytics_traffic_sources'
+				'analytics_traffic_sources',
+				'analytics_sea_data',
+				'analytics_sea_day_data',
+				'analytics_sea_goals'
 			)
 		);
 	}
