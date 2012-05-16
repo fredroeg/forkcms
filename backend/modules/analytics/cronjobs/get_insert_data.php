@@ -25,7 +25,8 @@ class BackendAnalyticsCronjobGetInsertData extends BackendBaseCronjob
 		$startTimestamp = trim(SpoonFilter::getGetValue('start_date', null, ''));
 		$endTimestamp = trim(SpoonFilter::getGetValue('end_date', null, ''));
 
-		$periodId = BackendAnalyticsModel::insertPeriod(array($startTimestamp, $endTimestamp));
+		$period = BackendAnalyticsModel::getLatestPeriod();
+		$periodId = $period['period_id'] + 1;
 		BackendAnalyticsHelper::insertAnalyticsData($startTimestamp, $endTimestamp, $periodId);
 	}
 }

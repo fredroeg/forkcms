@@ -49,7 +49,10 @@ class BackendAnalyticsBase extends BackendBaseActionIndex
 		// todo: insert the ! again
 		if(!BackendAnalyticsModel::checkPeriod($period))
 		{
-			BackendAnalyticsHelper::getAllData($startTimestamp, $endTimestamp);
+			// get current action
+			$action = Spoon::get('url')->getAction();
+
+			BackendAnalyticsHelper::getAllData($startTimestamp, $endTimestamp, $action);
 		}
 		else
 		{

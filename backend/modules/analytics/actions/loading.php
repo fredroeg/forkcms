@@ -67,7 +67,7 @@ class BackendAnalyticsLoading extends BackendAnalyticsBase
 		}
 
 		// build url
-		/*$URL = SITE_URL . '/backend/cronjob.php?module=analytics&action=get_insert_data&id=1';
+		$URL = SITE_URL . '/backend/cronjob.php?module=analytics&action=get_insert_data&id=1';
 		$URL .= '&start_date=' . $startTimestamp;
 		$URL .= '&end_date=' . $endTimestamp;
 
@@ -81,12 +81,7 @@ class BackendAnalyticsLoading extends BackendAnalyticsBase
 		$curl = curl_init();
 		curl_setopt_array($curl, $options);
 		curl_exec($curl);
-		curl_close($curl);*/
-		;
-
-		$period = BackendAnalyticsModel::getLatestPeriod();
-		$periodId = $period['period_id'] + 1;
-		BackendAnalyticsHelper::insertAnalyticsData($startTimestamp, $endTimestamp, $periodId);
+		curl_close($curl);
 	}
 
 	/**
@@ -96,13 +91,13 @@ class BackendAnalyticsLoading extends BackendAnalyticsBase
 	{
 		parent::parse();
 
-		// $page = ($this->pageId != '' ? BackendAnalyticsModel::getPageForId($this->pageId) : null);
+		$page = ($this->pageId != '' ? BackendAnalyticsModel::getPageForId($this->pageId) : null);
 
 		// update date_viewed for this page
 		// BackendAnalyticsModel::updatePageDateViewed($this->pageId);
 
 		// parse redirect link
-		// $this->tpl->assign('redirectGet', (isset($page) ? 'page=' . $page : ''));
+		$this->tpl->assign('redirectGet', (isset($page) ? 'page=' . $page : ''));
 		$this->tpl->assign('page', $this->redirectAction);
 		$this->tpl->assign('identifier', ($this->pageId != '' ? $this->pageId . '_' : '') . $this->identifier);
 

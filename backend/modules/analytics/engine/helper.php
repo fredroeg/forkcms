@@ -155,9 +155,10 @@ class BackendAnalyticsHelper
 	 *
 	 * @param string $startTimestamp
 	 * @param string $endTimestamp
+	 * @param string $action
 	 * @return true
 	 */
-	public static function getAllData($startTimestamp, $endTimestamp)
+	public static function getAllData($startTimestamp, $endTimestamp, $action)
 	{
 		$periodBoolean = BackendAnalyticsModel::checkPeriod(array($startTimestamp, $endTimestamp));
 
@@ -166,7 +167,7 @@ class BackendAnalyticsHelper
 		{
 			SpoonSession::set('loading', 'true');
 
-			$url = BackendModel::createURLForAction('loading' . '?redirect_action=index');
+			$url = BackendModel::createURLForAction('loading' . '?redirect_action=' . $action);
 			SpoonHTTP::redirect($url);
 		}
 		else
@@ -1015,7 +1016,6 @@ class BackendAnalyticsHelper
 		BackendAnalyticsModel::insertPeriod(array($periodId, $startTimestamp, $endTimestamp));
 
 		SpoonSession::set('loading', 'false');
-
 	}
 
 	/**
