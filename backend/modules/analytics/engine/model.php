@@ -17,22 +17,6 @@
 class BackendAnalyticsModel
 {
 	/**
-	 * Google authentication url and scope
-	 *
-	 * @var	string
-	 */
-	const GOOGLE_ACCOUNT_AUTHENTICATION_URL = 'https://www.google.com/accounts/AuthSubRequest?next=%1$s&amp;scope=%2$s&amp;secure=0&amp;session=1';
-	const GOOGLE_ACCOUNT_AUTHENTICATION_SCOPE = 'https://www.google.com/analytics/feeds/';
-
-	/**
-	 * Google analytics url
-	 *
-	 * @var	string
-	 */
-	const GOOGLE_ANALYTICS_URL = 'https://www.google.com/analytics/reporting';
-
-
-	/**
 	 * Check in the database if we already stored the data from that period
 	 *
 	 * @param array $period
@@ -983,17 +967,17 @@ class BackendAnalyticsModel
 		foreach($metrics as $dayMetric)
 		{
 			$query =
-			    'INSERT IGNORE INTO analytics_metrics_per_day (day, bounces, entrances, exits, pageviews, visits, visitors)
-			     VALUES (:day, :bounces, :entrances, :exits, :pageviews, :visits, :visitors)';
+				'INSERT IGNORE INTO analytics_metrics_per_day (day, bounces, entrances, exits, pageviews, visits, visitors)
+				 VALUES (:day, :bounces, :entrances, :exits, :pageviews, :visits, :visitors)';
 
 			$record = array(
-			    'day' => $dayMetric['date'],
-			    'bounces' => $dayMetric['bounces'],
-			    'entrances' => $dayMetric['entrances'],
-			    'exits' => $dayMetric['exits'],
-			    'pageviews' => $dayMetric['pageviews'],
-			    'visits' => $dayMetric['visits'],
-			    'visitors' => $dayMetric['visitors']
+				'day' => $dayMetric['date'],
+				'bounces' => $dayMetric['bounces'],
+				'entrances' => $dayMetric['entrances'],
+				'exits' => $dayMetric['exits'],
+				'pageviews' => $dayMetric['pageviews'],
+				'visits' => $dayMetric['visits'],
+				'visitors' => $dayMetric['visitors']
 			);
 
 			BackendModel::getDB()->execute($query, $record);
@@ -1066,19 +1050,21 @@ class BackendAnalyticsModel
 	public static function insertSEAData($periodId, $seaData)
 	{
 		// then we insert all the data from that period
-		$data['period_id'] = $periodId;
-		$data['visits'] = $seaData['visits'];
-		$data['impressions'] = $seaData['impressions'];
-		$data['clicks_amount'] = $seaData['adClicks'];
-		$data['click_through_rate'] = $seaData['CTR'];
-		$data['cost_per_click'] = $seaData['CPC'];
-		$data['cost_per_mimpressions'] = $seaData['CPM'];
-		$data['costs'] = $seaData['costs'];
-		$data['conversions'] = $seaData['conversions'];
-		$data['conversion_percentage'] = $seaData['conversion_percentage'];
-		$data['cost_per_conversion'] = $seaData['cost_per_conversion'];
+		$record = array(
+			'period_id' => $periodId,
+			'visits' => $seaData['visits'],
+		    	'impressions' => $seaData['impressions'],
+		    	'clicks_amount' => $seaData['adClicks'],
+		    	'click_through_rate' => $seaData['CTR'],
+		    	'cost_per_click' => $seaData['CPC'],
+			'cost_per_mimpressions' => $seaData['CPM'],
+		    	'costs' => $seaData['costs'],
+		    	'conversions' => $seaData['conversions'],
+		    	'conversion_percentage' => $seaData['conversion_percentage'],
+			'cost_per_conversion' => $seaData['cost_per_conversion']
+		);
 
-		BackendModel::getDB()->insert('analytics_sea_data', $data);
+		BackendModel::getDB()->insert('analytics_sea_data', $record);
 
 		// at last we insert day-related data
 		self::insertSEADayData($seaData['dayStats']);
@@ -1098,21 +1084,21 @@ class BackendAnalyticsModel
 		foreach($dayData as $day => $data)
 		{
 			$query =
-			    'INSERT IGNORE INTO analytics_sea_day_data (day, cost, visits, impressions, clicks, click_through_rate, cost_per_click, cost_per_mimpressions, conversions, conversion_percentage, cost_per_conversion)
-			     VALUES (:day, :cost, :visits, :impressions, :clicks, :click_through_rate, :cost_per_click, :cost_per_mimpressions, :conversions, :conversion_percentage, :cost_per_conversion)';
+				'INSERT IGNORE INTO analytics_sea_day_data (day, cost, visits, impressions, clicks, click_through_rate, cost_per_click, cost_per_mimpressions, conversions, conversion_percentage, cost_per_conversion)
+				 VALUES (:day, :cost, :visits, :impressions, :clicks, :click_through_rate, :cost_per_click, :cost_per_mimpressions, :conversions, :conversion_percentage, :cost_per_conversion)';
 
 			$record = array(
-			    'day' => $day,
-			    'cost' => $data['cost'],
-			    'visits' => $data['visits'],
-			    'impressions' => $data['impressions'],
-			    'clicks' => $data['adClicks'],
-			    'click_through_rate' => $data['CTR'],
-			    'cost_per_click' => $data['CPC'],
-			    'cost_per_mimpressions' => $data['CPM'],
-			    'conversions' => $data['conversions'],
-			    'conversion_percentage' => $data['conversion_percentage'],
-			    'cost_per_conversion' => $data['cost_per_conversion']
+				'day' => $day,
+				'cost' => $data['cost'],
+				'visits' => $data['visits'],
+				'impressions' => $data['impressions'],
+				'clicks' => $data['adClicks'],
+				'click_through_rate' => $data['CTR'],
+				'cost_per_click' => $data['CPC'],
+				'cost_per_mimpressions' => $data['CPM'],
+				'conversions' => $data['conversions'],
+				'conversion_percentage' => $data['conversion_percentage'],
+				'cost_per_conversion' => $data['cost_per_conversion']
 			);
 
 			BackendModel::getDB()->execute($query, $record);
