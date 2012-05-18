@@ -901,8 +901,8 @@ class BackendAnalyticsModel
 		}
 		elseif($total)
 		{
-		    BackendModel::getDB(true)->truncate('analytics_aggregates_total');
-		    BackendModel::getDB(true)->insert('analytics_aggregates_total', $aggregatesDataArray);
+			BackendModel::getDB(true)->truncate('analytics_aggregates_total');
+			BackendModel::getDB(true)->insert('analytics_aggregates_total', $aggregatesDataArray);
 		}
 	}
 
