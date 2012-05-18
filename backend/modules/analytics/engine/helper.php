@@ -226,11 +226,15 @@ class BackendAnalyticsHelper
 	{
 		// get page
 		$page = BackendModel::getDB(false)->getVar(
-			'SELECT page
+			'SELECT page_path
 			 FROM analytics_pages
 			 WHERE id = ?',
-			array((int) $pageId)
+			(int) $pageId
 		);
+
+		spoon::dump($page);
+
+		/*
 
 		$data = array();
 		$data['hostname'] = SITE_URL;
@@ -348,6 +352,9 @@ class BackendAnalyticsHelper
 		}
 
 		return $data;
+		 *
+		 *
+		 */
 	}
 
 	/**

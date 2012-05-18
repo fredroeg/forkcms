@@ -67,7 +67,6 @@
 					<p><strong>{$costPerClick}</strong> {$lblCostPerClick|ucfirst}</p>
 				</div>
 				<div class="analyticsCol">
-					<p><strong>{$position}</strong> {$lblPosition|ucfirst}</p>
 					<p><strong>{$cost}</strong> {$lblCost|ucfirst}</p>
 				</div>
 			</div>

@@ -54,22 +54,15 @@ class BackendAnalyticsLoading extends BackendAnalyticsBase
 
 		$this->pageId = SpoonFilter::getGetValue('page_id', null, '');
 		$this->pagePath = SpoonFilter::getGetValue('page_path', null, '');
+
 		$force = SpoonFilter::getGetValue('force', null, '');
 
-		// no id set but we have a path
-		if($this->pageId == '' && $this->pagePath != '')
-		{
-			// get page for path
-			$page = BackendAnalyticsModel::getPageByPath($this->pagePath);
-
-			// set id
-			$this->pageId = (isset($page['id']) ? $page['id'] : '');
-		}
 
 		// build url
 		$URL = SITE_URL . '/backend/cronjob.php?module=analytics&action=get_insert_data&id=1';
 		$URL .= '&start_date=' . $startTimestamp;
 		$URL .= '&end_date=' . $endTimestamp;
+		$URL .= '&page_path=' . $this->pagePath;
 
 		// set options
 		$options = array();

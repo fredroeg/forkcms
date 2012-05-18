@@ -234,16 +234,16 @@ class BackendAnalyticsModel
 		$id = (int) $db->getVar(
 			'SELECT id
 			 FROM analytics_pages
-			 WHERE page = ?',
-			array((string) $page)
+			 WHERE page_path = ?
+			 ORDER BY id DESC',
+			$page
 		);
 
-		// no id? insert this page
-		if($id === 0) $id = $db->insert('analytics_pages', array('page' => (string) $page));
+		$items['aggregates'] = BackendAnalyticsHelper::getDataForPage($pageId, $startTimestamp, $endTimestamp);
 
 		// get data from cache
-		$items = array();
-		$items['aggregates'] = self::getAggregatesFromCacheByType('page_' . $id, $startTimestamp, $endTimestamp);
+		/* $items = array();
+		$items['aggregates'] = self::getPageAggregatesFromDbById($id, $startTimestamp, $endTimestamp);
 		$items['entries'] = self::getDataFromCacheByType('page_' . $id, $startTimestamp, $endTimestamp);
 
 		// get current action
@@ -251,14 +251,21 @@ class BackendAnalyticsModel
 
 		// nothing in cache
 		if($items['aggregates'] === false || $items['entries'] === false) self::redirectToLoadingPage($action, array('page_id' => $id));
+*/
+		// get current action
+		$action = Spoon::get('url')->getAction();
+
+		// nothing in cache
+
+
 
 		// reset loop counter for the current action if we got data from cache
 		SpoonSession::set($action . 'Loop', null);
 
 		// update date_viewed for this page
-		BackendAnalyticsModel::updatePageDateViewed($id);
+		// BackendAnalyticsModel::updatePageDateViewed($id);
 
-		return $items;
+		// return $items;
 	}
 
 	/**
