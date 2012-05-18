@@ -141,8 +141,6 @@ class BackendAnalyticsSeaPage extends BackendAnalyticsBase
 			}
 		}
 
-		// $this->tpl->assign('maxYAxisTriple', $maxYAxisTriple);
-		// $this->tpl->assign('tickIntervalTriple', ($maxYAxisTriple == 2 ? '1' : ''));
 		$this->tpl->assign('graphDataMulti', $graphDataTriple);
 	}
 }

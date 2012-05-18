@@ -17,6 +17,21 @@
 class BackendAnalyticsModel
 {
 	/**
+	 * Google authentication url and scope
+	 *
+	 * @var	string
+	 */
+	const GOOGLE_ACCOUNT_AUTHENTICATION_URL = 'https://www.google.com/accounts/AuthSubRequest?next=%1$s&amp;scope=%2$s&amp;secure=0&amp;session=1';
+	const GOOGLE_ACCOUNT_AUTHENTICATION_SCOPE = 'https://www.google.com/analytics/feeds/';
+
+	/**
+	 * Google analytics url
+	 *
+	 * @var	string
+	 */
+	const GOOGLE_ANALYTICS_URL = 'https://www.google.com/analytics/reporting';
+
+	/**
 	 * Check in the database if we already stored the data from that period
 	 *
 	 * @param array $period
@@ -968,7 +983,7 @@ class BackendAnalyticsModel
 		{
 			$query =
 				'INSERT IGNORE INTO analytics_metrics_per_day (day, bounces, entrances, exits, pageviews, visits, visitors)
-				 VALUES (:day, :bounces, :entrances, :exits, :pageviews, :visits, :visitors)';
+				VALUES (:day, :bounces, :entrances, :exits, :pageviews, :visits, :visitors)';
 
 			$record = array(
 				'day' => $dayMetric['date'],

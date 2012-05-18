@@ -9,16 +9,16 @@
 	{include:{$BACKEND_MODULE_PATH}/layout/templates/period.tpl}
 	<div class="options content">
 		<div class="analyticsColWrapper clearfix">
-			<div class="analyticsCol">
+			<div class="seaCol">
 				<p><strong>{$visits}</strong> {$lblVisits|ucfirst}</p>
 			</div>
-			<div class="analyticsCol">
+			<div class="seaCol">
 				<p><strong>{$conversions}</strong> {$lblConversions|ucfirst}</p>
 			</div>
-			<div class="analyticsCol">
+			<div class="seaCol">
 				<p><strong>{$conversionPercentage}</strong> {$lblConversionPercentage|ucfirst}</p>
 			</div>
-			<div class="analyticsCol">
+			<div class="seaCol">
 				<p><strong>{$costPerConversion}</strong> {$lblCostPerConversion|ucfirst}</p>
 			</div>
 		</div>
@@ -58,15 +58,15 @@
 		</div>
 		<div class="options">
 			<div class="seaColWrapper clearfix">
-				<div class="seaCol">
+				<div class="analyticsCol">
 					<p><strong>{$impressions}</strong> {$lblImpressions|ucfirst}</p>
 					<p><strong>{$clicks}</strong> {$lblClicks|ucfirst}</p>
 				</div>
-				<div class="seaCol">
+				<div class="analyticsCol">
 					<p><strong>{$ctr}</strong> {$lblCTR|ucfirst}</p>
 					<p><strong>{$costPerClick}</strong> {$lblCostPerClick|ucfirst}</p>
 				</div>
-				<div class="seaCol">
+				<div class="analyticsCol">
 					<p><strong>{$position}</strong> {$lblPosition|ucfirst}</p>
 					<p><strong>{$cost}</strong> {$lblCost|ucfirst}</p>
 				</div>
