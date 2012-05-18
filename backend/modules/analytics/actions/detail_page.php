@@ -77,9 +77,6 @@ class BackendAnalyticsDetailPage extends BackendAnalyticsBase
 
 			foreach($metricsPerDay as $j => $data)
 			{
-				// cast SimpleXMLElement to array
-				$data = (array) $data;
-
 				$graphData[$i]['data'][$j]['date'] = (int) $data['timestamp'];
 				$graphData[$i]['data'][$j]['value'] = (string) $data[$metric];
 			}
