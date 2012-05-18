@@ -232,10 +232,6 @@ class BackendAnalyticsHelper
 			(int) $pageId
 		);
 
-		spoon::dump($page);
-
-		/*
-
 		$data = array();
 		$data['hostname'] = SITE_URL;
 		$data['aggregates'] = array();
@@ -253,10 +249,11 @@ class BackendAnalyticsHelper
 		$parameters['sort'] = '-ga:visits';
 
 		// get results
-		$results = self::getGoogleAnalyticsInstance()->getAnalyticsResults($metrics, mktime(0, 0, 0, 1, 1, 2005), $endTimestamp, $dimensions, $parameters);
+		$results = self::getGoogleAnalyticsInstance()->getAnalyticsResults($metrics, date('Y-m-d', mktime(0, 0, 0, 1, 1, 2005)), date('Y-m-d', $endTimestamp), $dimensions, $parameters);
+
 
 		// loop page results and add hostname to data array
-		foreach($results['entries'] as $result) $data['hostname'] = $result['hostname'];
+		foreach($results['aggregates'] as $result) $data['hostname'] = $result['hostname'];
 
 		// get metrics
 		$metrics = array('bounces', 'entrances', 'exits', 'newVisits', 'pageviews', 'timeOnPage', 'timeOnSite', 'visits');
@@ -271,13 +268,13 @@ class BackendAnalyticsHelper
 		$parameters['filters'] = 'ga:pagePath==' . $page;
 
 		// get results
-		$results = self::getGoogleAnalyticsInstance()->getAnalyticsResults($gaMetrics, $startTimestamp, $endTimestamp, $dimensions, $parameters);
+		$results = self::getGoogleAnalyticsInstance()->getAnalyticsResults($gaMetrics, date('Y-m-d', $startTimestamp), date('Y-m-d', $endTimestamp), $dimensions, $parameters);
 
 		// get aggregates
-		$data['aggregates'] = $results['aggregates'];
+		$data['aggregates'] = $results['totalResults'];
 
 		// loop page results
-		foreach($results['entries'] as $result)
+		foreach($results['aggregates'] as $result)
 		{
 			// get timestamp
 			$timestamp = gmmktime(12, 0, 0, substr($result['date'], 4, 2), substr($result['date'], 6, 2), substr($result['date'], 0, 4));
@@ -308,10 +305,10 @@ class BackendAnalyticsHelper
 		$parameters['sort'] = '-ga:pageviews';
 
 		// get results
-		$results = self::getGoogleAnalyticsInstance()->getAnalyticsResults($gaMetrics, $startTimestamp, $endTimestamp, $dimensions, $parameters);
+		$results = self::getGoogleAnalyticsInstance()->getAnalyticsResults($gaMetrics, date('Y-m-d', $startTimestamp), date('Y-m-d', $endTimestamp), $dimensions, $parameters);
 
 		// loop page results
-		foreach($results['entries'] as $result)
+		foreach($results['aggregates'] as $result)
 		{
 			// store dimension in correct format
 			$entry = array();
@@ -337,13 +334,13 @@ class BackendAnalyticsHelper
 		$parameters['sort'] = '-ga:pageviews';
 
 		// get results for sources grouped
-		$results = self::getGoogleAnalyticsInstance()->getAnalyticsResults('ga:pageviews', $startTimestamp, $endTimestamp, 'ga:medium', $parameters);
+		$results = self::getGoogleAnalyticsInstance()->getAnalyticsResults('ga:pageviews', date('Y-m-d', $startTimestamp), date('Y-m-d', $endTimestamp), 'ga:medium', $parameters);
 
 		// get total pageviews
 		$totalPageviews = (isset($results['aggregates']['pageviews']) ? (int) $results['aggregates']['pageviews'] : 0);
 
 		// loop entries
-		foreach($results['entries'] as $i => $result)
+		foreach($results['aggregates'] as $i => $result)
 		{
 			// add to sources array
 			$data['sources_grouped'][$i]['label'] = $result['medium'];
@@ -352,9 +349,6 @@ class BackendAnalyticsHelper
 		}
 
 		return $data;
-		 *
-		 *
-		 */
 	}
 
 	/**
