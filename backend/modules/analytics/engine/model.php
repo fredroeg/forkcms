@@ -270,6 +270,7 @@ class BackendAnalyticsModel
 	}
 
 	/**
+	 * Get day by day data from the database by type
 	 *
 	 * @param string $type
 	 * @param int $startTimestamp
@@ -304,7 +305,7 @@ class BackendAnalyticsModel
 		// get current action
 		$action = Spoon::get('url')->getAction();
 
-		// nothing in cache
+		// nothing in database
 		if($items === false) self::redirectToLoadingPage($action);
 
 		// reset loop counter for the current action if we got data from cache
