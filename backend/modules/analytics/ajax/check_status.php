@@ -52,7 +52,7 @@ class BackendAnalyticsAjaxCheckStatus extends BackendBaseAJAXAction
 			SpoonFile::setContent($filename, 'missing1');
 
 			// return status
-			$this->output(self::OK, array('status' => false), 'Temporary file was missing. We created one.');
+			$this->output(self::OK, array('status' => false), 'Data was missing. We are inserting the data.');
 		}
 
 		// busy status
@@ -116,14 +116,14 @@ class BackendAnalyticsAjaxCheckStatus extends BackendBaseAJAXAction
 			if($counter > 10)
 			{
 				SpoonFile::delete($filename);
-				$this->output(self::ERROR, array('status' => 'missing'), 'Error while retrieving data - file was never created.');
+				$this->output(self::ERROR, array('status' => 'missing'), 'Error while retrieving data - data was never inserted.');
 			}
 
 			// change file content to increase counter
 			SpoonFile::setContent($filename, 'missing' . $counter);
 
 			// return status
-			$this->output(self::OK, array('status' => 'busy'), 'Temporary file was still in status missing. (' . $counter . ')');
+			$this->output(self::OK, array('status' => 'busy'), 'Status missing. (' . $counter . ')');
 		}
 
 		/* FALLBACK - SOMETHING WENT WRONG */
