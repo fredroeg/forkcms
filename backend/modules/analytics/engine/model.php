@@ -430,7 +430,7 @@ class BackendAnalyticsModel
 	{
 		$metrics = (array) $metrics;
 
-		// get data from cacdbhe
+		// get data from db, if no table is given, the default day data will be accessed
 		if(!$table)
 		{
 			$items = self::getDayDataFromDbByType('analytics_metrics_per_day', $startTimestamp, $endTimestamp);
@@ -439,7 +439,6 @@ class BackendAnalyticsModel
 		elseif($table == 'analytics_sea_day_data')
 		{
 			$items = self::getDayDataFromDbByType($table, $startTimestamp, $endTimestamp);
-
 		}
 
 		// get current action
