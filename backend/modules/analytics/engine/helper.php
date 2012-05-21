@@ -251,7 +251,6 @@ class BackendAnalyticsHelper
 		// get results
 		$results = self::getGoogleAnalyticsInstance()->getAnalyticsResults($metrics, date('Y-m-d', mktime(0, 0, 0, 1, 1, 2005)), date('Y-m-d', $endTimestamp), $dimensions, $parameters);
 
-
 		// loop page results and add hostname to data array
 		foreach($results['aggregates'] as $result) $data['hostname'] = $result['hostname'];
 
