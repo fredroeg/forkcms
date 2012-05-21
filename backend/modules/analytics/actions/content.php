@@ -12,6 +12,7 @@
  *
  * @author Dieter Vanden Eynde <dieter.vandeneynde@netlash.com>
  * @author Annelies Van Extergem <annelies.vanextergem@netlash.com>
+ * @author Frederick Roegiers <frederick.roegiers@wijs.be>
  */
 class BackendAnalyticsContent extends BackendAnalyticsBase
 {
@@ -31,6 +32,7 @@ class BackendAnalyticsContent extends BackendAnalyticsBase
 	protected function parse()
 	{
 		parent::parse();
+
 		$this->parseOverviewData();
 		$this->parseChartData();
 		$this->parseImportantPages();

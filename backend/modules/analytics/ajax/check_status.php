@@ -32,7 +32,6 @@ class BackendAnalyticsAjaxCheckStatus extends BackendBaseAJAXAction
 			$this->output(self::OK, array('status' => 'done'), 'Data retrieved.');
 		}
 
-
 		$page = trim(SpoonFilter::getPostValue('page', null, ''));
 		$identifier = trim(SpoonFilter::getPostValue('identifier', null, ''));
 
