@@ -168,24 +168,21 @@ class BackendAnalyticsModel
 	/**
 	 * Get the sites total aggregates
 	 *
-	 * startTimestamp and endTimestamp are needed so we can fetch the correct cache file
-	 * They are not used when fetching the data from google.
-	 *
 	 * @param int $periodId
 	 * @return array
 	 */
 	public static function getAggregatesTotal($periodId)
 	{
-		// get data from cache
+		// get data from db
 		$aggregates = self::getDataFromDbByType('analytics_aggregates_total');
 
 		// get current action
 		$action = Spoon::get('url')->getAction();
 
-		// nothing in cache
+		// nothing in db
 		if($aggregates === false) self::redirectToLoadingPage($action);
 
-		// reset loop counter for the current action if we got data from cache
+		// reset loop counter for the current action if we got data from db
 		SpoonSession::set($action . 'Loop', null);
 
 		return $aggregates;
@@ -222,8 +219,8 @@ class BackendAnalyticsModel
 	 * Get the top exit pages
 	 *
 	 * @param string $page The page.
-	 * @param int $startTimestamp The start timestamp for the cache file.
-	 * @param int $endTimestamp The end timestamp for the cache file.
+	 * @param int $startTimestamp
+	 * @param int $endTimestamp
 	 * @return array
 	 */
 	public static function getDataForPage($page, $startTimestamp, $endTimestamp)
@@ -299,7 +296,7 @@ class BackendAnalyticsModel
 	 */
 	public static function getExitPages($periodId)
 	{
-		// get data from cache
+		// get data from db
 		$items = self::getDataFromDbByType('analytics_exit_pages', $periodId);
 
 		// get current action
@@ -308,7 +305,7 @@ class BackendAnalyticsModel
 		// nothing in database
 		if($items === false) self::redirectToLoadingPage($action);
 
-		// reset loop counter for the current action if we got data from cache
+		// reset loop counter for the current action if we got data from db
 		SpoonSession::set($action . 'Loop', null);
 
 		// init vars
@@ -421,47 +418,6 @@ class BackendAnalyticsModel
 	}
 
 	/**
-	 * Get all data for a given revision.
-	 *
-	 * @param string[optional] $language The language to use.
-	 * @return array
-	 */
-	public static function getLinkList($language = null)
-	{
-		$language = ($language !== null) ? (string) $language : BackendLanguage::getWorkingLanguage();
-
-		// there is no cache file
-		if(!SpoonFile::exists(FRONTEND_CACHE_PATH . '/navigation/tinymce_link_list_' . $language . '.js')) return array();
-
-		// read the cache file
-		$cacheFile = SpoonFile::getContent(FRONTEND_CACHE_PATH . '/navigation/tinymce_link_list_' . $language . '.js');
-
-		// get the array
-		preg_match('/new Array\((.*)\);$/s', $cacheFile, $matches);
-
-		// no matched
-		if(empty($matches)) return array();
-
-		// create array
-		$matches = explode('],', str_replace('[', '', $matches[count($matches) - 1]));
-
-		// init vars
-		$cacheList = array();
-
-		// loop list
-		foreach($matches as $item)
-		{
-			// trim item
-			$item = explode('", "', trim($item," \n\r\t\"]"));
-
-			// build cache list
-			$cacheList[$item[1]] = $item[0];
-		}
-
-		return $cacheList;
-	}
-
-	/**
 	 * Fetch metrics grouped by day
 	 *
 	 * @param array $metrics The metrics to collect.
@@ -474,7 +430,7 @@ class BackendAnalyticsModel
 	{
 		$metrics = (array) $metrics;
 
-		// get data from cache
+		// get data from cacdbhe
 		if(!$table)
 		{
 			$items = self::getDayDataFromDbByType('analytics_metrics_per_day', $startTimestamp, $endTimestamp);
@@ -489,10 +445,10 @@ class BackendAnalyticsModel
 		// get current action
 		$action = Spoon::get('url')->getAction();
 
-		// nothing in cache
+		// nothing in db
 		if($items === false) self::redirectToLoadingPage($action);
 
-		// reset loop counter for the current action if we got data from cache
+		// reset loop counter for the current action if we got data from db
 		SpoonSession::set($action . 'Loop', null);
 
 		return $items;
@@ -538,16 +494,16 @@ class BackendAnalyticsModel
 	 */
 	public static function getPages($periodId)
 	{
-		// get data from cache
+		// get data from db
 		$items = self::getDataFromDbByType('analytics_pages', $periodId);
 
 		// get current action
 		$action = Spoon::get('url')->getAction();
 
-		// nothing in cache
+		// nothing in db
 		if($items === false) self::redirectToLoadingPage($action);
 
-		// reset loop counter for the current action if we got data from cache
+		// reset loop counter for the current action if we got data from db
 		SpoonSession::set($action . 'Loop', null);
 
 		// init vars
@@ -689,10 +645,10 @@ class BackendAnalyticsModel
 		// get current action
 		$action = Spoon::get('url')->getAction();
 
-		// nothing in cache
+		// nothing in db
 		if($items === false) self::redirectToLoadingPage($action);
 
-		// reset loop counter for the current action if we got data from cache
+		// reset loop counter for the current action if we got data from db
 		SpoonSession::set($action . 'Loop', null);
 
 		// init vars
@@ -730,10 +686,10 @@ class BackendAnalyticsModel
 		// get current action
 		$action = Spoon::get('url')->getAction();
 
-		// nothing in cache
+		// nothing in db
 		if($items === false) self::redirectToLoadingPage($action);
 
-		// reset loop counter for the current action if we got data from cache
+		// reset loop counter for the current action if we got data from db
 		SpoonSession::set($action . 'Loop', null);
 
 		$results = array();
@@ -763,7 +719,7 @@ class BackendAnalyticsModel
 	 */
 	public static function getTopPages($periodId, $limit = 5)
 	{
-		// get data from cache
+		// get data from db
 		$items = self::getDataFromDbByType('analytics_pages', $periodId);
 
 		// limit data
@@ -772,10 +728,10 @@ class BackendAnalyticsModel
 		// get current action
 		$action = Spoon::get('url')->getAction();
 
-		// nothing in cache
+		// nothing in db
 		if($items === false) self::redirectToLoadingPage($action);
 
-		// reset loop counter for the current action if we got data from cache
+		// reset loop counter for the current action if we got data from db
 		SpoonSession::set($action . 'Loop', null);
 
 		// init vars
@@ -807,7 +763,7 @@ class BackendAnalyticsModel
 	 */
 	public static function getTopReferrals($periodId, $limit = 5)
 	{
-		// get data from cache
+		// get data from db
 		$items = self::getDataFromDbByType('analytics_referrals', $periodId);
 
 		// limit data
@@ -816,10 +772,10 @@ class BackendAnalyticsModel
 		// get current action
 		$action = Spoon::get('url')->getAction();
 
-		// nothing in cache
+		// nothing in db
 		if($items === false) self::redirectToLoadingPage($action);
 
-		// reset loop counter for the current action if we got data from cache
+		// reset loop counter for the current action if we got data from db
 		SpoonSession::set($action . 'Loop', null);
 
 		// init
@@ -850,16 +806,16 @@ class BackendAnalyticsModel
 	 */
 	public static function getTrafficSourcesGrouped($periodId)
 	{
-		// get data from cache
+		// get data from db
 		$items = self::getDataFromDbByType('analytics_traffic_sources', $periodId);
 
 		// get current action
 		$action = Spoon::get('url')->getAction();
 
-		// nothing in cache
+		// nothing in db
 		if($items === false) self::redirectToLoadingPage($action);
 
-		// reset loop counter for the current action if we got data from cache
+		// reset loop counter for the current action if we got data from db
 		SpoonSession::set($action . 'Loop', null);
 
 		return $items;
