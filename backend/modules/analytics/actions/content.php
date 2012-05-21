@@ -35,17 +35,19 @@ class BackendAnalyticsContent extends BackendAnalyticsBase
 		$this->parseChartData();
 		$this->parseImportantPages();
 		$this->parseImportantExitPages();
-		/*$this->parseImportantLandingPages();
+		$this->parseImportantLandingPages();
+
+		$apiSettings = BackendAnalyticsModel::getAPISettings();
 
 		$googleURL = BackendAnalyticsModel::GOOGLE_ANALYTICS_URL . '/%1$s?id=%2$s&amp;pdr=%3$s';
-		$googleTableId = str_replace('ga:', '', BackendAnalyticsModel::getTableId());
+		$googleTableId = $apiSettings['table_id'];
 		$googleDate = date('Ymd', $this->startTimestamp) . '-' . date('Ymd', $this->endTimestamp);
 
 		// parse links to google
 		$this->tpl->assign('googleTopContentURL', sprintf($googleURL, 'top_content', $googleTableId, $googleDate));
 		$this->tpl->assign('googleTopExitPagesURL', sprintf($googleURL, 'exits', $googleTableId, $googleDate));
 		$this->tpl->assign('googleTopLandingPagesURL', sprintf($googleURL, 'entrances', $googleTableId, $googleDate));
-		$this->tpl->assign('googleContentURL', sprintf($googleURL, 'content', $googleTableId, $googleDate));*/
+		$this->tpl->assign('googleContentURL', sprintf($googleURL, 'content', $googleTableId, $googleDate));
 	}
 
 	/**

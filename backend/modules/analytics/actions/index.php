@@ -43,10 +43,11 @@ class BackendAnalyticsIndex extends BackendAnalyticsBase
 			$this->parsePieChartData();
 			$this->parseImportantReferrals();
 			$this->parseImportantKeywords();
-		     /*
+
+			$apiSettings = BackendAnalyticsModel::getAPISettings();
 
 			$googleURL = BackendAnalyticsModel::GOOGLE_ANALYTICS_URL . '/%1$s?id=%2$s&amp;pdr=%3$s';
-			$googleTableId = str_replace('ga:', '', BackendAnalyticsModel::getTableId());
+			$googleTableId = $apiSettings['table_id'];
 			$googleDate = date('Ymd', $this->startTimestamp) . '-' . date('Ymd', $this->endTimestamp);
 
 			$this->tpl->assign('googleTopReferrersURL', sprintf($googleURL, 'referring_sources', $googleTableId, $googleDate));
@@ -59,8 +60,6 @@ class BackendAnalyticsIndex extends BackendAnalyticsBase
 			$this->tpl->assign('googleVisitorTypesURL', sprintf($googleURL, 'visitor_types', $googleTableId, $googleDate));
 			$this->tpl->assign('googleBouncesURL', sprintf($googleURL, 'bounce_rate', $googleTableId, $googleDate));
 			$this->tpl->assign('googleAveragePageviewsURL', sprintf($googleURL, 'average_pageviews', $googleTableId, $googleDate));
-
-			*/
 		}
 	}
 
