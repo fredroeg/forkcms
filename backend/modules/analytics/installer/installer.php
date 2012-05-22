@@ -11,6 +11,7 @@
  * Installer for the analytics module
  *
  * @author Annelies Van Extergem <annelies.vanextergem@netlash.com>
+ * @author Frederick Roegiers <frederick.roegiers@wijs.be>
  */
 class AnalyticsInstaller extends ModuleInstaller
 {
@@ -70,6 +71,7 @@ class AnalyticsInstaller extends ModuleInstaller
 		$this->setActionRights(1, 'analytics', 'mass_landing_page_action');
 		$this->setActionRights(1, 'analytics', 'refresh_traffic_sources');
 		$this->setActionRights(1, 'analytics', 'settings');
+		$this->setActionRights(1, 'analytics', 'sea_page');
 		$this->setActionRights(1, 'analytics', 'traffic_sources');
 		$this->setActionRights(1, 'analytics', 'visitors');
 
@@ -84,6 +86,7 @@ class AnalyticsInstaller extends ModuleInstaller
 			'analytics/edit_landing_page',
 			'analytics/detail_page'
 		));
+		$this->setNavigation($navigationAnalyticsId, 'SeaPage', 'analytics/sea_page');
 
 		// settings navigation
 		$navigationSettingsId = $this->setNavigation(null, 'Settings');

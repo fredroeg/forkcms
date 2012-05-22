@@ -114,6 +114,50 @@
         <translation language="sv"><![CDATA[välj detta konto]]></translation>
         <translation language="lt"><![CDATA[pasirinkite šįą sąskaitą]]></translation>
       </item>
+      <item type="label" name="Clicks">
+        <translation language="en"><![CDATA[clicks]]></translation>
+        <translation language="nl"><![CDATA[klikken]]></translation>
+      </item>
+      <item type="label" name="ClientId">
+        <translation language="nl"><![CDATA[client-id]]></translation>
+        <translation language="en"><![CDATA[client-id]]></translation>
+      </item>
+      <item type="label" name="ClientIdSecret">
+        <translation language="nl"><![CDATA[client-id-secret]]></translation>
+        <translation language="en"><![CDATA[client-id-secret]]></translation>
+      </item>
+      <item type="label" name="Connect">
+        <translation language="en"><![CDATA[connect]]></translation>
+        <translation language="nl"><![CDATA[connecteer]]></translation>
+      </item>
+      <item type="label" name="ConversionPercentage">
+        <translation language="en"><![CDATA[conversion percentage]]></translation>
+        <translation language="nl"><![CDATA[conversie percentage]]></translation>
+      </item>
+      <item type="label" name="Conversions">
+        <translation language="en"><![CDATA[conversions]]></translation>
+        <translation language="nl"><![CDATA[conversies]]></translation>
+      </item>
+      <item type="label" name="Cost">
+        <translation language="en"><![CDATA[cost]]></translation>
+        <translation language="nl"><![CDATA[kost]]></translation>
+      </item>
+      <item type="label" name="CostPerClick">
+        <translation language="en"><![CDATA[cost per click]]></translation>
+        <translation language="nl"><![CDATA[kost per klik]]></translation>
+      </item>
+      <item type="label" name="CostPerConversion">
+        <translation language="en"><![CDATA[cost per conversion]]></translation>
+        <translation language="nl"><![CDATA[kost per conversie]]></translation>
+      </item>
+      <item type="label" name="CostPerMimpressions">
+        <translation language="en"><![CDATA[cost per 1000 impressions]]></translation>
+        <translation language="nl"><![CDATA[kost per 1000 vertoningen]]></translation>
+      </item>
+      <item type="label" name="CTR">
+        <translation language="en"><![CDATA[CTR]]></translation>
+        <translation language="nl"><![CDATA[CTR]]></translation>
+      </item>
       <item type="label" name="DirectTraffic">
         <translation language="nl"><![CDATA[direct verkeer]]></translation>
         <translation language="en"><![CDATA[direct traffic]]></translation>
@@ -194,6 +238,14 @@
         <translation language="uk"><![CDATA[З'єднання з Google Analytics]]></translation>
         <translation language="sv"><![CDATA[länk till Google Analytics]]></translation>
         <translation language="lt"><![CDATA[nurodo į Google Analytics]]></translation>
+      </item>
+      <item type="label" name="GoogleConsoleSettings">
+        <translation language="en"><![CDATA[Google Console Settings]]></translation>
+        <translation language="nl"><![CDATA[Google Console Instellingen]]></translation>
+      </item>
+      <item type="label" name="Impressions">
+        <translation language="en"><![CDATA[impressions]]></translation>
+        <translation language="nl"><![CDATA[Vertoningen]]></translation>
       </item>
       <item type="label" name="LinkedAccount">
         <translation language="nl"><![CDATA[gekoppelde account]]></translation>
@@ -312,6 +364,14 @@
         <translation language="uk"><![CDATA[Період статистики]]></translation>
         <translation language="sv"><![CDATA[periodstatistik]]></translation>
       </item>
+      <item type="label" name="Profile">
+        <translation language="en"><![CDATA[profile]]></translation>
+        <translation language="nl"><![CDATA[profiel]]></translation>
+      </item>
+      <item type="label" name="RedirectUri">
+        <translation language="en"><![CDATA[redirect URI]]></translation>
+        <translation language="nl"><![CDATA[redirect URI]]></translation>
+      </item>
       <item type="label" name="Referral">
         <translation language="nl"><![CDATA[verwijzende site]]></translation>
         <translation language="en"><![CDATA[referring site]]></translation>
@@ -324,6 +384,14 @@
         <translation language="es"><![CDATA[sitio de referencia]]></translation>
         <translation language="uk"><![CDATA[Сайти що посилаються]]></translation>
         <translation language="sv"><![CDATA[refererande sajt]]></translation>
+      </item>
+      <item type="label" name="Sea">
+        <translation language="en"><![CDATA[SEA]]></translation>
+        <translation language="nl"><![CDATA[SEA]]></translation>
+      </item>
+      <item type="label" name="SeaPage">
+        <translation language="en"><![CDATA[SEA Page]]></translation>
+        <translation language="nl"><![CDATA[SEA Page]]></translation>
       </item>
       <item type="label" name="SearchEngines">
         <translation language="nl"><![CDATA[zoekmachines]]></translation>
@@ -521,6 +589,18 @@
         <translation language="es"><![CDATA[Aún no hay ningun perfil de sitio web analytics vinculado. <a href="%1$s">Configurar</a>]]></translation>
         <translation language="sv"><![CDATA[Det finns ingen länk med ett analytics webbplats profil än. <en href="%1$s">Konfigurera</en>]]></translation>
       </item>
+      <item type="error" name="ClientIdIsRequired">
+        <translation language="nl"><![CDATA[Client Id is een verplicht veld]]></translation>
+        <translation language="en"><![CDATA[Client Id is a required value]]></translation>
+      </item>
+      <item type="error" name="ClientIdSecretIsRequired">
+        <translation language="nl"><![CDATA[Client Id Secret is een  verplicht veld]]></translation>
+        <translation language="en"><![CDATA[Client Id Secret is a required value]]></translation>
+      </item>
+      <item type="error" name="InvalidClient">
+        <translation language="nl"><![CDATA[ongeldige client id en/of client secret id]]></translation>
+        <translation language="en"><![CDATA[Invalid client id and/or client secret id]]></translation>
+      </item>
       <item type="error" name="NoSessionToken">
         <translation language="nl"><![CDATA[Er is nog geen Google account gekoppeld.]]></translation>
         <translation language="en"><![CDATA[There is no link with a Google analytics account yet.]]></translation>
@@ -545,6 +625,14 @@
         <translation language="de"><![CDATA[Es gibt noch keine Verbindung zu einem Analytics-Website-Profil.]]></translation>
         <translation language="es"><![CDATA[Aún no hay ningun perfil de sitio web analytics vinculado.]]></translation>
         <translation language="sv"><![CDATA[Det finns ingen länk med ett analytics webbplats profil än.]]></translation>
+      </item>
+      <item type="error" name="ProfileWarning">
+        <translation language="en"><![CDATA[please select a profile and update again]]></translation>
+        <translation language="nl"><![CDATA[selecteer een profiel en update opnieuw aub]]></translation>
+      </item>
+      <item type="error" name="RedirectIsRequired">
+        <translation language="en"><![CDATA[redirect URI is required]]></translation>
+        <translation language="nl"><![CDATA[redirect URI is verplicht]]></translation>
       </item>
       <item type="message" name="AnalyticsDelete">
         <translation language="nl"><![CDATA[De items zijn verwijderd]]></translation>
@@ -599,6 +687,10 @@
         <translation language="de"><![CDATA[Willst du die Verbdindung zu deinem Google-Konto wirklich trennen?]]></translation>
         <translation language="es"><![CDATA[¿Estás seguro de eliminar el vinculo con tu cuenta Google?]]></translation>
         <translation language="sv"><![CDATA[Är du säker du vill till ta bort länken med ditt Google konto?]]></translation>
+      </item>
+      <item type="message" name="ConsoleInfo">
+        <translation language="en"><![CDATA[Please insert the client-id, the client-id-secret. You can create these id&#039;s on the following site: https://code.google.com/apis/console/]]></translation>
+        <translation language="nl"><![CDATA[Vul de client-id, de client-insert-id aub in. Je kan deze op de volgende site aanmaken of terugvinden: https://code.google.com/apis/console/]]></translation>
       </item>
       <item type="message" name="GetDataError">
         <translation language="nl"><![CDATA[Er liep iets mis bij het ophalen van de gegevens via Google Analytics. Onze excuses voor het ongemak. Probeer het later nog eens.]]></translation>
