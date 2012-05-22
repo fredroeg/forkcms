@@ -31,7 +31,12 @@ class BackendAnalyticsAjaxCheckStatus extends BackendBaseAJAXAction
 			// return status
 			$this->output(self::OK, array('status' => 'done'), 'Data retrieved.');
 		}
+		else
+		{
+			$status = false;
+		}
 
+		/*
 		$page = trim(SpoonFilter::getPostValue('page', null, ''));
 		$identifier = trim(SpoonFilter::getPostValue('identifier', null, ''));
 
@@ -43,17 +48,17 @@ class BackendAnalyticsAjaxCheckStatus extends BackendBaseAJAXAction
 
 		// does the temporary file still exist?
 		$status = SpoonFile::getContent($filename);
-
+		*/
 		// no file - create one
 		if($status === false)
 		{
 			// create file with initial counter
-			SpoonFile::setContent($filename, 'missing1');
+			// SpoonFile::setContent($filename, 'missing1');
 
 			// return status
 			$this->output(self::OK, array('status' => false), 'Data was missing. We are inserting the data.');
 		}
-
+		/*
 		// busy status
 		if(strpos($status, 'busy') !== false)
 		{
@@ -126,7 +131,8 @@ class BackendAnalyticsAjaxCheckStatus extends BackendBaseAJAXAction
 		}
 
 		/* FALLBACK - SOMETHING WENT WRONG */
-		SpoonFile::delete($filename);
+		// SpoonFile::delete($filename);
+
 		$this->output(self::ERROR, array('status' => 'error'), 'Error while retrieving data.');
 	}
 }
