@@ -29,26 +29,13 @@ class BackendAnalyticsAjaxCheckStatus extends BackendBaseAJAXAction
 		if(date('Y-m-d', $startTimestamp) == $period['period_start'] && date('Y-m-d', $endTimestamp) == $period['period_end'])
 		{
 			// return status
-			$this->output(self::OK, array('status' => 'done'), 'Data retrieved.');
+			$status = 'done';
 		}
 		else
 		{
 			$status = false;
 		}
 
-		/*
-		$page = trim(SpoonFilter::getPostValue('page', null, ''));
-		$identifier = trim(SpoonFilter::getPostValue('identifier', null, ''));
-
-		// validate
-		if($page == '' || $identifier == '') $this->output(self::BAD_REQUEST, null, 'No page provided.');
-
-		// init vars
-		$filename = BACKEND_CACHE_PATH . '/analytics/' . $page . '_' . $identifier . '.txt';
-
-		// does the temporary file still exist?
-		$status = SpoonFile::getContent($filename);
-		*/
 		// no file - create one
 		if($status === false)
 		{
@@ -58,8 +45,7 @@ class BackendAnalyticsAjaxCheckStatus extends BackendBaseAJAXAction
 			// return status
 			$this->output(self::OK, array('status' => false), 'Data was missing. We are inserting the data.');
 		}
-		/*
-		// busy status
+
 		if(strpos($status, 'busy') !== false)
 		{
 			// get counter
@@ -68,15 +54,9 @@ class BackendAnalyticsAjaxCheckStatus extends BackendBaseAJAXAction
 			// file's been busy for more than hundred cycles - just stop here
 			if($counter > 100)
 			{
-				// remove file
-				SpoonFile::delete($filename);
-
 				// return status
 				$this->output(self::ERROR, array('status' => 'timeout'), 'Error while retrieving data - the script took too long to retrieve data.');
 			}
-
-			// change file content to increase counter
-			SpoonFile::setContent($filename, 'busy' . $counter);
 
 			// return status
 			$this->output(self::OK, array('status' => 'busy'), 'Data is being retrieved. (' . $counter . ')');
@@ -85,17 +65,10 @@ class BackendAnalyticsAjaxCheckStatus extends BackendBaseAJAXAction
 		// unauthorized status
 		if($status == 'unauthorized')
 		{
-			// remove file
-			SpoonFile::delete($filename);
-
 			// remove all parameters from the module settings
-			BackendModel::setModuleSetting($this->getModule(), 'session_token', null);
-			BackendModel::setModuleSetting($this->getModule(), 'account_name', null);
-			BackendModel::setModuleSetting($this->getModule(), 'table_id', null);
-			BackendModel::setModuleSetting($this->getModule(), 'profile_title', null);
+			// todo
 
-			BackendAnalyticsModel::removeCacheFiles();
-			// BackendAnalyticsModel::clearTables();
+			BackendAnalyticsModel::clearTables();
 
 			$this->output(self::OK, array('status' => 'unauthorized'), 'No longer authorized.');
 		}
@@ -103,9 +76,6 @@ class BackendAnalyticsAjaxCheckStatus extends BackendBaseAJAXAction
 		// done status
 		if($status == 'done')
 		{
-			// remove file
-			SpoonFile::delete($filename);
-
 			// return status
 			$this->output(self::OK, array('status' => 'done'), 'Data retrieved.');
 		}
@@ -119,20 +89,14 @@ class BackendAnalyticsAjaxCheckStatus extends BackendBaseAJAXAction
 			// file's been missing for more than ten cycles - just stop here
 			if($counter > 10)
 			{
-				SpoonFile::delete($filename);
 				$this->output(self::ERROR, array('status' => 'missing'), 'Error while retrieving data - data was never inserted.');
 			}
-
-			// change file content to increase counter
-			SpoonFile::setContent($filename, 'missing' . $counter);
 
 			// return status
 			$this->output(self::OK, array('status' => 'busy'), 'Status missing. (' . $counter . ')');
 		}
 
 		/* FALLBACK - SOMETHING WENT WRONG */
-		// SpoonFile::delete($filename);
-
 		$this->output(self::ERROR, array('status' => 'error'), 'Error while retrieving data.');
 	}
 }
