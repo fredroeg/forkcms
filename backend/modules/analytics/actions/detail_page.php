@@ -11,6 +11,7 @@
  * This is the detail-page-action, it will display the overview of analytics posts
  *
  * @author Annelies Van Extergem <annelies.vanextergem@netlash.com>
+ * @author Frederick Roegiers <frederick.roegiers@wijs.be>
  */
 class BackendAnalyticsDetailPage extends BackendAnalyticsBase
 {

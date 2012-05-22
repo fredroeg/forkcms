@@ -12,6 +12,7 @@
  *
  * @author Dieter Vanden Eynde <dieter.vandeneynde@netlash.com>
  * @author Annelies Van Extergem <annelies.vanextergem@netlash.com>
+ * @author Frederick Roegiers <frederick.roegiers@wijs.be>
  */
 class BackendAnalyticsExitPages extends BackendAnalyticsBase
 {
@@ -35,14 +36,12 @@ class BackendAnalyticsExitPages extends BackendAnalyticsBase
 		$this->parseChartData();
 		$this->parseExitPages();
 
-		/*$googleURL = BackendAnalyticsModel::GOOGLE_ANALYTICS_URL . '/%1$s?id=%2$s&amp;pdr=%3$s';
+		$googleURL = BackendAnalyticsModel::GOOGLE_ANALYTICS_URL . '/%1$s?id=%2$s&amp;pdr=%3$s';
 		$googleTableId = str_replace('ga:', '', BackendAnalyticsModel::getTableId());
 		$googleDate = date('Ymd', $this->startTimestamp) . '-' . date('Ymd', $this->endTimestamp);
 
 		// parse links to google
 		$this->tpl->assign('googleTopExitPagesURL', sprintf($googleURL, 'exits', $googleTableId, $googleDate));
-		 *
-		 */
 	}
 
 	/**

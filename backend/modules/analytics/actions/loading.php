@@ -12,6 +12,7 @@
  *
  * @author Annelies Van Extergem <annelies.vanextergem@netlash.com>
  * @author Dieter Vanden Eynde <dieter.vandeneynde@netlash.com>
+ * @author Frederick Roegiers <frederick.roegiers@wijs.be>
  */
 class BackendAnalyticsLoading extends BackendAnalyticsBase
 {

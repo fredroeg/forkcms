@@ -10,7 +10,7 @@
 /**
  * This cronjob will fetch the requested data
  *
- * @author Annelies Van Extergem <annelies.vanextergem@netlash.com>
+ * @author Frederick Roegiers <frederick.roegiers@wijs.be>
  */
 class BackendAnalyticsCronjobGetInsertData extends BackendBaseCronjob
 {

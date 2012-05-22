@@ -35,7 +35,7 @@ class BackendAnalyticsAllPages extends BackendAnalyticsBase
 		$this->parseOverviewData();
 		$this->parseChartData();
 		$this->parsePages();
-/*
+
 		// init google url
 		$googleURL = BackendAnalyticsModel::GOOGLE_ANALYTICS_URL . '/%1$s?id=%2$s&amp;pdr=%3$s';
 		$googleTableId = str_replace('ga:', '', BackendAnalyticsModel::getTableId());
@@ -43,8 +43,6 @@ class BackendAnalyticsAllPages extends BackendAnalyticsBase
 
 		// parse links to google
 		$this->tpl->assign('googleTopContentURL', sprintf($googleURL, 'top_content', $googleTableId, $googleDate));
-		 *
-		 */
 	}
 
 	/**
