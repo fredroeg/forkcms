@@ -60,7 +60,7 @@ class BackendAnalyticsLoading extends BackendAnalyticsBase
 
 
 		// build url
-		$URL = SITE_URL . '/backend/cronjob.php?module=analytics&action=get_insert_data&id=1';
+		$URL = SITE_URL . '/backend/cronjob.php?module=analytics&action=get_data&id=1';
 		$URL .= '&start_date=' . $startTimestamp;
 		$URL .= '&end_date=' . $endTimestamp;
 		$URL .= '&page_path=' . $this->pagePath;

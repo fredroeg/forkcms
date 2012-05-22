@@ -1141,7 +1141,7 @@ class BackendAnalyticsHelper
 	 */
 	private static function renewAccessToken()
 	{
-		$APISettingsArray = BackendSeaModel::getAPISettings();
+		$APISettingsArray = BackendAnalyticsModel::getAPISettings();
 		if($APISettingsArray['refresh_token'] != '')
 		{
 			if(self::getOAuth2Token($APISettingsArray['refresh_token'], true))
