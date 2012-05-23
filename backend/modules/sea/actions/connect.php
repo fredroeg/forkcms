@@ -140,13 +140,16 @@ class BackendSeaConnect extends BackendBaseActionEdit
 		}
 		elseif(!isset($this->error))
 		{
-			$this->frm->addRadiobutton('profileId', $this->getProfileIds());
+			$profileIds = $this->getProfileIds();
+			if($profileIds[0]['value'] == '')
+			{
+				$this->frm->addRadiobutton('profileId', array(array('label' => 'INSERT ID\'S FIRST', 'value' => ' ')));
+			}
+			else
+			{
+				$this->frm->addRadiobutton('profileId', $profileIds);
+			}
 		}
-		else
-		{
-			$this->frm->addRadiobutton('profileId', array(array('label' => ' ', 'value' => ' ')));
-		}
-
 
 		// submit dialog
 		$this->frm->addButton('change', 'update', 'submit', 'inputButton button mainButton');
